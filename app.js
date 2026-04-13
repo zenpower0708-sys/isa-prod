@@ -118,6 +118,7 @@ const SKILL_MAP = {
             { level: 3, skills: ['Cutback', 'Top turn', 'Wave reading'] },
             { level: 2, skills: ['Aerial', 'Tube riding attempt', 'Advanced turns'] },
             { level: 1, skills: ['Full aerials', 'Scoring criteria', 'Judge & instructor (1~2 min / 3~5 min)'] }
+        ]
     }
 };
 
