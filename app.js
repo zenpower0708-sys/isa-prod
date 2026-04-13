@@ -270,7 +270,7 @@ function renderCertDetail(t, cd) {
     const steps = [
         { title: t.cert.step1, desc: t.cert.step1Desc, status: 'completed', icon: '✔' },
         { title: t.cert.step2, desc: t.cert.step2Desc, status: 'current', icon: '📝' },
-        { title: t.cert.step3, desc: t.cert.step3Desc, status: (selectedLevel >= 3) ? 'active-form' : 'locked', icon: '🎥' },
+        { title: t.cert.step3, desc: t.cert.step3Desc, status: (selectedLevel >= 1) ? 'active-form' : 'locked', icon: '🎥' },
         { title: t.cert.step4, desc: t.cert.step4Desc, status: 'locked', icon: '🏆' }
     ];
 
@@ -282,20 +282,61 @@ function renderCertDetail(t, cd) {
                 <p>${s.desc}</p>
                 ${s.status === 'active-form' ? `
                     <div class="practical-form" style="margin-top:10px; display:flex; flex-direction:column; gap:10px">
+
+                        ${(() => {
+                            // 종목별 기술 요구사항 데이터
+                            const skillReqMap = {
+                                'Standing/Flow Board': {
+                                    4: { skills: ['전/측/후방 입수 (택1)', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '' },
+                                    3: { skills: ['측면 점프/후방 입수 (택1)', '(남) 기술 3개↑', '(여) 기술 2개↑', '핸드플립 가산점', '콤보 가산점'], details: '* 지정 기술: 알리, 셔빗, 쓰리 셔빗, 원에이티, 본래스(패스트플랜트) 이상' },
+                                    2: { skills: ['후방 입수 (필수)', '(남) 기술 3개 (택3)', '(여) 기술 2개 (택2)', '핸드플립 가산점', '콤보 가산점'], details: '* 지정 기술: 알리, 쓰리셔빗, 능숙한 알리, 원에이티' },
+                                    1: { skills: ['(남) 지정 기술 3개↑', '(여) 지정 기술 3개↑', '핸드플립 가산점', '콤보 가산점'], details: '[기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>(남) 쓰리셔빗 이상, 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>(여) 팝셔빗, 쓰리셔빗, 원에이티, 킥플립 이상 기술 중 3개 이상' }
+                                },
+                                'Body/Boogie Board': {
+                                    4: { skills: ['전/측/후방 입수 (택1)', '원드롭니 균형 (10초↑)', '원드롭니 슬라럼 (좌우/상하 각 5회)', '원/투드롭니 360° 턴'], details: '' },
+                                    3: { skills: ['지정 기술 중 3개 포함', '콤보 가산점'], details: '* 지정 기술: 원/투드롭니 540° 스핀 이상, 바디 헬리콥터 이상(YoYo, Umbrella 등), 바디 롤 이상, 바디 로데오 이상' },
+                                    2: { skills: ['(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점'], details: '* 지정 기술: 360° 바디턴 이상, 360° 바디로데오 이상, 허브, 허브캡, 180° 셔빗 이상, 드롭니 롤 이상, 디테이 이상, 드롭니 로데오 이상' },
+                                    1: { skills: ['(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점'], details: '[기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 540° 바디턴 이상, 540° 바디로데오 이상, 디테이 이상(오버로드), 디테이 프론 이상, 드롭니 로데오 이상, 드롭니 로데오 프론 이상, 180° 셔빗 이상, 허브캡(멀티) 이상' }
+                                },
+                                'Wake Surfing': {
+                                    4: { skills: ['밸런스 탑승', '웨이크 파도 유지', '기본 자세'], details: '' },
+                                    3: { skills: ['웨이크 투 웨이크', '올리 시도', '스위치 탑승'], details: '' },
+                                    2: { skills: ['360° 스핀', '에어 시도', '래일 턴 완성'], details: '' },
+                                    1: { skills: ['에어 트릭 완성', '콤보 라이딩', '코칭 능력'], details: '[기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' }
+                                },
+                                'Wave Surfing': {
+                                    4: { skills: ['파도 탑승 기초', '트림 라이딩', '폼위에서 균형'], details: '' },
+                                    3: { skills: ['커팅백', '탑턴', '파도 읽기'], details: '' },
+                                    2: { skills: ['에어리얼', '튜브 라이딩 시도', '고난이도 턴'], details: '' },
+                                    1: { skills: ['에어리얼 완성', '채점 기준 이해', '심판·강사 자격'], details: '[기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' }
+                                }
+                            };
+                            const req = (skillReqMap[selectedDiscipline] || {})[selectedLevel];
+                            if (!req) return '';
+                            const skillTags = req.skills.map(sk => `<span style="font-size:11px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);border-radius:6px;padding:3px 10px;color:#7dd3fc;">${sk}</span>`).join('');
+                            return `
+                            <div style="background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.25);border-radius:8px;padding:14px;margin-bottom:4px;">
+                                <p style="color:#67e8f9;font-size:12px;font-weight:700;margin:0 0 10px;">📋 ${selectedLevel}급 기술 요구사항 <span style="font-weight:400;color:#94a3b8;">(공통 규정: 1분~2분 이내 원테이크, 입/퇴수 전후 5초 포함)</span></p>
+                                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:${req.details ? '10px' : '0'};">${skillTags}</div>
+                                ${req.details ? `<p style="font-size:11px;color:#64748b;line-height:1.6;margin:0;">${req.details}</p>` : ''}
+                            </div>`;
+                        })()}
+
                         ${selectedLevel === 1 ? `
-                            <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:12px;margin-bottom:8px;">
-                                <p style="color:#f87171;font-size:12px;margin:0;font-weight:700;line-height:1.5;">🚨 1급 필수 안내<br>1급은 심사 및 강사 자격 부여를 위해 본인의 기술 시연 영상과 실제 코칭 영상 총 2개가 필요합니다.</p>
+                            <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:12px;margin-bottom:4px;">
+                                <p style="color:#f87171;font-size:12px;margin:0;font-weight:700;line-height:1.6;">🚨 1급 필수 안내<br><span style="font-weight:400;">1급은 코칭 능력·심판·강사 자격 실기 평가를 위해 기술 시연 영상과 강습 영상 총 <strong>2개</strong>를 제출해야 합니다.</span></p>
                             </div>
-                            <label style="color:white;font-size:12px;margin-bottom:-4px;">📁 1. 기술 영상 업로드 (1분 30초 이내 원테이크)</label>
+                            <label style="color:white;font-size:12px;margin-bottom:-4px;">📹 1. 기술 영상 (1분~2분 이내 원테이크)</label>
                             <input type="text" id="youtube-url-tech" placeholder="기술 영상 YouTube 링크 입력" 
                                    style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:4px;color:white;font-size:13px;margin-top:4px;">
-                            <br>
-                            <label style="color:white;font-size:12px;margin-top:8px;margin-bottom:-4px;display:block;">📁 2. 강습 영상 업로드 (5분 이내 코칭 시범)</label>
-                            <input type="text" id="youtube-url-coach" placeholder="강습 영상 YouTube 링크 입력" 
-                                   style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:4px;color:white;font-size:13px;margin-top:4px;">
+                            <label style="color:#a78bfa;font-size:12px;margin-top:6px;margin-bottom:-4px;display:block;">📹 2. 강습 영상 (3분~5분 이내 · 코칭 능력/심판/강사 자격 실기 평가용)</label>
+                            <input type="text" id="youtube-url-coach" placeholder="강습 영상 YouTube 링크 입력 (3분~5분 이내)" 
+                                   style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid rgba(167,139,250,0.4);border-radius:4px;color:white;font-size:13px;margin-top:4px;">
+                            <p style="font-size:11px;color:#a78bfa;margin-top:-4px;">※ 강습 영상은 실제 코칭 장면이 포함된 3분~5분 이내 영상이어야 합니다.</p>
                         ` : `
+                            <label style="color:white;font-size:12px;margin-bottom:-4px;">📹 실기 평가 영상 (1분~2분 이내 원테이크)</label>
                             <input type="text" id="youtube-url" placeholder="YouTube 링크 (URL) 입력" 
-                                   style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:4px;color:white;font-size:13px">
+                                   style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:4px;color:white;font-size:13px;margin-top:4px;">
                         `}
                         <div style="border:1px solid var(--border);border-radius:6px;padding:12px;background:rgba(0,0,0,0.2);">
                             <p style="font-size:12px;color:#94a3b8;margin:0 0 8px;font-weight:700;">📸 본인 사진 첨부 <span style="color:#64748b;font-weight:400;">(자격증 발급용, 선택)</span></p>
@@ -475,7 +516,7 @@ function renderShopPage() {
     return `
     <section class="page-section page-enter" style="background:var(--bg-slate)">
         <div class="content-container glass-panel fade-in" style="text-align:center; padding:80px 20px; max-width:600px; margin: 40px auto; border: 1px solid rgba(6,182,212,0.3);">
-            <div style="font-size: 60px; margin-bottom: 20px;">🏄‍♂️</div>
+            <div style="font-size: 60px; margin-bottom: 20px;">🏄♂️</div>
             <h2 class="game-font " style="font-size:32px; color:white; margin-bottom:16px; letter-spacing:1px;">ISA Official Store</h2>
             <p style="color:var(--text-dim); font-size:16px; margin-bottom: 40px; line-height:1.8;">
                 ${currentLang === 'KO' ? 
@@ -845,13 +886,13 @@ function renderIntroPage() {
             { level: 4, skills: ['전/측/후방 입수 (택1)', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '' },
             { level: 3, skills: ['측면 점프/후방 입수 (택1)', '(남) 기술 3개↑', '(여) 기술 2개↑', '핸드플립 가산점', '콤보 가산점'], details: '* 지정 기술: 알리, 셔빗, 쓰리 셔빗, 원에이티, 본래스(패스트플랜트) 이상' },
             { level: 2, skills: ['후방 입수 (필수)', '(남) 기술 3개 (택3)', '(여) 기술 2개 (택2)', '핸드플립 가산점', '콤보 가산점'], details: '* 지정 기술: 알리, 쓰리셔빗, 능숙한 알리, 원에이티' },
-            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 3개↑', '(여) 지정 기술 3개↑', '강습 영상 (5분 이내)'], details: '[1. 기술 영상] 1분~1분 30초 원테이크 (입/퇴수 전후 5초 포함)<br>(남) 쓰리셔빗 이상, 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>(여) 팝셔빗, 쓰리셔빗, 원에이티, 킥플립 이상 기술 중 3개 이상<br><br>[2. 강습 영상] 5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 3개↑', '(여) 지정 기술 3개↑', '강습 영상 (3분~5분 이내)'], details: '[1. 기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>(남) 쓰리셔빗 이상, 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>(여) 팝셔빗, 쓰리셔빗, 원에이티, 킥플립 이상 기술 중 3개 이상<br><br>[2. 강습 영상] 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
         ],
         'Body/Boogie Board': [
             { level: 4, skills: ['전/측/후방 입수 (택1)', '원드롭니 균형 (10초↑)', '원드롭니 슬라럼 (좌우/상하 각 5회)', '원/투드롭니 360° 턴'], details: '' },
             { level: 3, skills: ['지정 기술 중 3개 포함', '콤보 가산점'], details: '* 지정 기술: 원/투드롭니 540° 스핀 이상, 바디 헬리콥터 이상(YoYo, Umbrella 등), 바디 롤 이상, 바디 로데오 이상' },
             { level: 2, skills: ['(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점'], details: '* 지정 기술: 360° 바디턴 이상, 360° 바디로데오 이상, 허브, 허브캡, 180° 셔빗 이상, 드롭니 롤 이상, 디테이 이상, 드롭니 로데오 이상' },
-            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점', '강습 영상 (5분 이내)'], details: '[1. 기술 영상] 1분~1분 30초 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 540° 바디턴 이상, 540° 바디로데오 이상, 디테이 이상(오버로드), 디테이 프론 이상, 드롭니 로데오 이상, 드롭니 로데오 프론 이상, 180° 셔빗 이상, 허브캡(멀티) 이상<br><br>[2. 강습 영상] 5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점', '강습 영상 (3분~5분 이내)'], details: '[1. 기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 540° 바디턴 이상, 540° 바디로데오 이상, 디테이 이상(오버로드), 디테이 프론 이상, 드롭니 로데오 이상, 드롭니 로데오 프론 이상, 180° 셔빗 이상, 허브캡(멀티) 이상<br><br>[2. 강습 영상] 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
         ],
         'Wake Surfing': [
             { level: 4, skills: ['밸런스 탑승', '웨이크 파도 유지', '기본 자세'], details: '' },
@@ -1062,7 +1103,7 @@ function renderIntroPage() {
                 <div style="margin-bottom:16px;padding:14px;background:rgba(${dIdx%2===0?'6,182,212':'168,85,247'},0.05);border:1px dashed rgba(255,255,255,0.15);border-radius:10px;">
                     <p style="font-size:12px;color:white;margin:0 0 6px;font-weight:700;">[공통 규정]</p>
                     <ul style="margin:0;padding-left:18px;font-size:12px;color:#94a3b8;line-height:1.6;">
-                        <li><strong>영상 촬영:</strong> 1분 ~ 1분 30초 원테이크 (입수 전 5초, 퇴수 후 5초 반드시 포함)</li>
+                        <li><strong>영상 촬영:</strong> 1분~2분 이내 원테이크 (입수 전 5초, 퇴수 후 5초 반드시 포함)</li>
                         <li><strong>합격 기준:</strong> 타인의 도움 없이 1회 주행 내에 기술 완성 시 합격</li>
                     </ul>
                 </div>
