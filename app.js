@@ -15,6 +15,9 @@ let currentPage = '';
 let isLoginMode = true; 
 let selectedDiscipline = 'Standing/Flow Board';
 let selectedLevel = null;
+let eduView = 'menu';
+let activeShopCategory = 'all'; // 장비 스토어 카테고리 상태 추가
+
 // ===== CONFIG =====
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNnUhGtxCc9hxaJDU71N0zO2Fv4R10j6Uxl9fAvLRoOeBezXqCI5zZZE_2l8w2caAyYg/exec';
 
@@ -124,15 +127,22 @@ const $$ = sel => document.querySelectorAll(sel);
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("[ISA] App Initializing...");
+    
+    // 기본 선택 상태 설정
     if (typeof DISCIPLINES !== 'undefined' && DISCIPLINES.length > 0) {
         selectedDiscipline = DISCIPLINES[0];
     }
+    
+    // 푸터 연도
     const yr = document.getElementById('footer-year');
     if (yr) yr.textContent = new Date().getFullYear();
 
-    window.addEventListener('hashchange', handleRoute);
+    // 초기 실행 순서 조정: 언어 UI 업데이트 후 라우팅
+    updateLangUI(); 
     handleRoute();
-    updateLangUI();
+    
+    window.addEventListener('hashchange', handleRoute);
     initAuth();
 });
 
@@ -540,22 +550,83 @@ function renderCertDetail(t, cd) {
 }
 
 // ===== SHOP PAGE (LINK TO ISA-SHOP) =====
+// ===== SHOP PAGE (Integrated Full Version) =====
 function renderShopPage() {
+    if (typeof LANG === 'undefined' || typeof SHOP_DATA === 'undefined') return '';
+    const t = LANG[currentLang].shop;
+
+    // 카테고리 탭 생성
+    const categoriesHTML = t.categories.map(cat => `
+        <button class="discipline-tab ${activeShopCategory === cat.id ? 'active' : ''}" 
+                style="padding: 10px 20px; font-size: 13px;"
+                onclick="setShopCategory('${cat.id}')">
+            ${cat.icon ? cat.icon + ' ' : ''}${cat.name}
+        </button>
+    `).join('');
+
+    // 상품 필터링
+    let filtered = SHOP_DATA;
+    if (activeShopCategory !== 'all') {
+        filtered = SHOP_DATA.filter(p => p.cat === activeShopCategory);
+    }
+
+    // 상품 카드 생성
+    const productsHTML = filtered.length === 0 
+        ? `<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-dark);">${t.empty}</div>`
+        : filtered.map((p, index) => {
+            const isPartner = ['coupang', 'olive'].includes(p.cat);
+            const tagText = p.tag ? p.tag[currentLang] : '';
+            const descText = p.desc[currentLang];
+            
+            const btnHTML = isPartner 
+                ? `<a href="${p.link}" target="_blank" class="hero-btn-primary" style="width:100%; justify-content:center; transform:none; margin-top:16px; font-size:13px; padding:10px;"><span>${t.btnPartner}</span></a>`
+                : `<button class="hero-btn-secondary" style="width:100%; justify-content:center; transform:none; margin-top:16px; font-size:13px; padding:10px;" onclick="alert('${currentLang === 'KO' ? '구매 시스템 준비 중입니다.' : 'Payment system coming soon.'}')"><span>${t.btnBuy}</span></button>`;
+
+            const tagHTML = tagText ? `<div style="position:absolute; top:12px; right:12px; padding:4px 8px; background:var(--cyan); color:black; font-size:10px; font-weight:900; border-radius:4px; z-index:2;">${tagText}</div>` : '';
+
+            return `
+            <div class="level-card glass-panel page-enter" style="padding:0; overflow:hidden; animation-delay: ${index * 0.05}s">
+                <div style="position:relative; aspect-ratio:4/3; background:url('${p.img}') center/cover no-repeat;">
+                    <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent);"></div>
+                    ${tagHTML}
+                </div>
+                <div style="padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                        <h3 style="font-size:16px; color:white;">${p.name}</h3>
+                        <span style="color:var(--cyan); font-weight:700;">★ ${p.rating}</span>
+                    </div>
+                    <p style="font-size:13px; color:var(--text-dark); line-height:1.5; height:40px; overflow:hidden;">${descText}</p>
+                    <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:18px; font-weight:900; color:white;">₩${p.price.toLocaleString()}</span>
+                    </div>
+                    ${btnHTML}
+                </div>
+            </div>`;
+        }).join('');
+
     return `
-    <section class="page-section page-enter" style="background:var(--bg-slate)">
-        <div class="content-container glass-panel fade-in" style="text-align:center; padding:80px 20px; max-width:600px; margin: 40px auto; border: 1px solid rgba(6,182,212,0.3);">
-            <div style="font-size: 60px; margin-bottom: 20px;">🏄‍♂️</div>
-            <h2 class="game-font " style="font-size:32px; color:white; margin-bottom:16px; letter-spacing:1px;">ISA Official Store</h2>
-            <p style="color:var(--text-dim); font-size:16px; margin-bottom: 40px; line-height:1.8;">
-                ${currentLang === 'KO' ? 
-                '국제인공서핑협회 장비스토어가 <b>새로운 프리미엄 플랫폼</b>으로 단장했습니다.<br>지금 접속하여 쿠팡 및 올리브영 제휴 혜택을 만나보세요!' : 
-                'The ISA equipment store has been revamped into a <b>new premium platform.</b><br>Visit now to explore exclusive partner benefits and gear!'}
-            </p>
-            <a href="/shop/" target="_blank" style="display:inline-block; padding: 16px 40px; background: var(--cyan); color: #000; font-weight: 800; border-radius: 999px; font-size: 18px; text-decoration: none; box-shadow: 0 0 20px rgba(6,182,212,0.4); border: 2px solid var(--cyan);">
-                ${currentLang === 'KO' ? '장비스토어 입장하기 →' : 'Enter Official Store →'}
-            </a>
+    <section class="page-section page-enter" style="background:var(--bg-dark)">
+        <div class="hero-bg" style="opacity: 0.3;"></div>
+        <div class="content-container" style="position:relative; z-index:1;">
+            <div style="text-align:center; margin-bottom:48px;">
+                <h2 class="section-title game-font">${currentLang === 'KO' ? '장비 스토어' : 'Equipment Store'}</h2>
+                <p class="section-subtitle">${t.heroDesc}</p>
+            </div>
+            
+            <div class="discipline-tabs" style="grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));">
+                ${categoriesHTML}
+            </div>
+
+            <div class="level-grid" style="margin-top:32px;">
+                ${productsHTML}
+            </div>
         </div>
     </section>`;
+}
+
+function setShopCategory(catId) {
+    activeShopCategory = catId;
+    renderPage('shop');
 }
 
 // ===== MAP & EDU & INTRO (CLAUDE STATIC FALLBACKS) =====
