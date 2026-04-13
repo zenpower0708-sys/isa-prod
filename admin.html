@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISA Portal Admin - 실기 평가 및 로그북 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.3);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans KR', sans-serif;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.05) 0%, transparent 50%);
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 24px 40px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-box {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--cyan), #2563eb);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 0 15px var(--cyan-glow);
+        }
+
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stat-label { font-size: 13px; color: var(--text-dim); font-weight: 700; }
+        .stat-value { font-size: 32px; font-weight: 900; font-family: 'Orbitron', sans-serif; color: var(--cyan); }
+
+        /* Tabs */
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0;
+        }
+
+        .admin-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .admin-tab.active {
+            color: var(--cyan);
+        }
+
+        .admin-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; width: 100%; height: 2px;
+            background: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan);
+        }
+
+        /* Table */
+        .table-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left;
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            font-weight: 800;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .badge-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-success { background: rgba(34, 197, 94, 0.1); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.3); }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 5px;
+            transition: all 0.2s;
+        }
+
+        .btn-approve { border-color: rgba(34, 197, 94, 0.5); color: var(--success); }
+        .btn-approve:hover { background: rgba(34, 197, 94, 0.1); }
+        .btn-reject { border-color: rgba(239, 68, 68, 0.5); color: var(--error); }
+        .btn-reject:hover { background: rgba(239, 68, 68, 0.1); }
+
+        .loading-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+            visibility: hidden; opacity: 0; transition: 0.3s;
+        }
+        .loading-overlay.active { visibility: visible; opacity: 1; }
+
+        .yt-link { color: var(--cyan); text-decoration: none; font-weight: 700; }
+        .yt-link:hover { text-decoration: underline; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <div class="logo-box">ISA</div>
+        <h1>ISA Portal Admin</h1>
+    </div>
+    <div style="display:flex; gap:10px">
+        <button class="action-btn" onclick="fetchData()">🔄 데이터 동기화</button>
+        <a href="index.html" class="action-btn" style="text-decoration:none">🏠 사이트 바로가기</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">📝 미승인 로그북</span>
+            <span class="stat-value" id="stat-pending-log">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">🏄 실기 평가 신청</span>
+            <span class="stat-value" id="stat-practical">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">👤 총 회원수</span>
+            <span class="stat-value" id="stat-total-users">0</span>
+        </div>
+    </div>
+
+    <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchTab('logbook')">로그북 승인 관리</button>
+        <button class="admin-tab" onclick="switchTab('practical')">실기 평가 관리</button>
+        <button class="admin-tab" onclick="switchTab('issuecert')" style="color:#d4af37">🏆 디지털 자격증 발급</button>
+    </div>
+
+    <div id="content-area">
+        <div class="table-wrap">
+            <table id="data-table">
+                <thead id="table-head"></thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="loading-overlay">
+    <div style="text-align:center">
+        <div style="font-size:32px; font-weight:900; font-family:'Orbitron'; color:var(--cyan); margin-bottom:10px">SYNCING...</div>
+        <div style="color:var(--text-dim)">데이터를 불러오는 중입니다</div>
+    </div>
+</div>
+
+<script>
+    // 현재 app.js에서 사용 중인 GOOGLE_SCRIPT_URL과 동일하게 설정 필요
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbyNnUhGtxCc9hxaJDU71N0zO2Fv4R10j6Uxl9fAvLRoOeBezXqCI5zZZE_2l8w2caAyYg/exec';
+    let currentTab = 'logbook';
+    let rawData = { logbook: [], practical: [], users: [] };
+
+    async function fetchData() {
+        showLoading(true);
+        try {
+            // 실제 GAS 연동 (예시)
+            // const res = await fetch(GAS_URL + '?action=getAdminData');
+            // const data = await res.json();
+            
+            // 시뮬레이션 데이터
+            rawData.logbook = [
+                { email: 'user1@example.com', date: '2026-04-10', place: '시흥 웨이브파크', hours: 2, status: '승인대기', rowIndex: 2 },
+                { email: 'user2@example.com', date: '2026-04-11', place: '인공서핑장A', hours: 1, status: '승인대기', rowIndex: 3 }
+            ];
+            rawData.practical = [
+                { email: 'user3@example.com', name: '김철수', discipline: 'Standing', level: 3, youtubeUrl: 'https://youtu.be/example', timestamp: '2026-04-10' }
+            ];
+            rawData.users = [{ email: 'u1@e.com' }, { email: 'u2@e.com' }, { email: 'u3@e.com' }];
+
+            updateStats();
+            renderTable();
+        } catch (e) {
+            console.error(e);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function updateStats() {
+        document.getElementById('stat-pending-log').textContent = rawData.logbook.filter(l => l.status === '승인대기').length;
+        document.getElementById('stat-practical').textContent = rawData.practical.length;
+        document.getElementById('stat-total-users').textContent = rawData.users.length;
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.admin-tab').forEach(t => {
+            if (tab === 'logbook') t.classList.toggle('active', t.textContent.includes('로그북'));
+            else if (tab === 'practical') t.classList.toggle('active', t.textContent.includes('실기'));
+            else if (tab === 'issuecert') t.classList.toggle('active', t.textContent.includes('자격증 발급'));
+        });
+        if (tab === 'issuecert') {
+            renderIssueCertForm();
+        } else {
+            renderTable();
+        }
+    }
+
+    function renderTable() {
+        const head = document.getElementById('table-head');
+        const body = document.getElementById('table-body');
+        
+        if (currentTab === 'logbook') {
+            head.innerHTML = `<tr><th>사용자</th><th>날짜</th><th>장소</th><th>시간</th><th>상태</th><th>관리</th></tr>`;
+            body.innerHTML = rawData.logbook.map((l, i) => `
+                <tr>
+                    <td>${l.email}</td>
+                    <td>${l.date}</td>
+                    <td>${l.place}</td>
+                    <td>${l.hours}h</td>
+                    <td><span class="badge badge-pending">${l.status}</span></td>
+                    <td>
+                        <button class="action-btn btn-approve" onclick="approveLog(${l.rowIndex}, '승인완료')">승인</button>
+                        <button class="action-btn btn-reject" onclick="approveLog(${l.rowIndex}, '반려')">반려</button>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            head.innerHTML = `<tr><th>신청자</th><th>종목/레벨</th><th>YouTube 링크</th><th>접수일시</th><th>상태</th></tr>`;
+            body.innerHTML = rawData.practical.map(p => `
+                <tr>
+                    <td>${p.name} (${p.email})</td>
+                    <td>${p.discipline} / Lv.${p.level}</td>
+                    <td><a href="${p.youtubeUrl}" target="_blank" class="yt-link">🎬 영상 보기</a></td>
+                    <td>${p.timestamp}</td>
+                    <td><span class="badge badge-success">접수됨</span></td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    async function approveLog(rowIndex, status) {
+        if (!confirm(`항목을 ${status} 처리하시겠습니까?`)) return;
+        
+        showLoading(true);
+        try {
+            await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: 'approveLogbook', rowIndex, status })
+            });
+            alert(`성공적으로 ${status} 처리되었습니다.`);
+            fetchData(); 
+        } catch (e) {
+            alert('처리 중 오류가 발생했습니다.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ==========================================
+    // 디지털 자격증 발급 폼
+    // ==========================================
+    const DISCIPLINES = ['Standing/Flow Board', 'Body/Boogie Board', 'Wake Surfing', 'Wave Surfing'];
+
+    function renderIssueCertForm() {
+        const area = document.getElementById('content-area');
+        area.innerHTML = `
+        <div class="table-wrap" style="padding:32px; animation: fadeIn 0.4s ease-out;">
+            <div style="margin-bottom:28px;">
+                <h2 style="color:var(--cyan); font-family:'Orbitron',sans-serif; font-size:18px; margin-bottom:8px;">🏆 디지털 자격증 발급</h2>
+                <p style="color:var(--text-dim); font-size:13px;">합격자 정보를 입력하면 PDF 자격증이 자동 생성되어 이메일로 발송됩니다.</p>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+                <div>
+                    <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:6px; font-weight:700;">성명 (이름) *</label>
+                    <input id="ci-name" type="text" placeholder="홍길동" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; color:white; font-size:14px;">
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:6px; font-weight:700;">이메일 *</label>
+                    <input id="ci-email" type="email" placeholder="example@email.com" style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; color:white; font-size:14px;">
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:6px; font-weight:700;">등급 *</label>
+                    <select id="ci-level" style="width:100%; padding:12px; background:#1e293b; border:1px solid var(--border); border-radius:8px; color:white; font-size:14px;">
+                        <option value="4">4급 (Beginner)</option>
+                        <option value="3">3급 (Intermediate)</option>
+                        <option value="2">2급 (Advanced)</option>
+                        <option value="1">1급 (Professional)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:6px; font-weight:700;">종목 *</label>
+                    <select id="ci-discipline" style="width:100%; padding:12px; background:#1e293b; border:1px solid var(--border); border-radius:8px; color:white; font-size:14px;">
+                        ${DISCIPLINES.map(d => `<option value="${d}">${d}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom:24px;">
+                <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:6px; font-weight:700;">증명사진 URL <span style="color:#475569; font-weight:400;">(선택 - Google Drive 공개 링크)</span></label>
+                <input id="ci-photo" type="text" placeholder="https://lh3.googleusercontent.com/d/..." style="width:100%; padding:12px; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; color:white; font-size:14px;">
+            </div>
+
+            <div style="background:rgba(212,175,55,0.07); border:1px solid rgba(212,175,55,0.25); border-radius:10px; padding:16px; margin-bottom:24px;">
+                <p style="font-size:13px; color:#d4af37; font-weight:700; margin:0 0 8px;">📋 발급 시 자동 처리 항목</p>
+                <ul style="font-size:12px; color:#94a3b8; margin:0; padding-left:16px; line-height:2.2;">
+                    <li>자격증 번호 자동 생성 (ISA-YYYY-XXXXXX)</li>
+                    <li>PDF 자격증 자동 생성 (QR코드 포함)</li>
+                    <li>Google Drive 자동 저장</li>
+                    <li>합격자 이메일로 자동 발송 📧</li>
+                    <li>Google Sheets 자격증 시트 자동 기록</li>
+                </ul>
+            </div>
+
+            <div id="ci-result" style="margin-bottom:16px;"></div>
+
+            <button onclick="issueCertificate()" style="width:100%; padding:16px; background:linear-gradient(135deg,#d4af37,#f59e0b); border:none; border-radius:10px; color:#0f172a; font-weight:900; font-size:16px; cursor:pointer; transition:opacity 0.2s; font-family:'Orbitron',sans-serif; letter-spacing:1px;"
+                onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                🏆 디지털 자격증 발급하기
+            </button>
+        </div>`;
+    }
+
+    async function issueCertificate() {
+        const name = document.getElementById('ci-name').value.trim();
+        const email = document.getElementById('ci-email').value.trim();
+        const level = document.getElementById('ci-level').value;
+        const discipline = document.getElementById('ci-discipline').value;
+        const photoUrl = document.getElementById('ci-photo').value.trim();
+        const resultEl = document.getElementById('ci-result');
+
+        if (!name || !email) {
+            resultEl.innerHTML = '<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px;color:#ef4444;font-size:13px;">❌ 성명과 이메일은 필수 입력 항목입니다.</div>';
+            return;
+        }
+        if (!email.includes('@')) {
+            resultEl.innerHTML = '<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px;color:#ef4444;font-size:13px;">❌ 올바른 이메일 형식을 입력해주세요.</div>';
+            return;
+        }
+        if (!confirm(`[${name}] 님에게 ${level}급 ${discipline} 자격증을 발급하시겠습니까?\n\n이메일(${email})로 자격증 PDF가 자동 발송됩니다.`)) return;
+
+        resultEl.innerHTML = '<div style="text-align:center;padding:20px;color:#06b6d4;font-size:13px;">⏳ 자격증 생성 중... PDF 생성 및 이메일 발송에 약 10~30초가 소요됩니다.</div>';
+
+        showLoading(true);
+        try {
+            const res = await fetch(GAS_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({
+                    action: 'issueCertificate',
+                    name, email, level, discipline, photoUrl
+                })
+            });
+            const json = await res.json();
+
+            if (json.status === 'success') {
+                resultEl.innerHTML = `
+                <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:20px;">
+                    <p style="color:#22c55e; font-weight:700; font-size:15px; margin:0 0 12px;">✅ 자격증 발급 완료!</p>
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <tr><td style="color:#64748b;padding:4px 0;width:100px;">자격증 번호</td><td style="color:white;font-family:monospace;font-weight:700;">${json.certNumber}</td></tr>
+                        <tr><td style="color:#64748b;padding:4px 0;">수신자</td><td style="color:white;">${email}</td></tr>
+                        <tr><td style="color:#64748b;padding:4px 0;">등급/종목</td><td style="color:#d4af37;font-weight:700;">${level}급 / ${discipline}</td></tr>
+                    </table>
+                    <div style="margin-top:12px;padding:10px;background:rgba(6,182,212,0.08);border-radius:6px;">
+                        <p style="font-size:12px;color:#94a3b8;margin:0;">📧 합격자 이메일로 PDF 자격증이 발송되었습니다.</p>
+                    </div>
+                    ${json.driveUrl ? `<a href="${json.driveUrl}" target="_blank" style="display:inline-block;margin-top:12px;padding:8px 18px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.4);border-radius:6px;color:var(--cyan);font-size:12px;text-decoration:none;">📥 PDF 다운로드 확인</a>` : ''}
+                </div>`;
+                // 입력 초기화
+                document.getElementById('ci-name').value = '';
+                document.getElementById('ci-email').value = '';
+                document.getElementById('ci-photo').value = '';
+            } else {
+                resultEl.innerHTML = `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px;color:#ef4444;font-size:13px;">❌ 발급 실패: ${json.message || '알 수 없는 오류'}</div>`;
+            }
+        } catch (e) {
+            resultEl.innerHTML = `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px;color:#ef4444;font-size:13px;">❌ 서버 연결 오류: ${e.message}<br><small style="color:#64748b;">GAS 배포 URL을 확인해주세요.</small></div>`;
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('active', show);
+    }
+
+    window.onload = fetchData;
+</script>
+
+</body>
+</html>

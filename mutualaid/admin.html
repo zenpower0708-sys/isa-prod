@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISA 공제회 관리자 대시보드</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0a0f1a;--bg2:#111827;--glass:rgba(255,255,255,0.03);--cyan:#22d3ee;--red:#f87171;--green:#4ade80;--amber:#fbbf24;--purple:#c084fc;--text:#f1f5f9;--text2:#94a3b8;--muted:#64748b;--border:rgba(255,255,255,0.08);--radius:14px;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Noto Sans KR','Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    .header{position:sticky;top:0;z-index:50;background:rgba(10,15,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;}
+    .header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:68px;flex-wrap:wrap;gap:10px;}
+    .logo{display:flex;align-items:center;gap:12px;}
+    .logo-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#2563eb);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#fff;}
+    .logo h1{font-size:16px;font-weight:800;}.logo p{font-size:10px;color:var(--amber);font-weight:700;letter-spacing:2px;margin-top:1px;}
+    .header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .hbtn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+    .hbtn:hover{background:rgba(255,255,255,0.1);color:var(--text);}
+    .hbtn.primary{background:rgba(6,182,212,0.15);border-color:rgba(6,182,212,0.3);color:var(--cyan);}
+    .gs-status{font-size:10px;padding:4px 10px;border-radius:20px;font-weight:700;}
+    .gs-on{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.3);}
+    .gs-off{background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.3);}
+
+    .container{max-width:1400px;margin:0 auto;padding:24px 20px 80px;}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px;}
+    @media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr);}}
+    .stat-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+    .stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px;}
+    .stat-value{font-size:32px;font-weight:900;margin-bottom:4px;}
+    .stat-sub{font-size:11px;color:var(--muted);}
+    .s-cyan .stat-value{color:var(--cyan);}.s-amber .stat-value{color:var(--amber);}
+    .s-green .stat-value{color:var(--green);}.s-purple .stat-value{color:var(--purple);}
+
+    .tabs{display:flex;gap:4px;margin-bottom:24px;background:rgba(255,255,255,0.03);padding:4px;border-radius:10px;border:1px solid var(--border);}
+    .tab{flex:1;padding:12px;border-radius:8px;text-align:center;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;border:none;background:none;font-family:inherit;}
+    .tab:hover{color:var(--text2);}.tab.active{background:rgba(6,182,212,0.12);color:var(--cyan);}
+
+    .table-wrap{background:var(--glass);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px;}
+    .table-title{font-size:16px;font-weight:700;}
+    .search-input{padding:8px 14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);font-size:13px;font-family:inherit;outline:none;width:220px;transition:all .2s;}
+    .search-input:focus{border-color:rgba(6,182,212,0.5);}
+    .search-input::placeholder{color:var(--muted);}
+    
+    table{width:100%;border-collapse:collapse;}
+    thead th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);}
+    tbody td{padding:14px 16px;font-size:13px;color:var(--text2);border-bottom:1px solid rgba(255,255,255,0.03);}
+    tbody tr:hover{background:rgba(6,182,212,0.03);}
+    .td-name{color:var(--text);font-weight:600;}
+    .td-cert{font-family:'Inter',monospace;font-size:11px;color:var(--cyan);letter-spacing:0.5px;}
+    .td-plan{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+    .plan-day{background:rgba(6,182,212,0.12);color:var(--cyan);}
+    .plan-week{background:rgba(239,68,68,0.12);color:var(--red);}
+    .plan-month{background:rgba(168,85,247,0.12);color:var(--purple);}
+
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+    .b-접수완료{background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.2);}
+    .b-심사중{background:rgba(6,182,212,0.12);color:var(--cyan);border:1px solid rgba(6,182,212,0.2);}
+    .b-승인{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.2);}
+    .b-지급완료{background:rgba(34,197,94,0.2);color:#86efac;border:1px solid rgba(34,197,94,0.3);}
+    .b-거절{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.2);}
+
+    .abtn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--text2);font-family:inherit;transition:all .2s;margin-right:3px;}
+    .abtn:hover{background:rgba(255,255,255,0.1);}.abtn.g{border-color:rgba(34,197,94,0.3);color:var(--green);}
+    .abtn.r{border-color:rgba(239,68,68,0.3);color:var(--red);}.abtn.c{border-color:rgba(6,182,212,0.3);color:var(--cyan);}
+    
+    .empty{text-align:center;padding:60px 20px;color:var(--muted);}
+    .empty .icon{font-size:48px;margin-bottom:12px;}
+
+    .modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;}
+    .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;}
+    .modal h3{font-size:20px;font-weight:800;margin-bottom:20px;}
+    .modal-row{display:flex;justify-content:space-between;padding:10px 0;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.05);}
+    .modal-row .k{color:var(--muted);}.modal-row .v{color:var(--text);font-weight:500;text-align:right;max-width:60%;word-break:break-all;}
+    .modal-close{margin-top:20px;width:100%;padding:14px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+    .loading{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+    .spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
+  </style>
+</head>
+<body>
+  <div id="app"><div class="loading"><div class="spinner"></div><p style="color:#94a3b8;">데이터 로딩 중...</p></div></div>
+  <script src="config.js"></script>
+  <script>
+(function(){
+'use strict';
+
+let tab='members', search='', modal=null, mtype=null;
+let members=[], claims=[], isLoading=true;
+
+const PLAN_KR={day:'일간',week:'주간',month:'월간'};
+const PLAN_NAMES={day:'One Day Pass',week:'Weekly Guard',month:'Monthly Pro'};
+const url=()=>(typeof CONFIG!=='undefined'&&CONFIG.GOOGLE_SCRIPT_URL)||'';
+const gsEnabled=()=>(typeof CONFIG!=='undefined'&&CONFIG.USE_GOOGLE_SHEETS&&CONFIG.GOOGLE_SCRIPT_URL);
+
+async function loadData(){
+  isLoading=true;
+  if(gsEnabled()){
+    try{
+      const [mRes,cRes]=await Promise.all([
+        fetch(url()+'?action=getMembers').then(r=>r.json()),
+        fetch(url()+'?action=getClaims').then(r=>r.json())
+      ]);
+      members=mRes.data||[];
+      claims=cRes.data||[];
+    }catch(e){
+      console.error('Google Sheets 로드 실패, 로컬 데이터 사용:', e);
+      members=JSON.parse(localStorage.getItem('isa_mutualaid_history')||'[]');
+      claims=JSON.parse(localStorage.getItem('isa_claim_history')||'[]');
+    }
+  } else {
+    members=JSON.parse(localStorage.getItem('isa_mutualaid_history')||'[]');
+    claims=JSON.parse(localStorage.getItem('isa_claim_history')||'[]');
+  }
+  isLoading=false;
+  render();
+}
+
+function render(){
+  if(isLoading){document.getElementById('app').innerHTML='<div class="loading"><div class="spinner"></div><p style="color:#94a3b8;">데이터 로딩 중...</p></div>';return;}
+  const rev=members.reduce((s,m)=>s+(Number(m.amount)||0),0);
+  const appr=claims.filter(c=>c.status==='승인'||c.status==='지급완료').length;
+  const gsOn=gsEnabled();
+
+  document.getElementById('app').innerHTML=`
+    <header class="header"><div class="header-inner">
+      <div class="logo"><div class="logo-icon">ISA</div><div><h1>공제회 관리자</h1><p>ADMIN DASHBOARD</p></div></div>
+      <div class="header-actions">
+        <span class="gs-status ${gsOn?'gs-on':'gs-off'}">${gsOn?'● 구글시트 연동':'● 로컬 저장'}</span>
+        <button class="hbtn" onclick="exportCSV('members')">📥 가입자 CSV</button>
+        <button class="hbtn" onclick="exportCSV('claims')">📥 청구 CSV</button>
+        <button class="hbtn" onclick="loadData()">🔄 새로고침</button>
+        <a href="index.html" class="hbtn primary">← 공제회</a>
+      </div>
+    </div></header>
+    <div class="container">
+      <div class="stats">
+        <div class="stat-card s-cyan"><div class="stat-label">🛡️ 총 가입자</div><div class="stat-value">${members.length}</div><div class="stat-sub">명</div></div>
+        <div class="stat-card s-amber"><div class="stat-label">📋 청구 건수</div><div class="stat-value">${claims.length}</div><div class="stat-sub">건</div></div>
+        <div class="stat-card s-green"><div class="stat-label">✅ 승인/지급</div><div class="stat-value">${appr}</div><div class="stat-sub">건</div></div>
+        <div class="stat-card s-purple"><div class="stat-label">💰 총 수입</div><div class="stat-value">₩${rev.toLocaleString()}</div><div class="stat-sub">공제회비</div></div>
+      </div>
+      <div class="tabs">
+        <button class="tab ${tab==='members'?'active':''}" onclick="switchTab('members')">🛡️ 가입자 (${members.length})</button>
+        <button class="tab ${tab==='claims'?'active':''}" onclick="switchTab('claims')">📋 청구 (${claims.length})</button>
+      </div>
+      ${tab==='members'?renderMembers():renderClaims()}
+    </div>
+    ${modal?renderModal():''}`;
+}
+
+function renderMembers(){
+  const f=search?members.filter(m=>(m.name||'').includes(search)||(m.phone||'').includes(search)||(m.certNumber||'').includes(search)):members;
+  if(!f.length) return '<div class="table-wrap"><div class="empty"><div class="icon">📭</div><h3>가입자가 없습니다</h3></div></div>';
+  return `<div class="table-wrap">
+    <div class="table-header"><div class="table-title">🛡️ 가입자 목록</div>
+      <input type="text" class="search-input" placeholder="검색 (이름/연락처/증권번호)" value="${search}" oninput="doSearch(this.value)"></div>
+    <div style="overflow-x:auto;"><table><thead><tr><th>No.</th><th>이름</th><th>연락처</th><th>플랜</th><th>증권번호</th><th>가입일</th><th>회비</th><th></th></tr></thead>
+    <tbody>${f.map((m,i)=>{
+      const dt=m.timestamp?new Date(m.timestamp).toLocaleDateString('ko-KR'):(typeof m.timestamp==='string'?m.timestamp:'-');
+      const pc=m.plan==='day'?'plan-day':m.plan==='week'?'plan-week':'plan-month';
+      return `<tr><td>${f.length-i}</td><td class="td-name">${m.name||'-'}</td><td>${m.phone||'-'}</td>
+        <td><span class="td-plan ${pc}">${PLAN_KR[m.plan]||m.plan}</span></td>
+        <td class="td-cert">${m.certNumber||'-'}</td><td>${dt}</td>
+        <td style="font-weight:700;">₩${(Number(m.amount)||0).toLocaleString()}</td>
+        <td><button class="abtn" onclick="showDetail('m',${i})">상세</button></td></tr>`;
+    }).join('')}</tbody></table></div></div>`;
+}
+
+function renderClaims(){
+  const f=search?claims.filter(c=>(c.name||'').includes(search)||(c.claimNumber||'').includes(search)):claims;
+  if(!f.length) return '<div class="table-wrap"><div class="empty"><div class="icon">📭</div><h3>청구 내역이 없습니다</h3></div></div>';
+  return `<div class="table-wrap">
+    <div class="table-header"><div class="table-title">📋 청구 목록</div>
+      <input type="text" class="search-input" placeholder="검색 (이름/접수번호)" value="${search}" oninput="doSearch(this.value)"></div>
+    <div style="overflow-x:auto;"><table><thead><tr><th>No.</th><th>청구자</th><th>접수번호</th><th>사고일</th><th>부상부위</th><th>청구금액</th><th>상태</th><th>관리</th></tr></thead>
+    <tbody>${f.map((c,i)=>{
+      const st=c.status||'접수완료';
+      return `<tr><td>${f.length-i}</td><td class="td-name">${c.name||'-'}</td>
+        <td class="td-cert">${c.claimNumber||'-'}</td><td>${c.accidentDate||'-'}</td>
+        <td>${c.injuryPart||'-'}</td><td style="font-weight:700;">₩${Number(c.selfPay||0).toLocaleString()}</td>
+        <td><span class="badge b-${st}">${st}</span></td>
+        <td>
+          <button class="abtn" onclick="showDetail('c',${i})">상세</button>
+          ${st==='접수완료'?'<button class="abtn g" onclick="updateSt('+i+',\'심사중\')">심사</button>':''}
+          ${st==='심사중'?'<button class="abtn g" onclick="updateSt('+i+',\'승인\')">승인</button><button class="abtn r" onclick="updateSt('+i+',\'거절\')">거절</button>':''}
+          ${st==='승인'?'<button class="abtn c" onclick="updateSt('+i+',\'지급완료\')">지급</button>':''}
+        </td></tr>`;
+    }).join('')}</tbody></table></div></div>`;
+}
+
+function renderModal(){
+  const labels={certNumber:'증권번호',claimNumber:'접수번호',name:'이름',phone:'연락처',birth:'생년월일',gender:'성별',email:'이메일',plan:'플랜',amount:'회비',timestamp:'가입일시',submittedAt:'접수일시',accidentDate:'사고일',accidentLocation:'사고장소',accidentDesc:'사고경위',injuryPart:'부상부위',hospitalName:'병원명',treatmentDate:'치료일',treatmentDesc:'치료내용',totalMedical:'총진료비',selfPay:'본인부담금',status:'상태',updatedAt:'업데이트'};
+  return `<div class="modal-overlay" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()">
+    <h3>${mtype==='m'?'🛡️ 가입자 상세':'📋 청구 상세'}</h3>
+    ${Object.entries(modal).map(([k,v])=>{
+      if(k==='amount'||k==='selfPay'||k==='totalMedical')v='₩'+Number(v||0).toLocaleString();
+      if(k==='gender')v=v==='M'||v==='남성'?'남성':'여성';
+      if(k==='plan')v=(PLAN_NAMES[v]||v);
+      return `<div class="modal-row"><span class="k">${labels[k]||k}</span><span class="v">${v||'-'}</span></div>`;
+    }).join('')}
+    <button class="modal-close" onclick="closeModal()">닫기</button>
+  </div></div>`;
+}
+
+window.switchTab=t=>{tab=t;search='';render();};
+window.doSearch=q=>{search=q;render();};
+window.showDetail=(t,i)=>{mtype=t;modal=t==='m'?members[i]:claims[i];render();};
+window.closeModal=()=>{modal=null;render();};
+
+window.updateSt=async function(idx,status){
+  const c=claims[idx]; if(!c) return;
+  c.status=status; c.updatedAt=new Date().toISOString();
+
+  // 로컬 저장
+  localStorage.setItem('isa_claim_history',JSON.stringify(claims));
+
+  // 구글 시트 업데이트
+  if(gsEnabled()&&c.claimNumber){
+    try{
+      await fetch(url(),{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'updateClaimStatus',claimNumber:c.claimNumber,status:status})});
+    }catch(e){console.error('상태 업데이트 실패:',e);}
+  }
+  render();
+};
+
+window.exportCSV=function(type){
+  let hdr,rows,fn;
+  if(type==='members'){
+    fn='isa_members.csv';hdr=['증권번호','이름','연락처','생년월일','성별','플랜','회비','가입일시'];
+    rows=members.map(m=>[m.certNumber,m.name,m.phone,m.birth,m.gender,PLAN_NAMES[m.plan]||m.plan,m.amount||0,m.timestamp||'']);
+  }else{
+    fn='isa_claims.csv';hdr=['접수번호','증권번호','청구자','사고일','사고장소','부상부위','청구금액','상태','접수일시'];
+    rows=claims.map(c=>[c.claimNumber,c.certNumber,c.name,c.accidentDate,c.accidentLocation,c.injuryPart,c.selfPay||0,c.status||'접수완료',c.submittedAt||'']);
+  }
+  let csv='\uFEFF'+hdr.join(',')+'\n';
+  rows.forEach(r=>{csv+=r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')+'\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download=fn;a.click();
+};
+
+loadData();
+})();
+  </script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+import re
+
+with open('google-apps-script-auth.js', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+new_content = """function getCertTemplate(certData) {
+  var qrUrl = 'https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=' +
+    encodeURIComponent('https://isa-web-portal.vercel.app/#/verify?id=' + certData.certNumber) +
+    '&choe=UTF-8';
+  
+  var levelLabel = {
+    '1': '1급 (Professional)', '2': '2급 (Advanced)',
+    '3': '3급 (Intermediate)', '4': '4급 (Beginner)'
+  }[String(certData.level)] || certData.level + '급';
+
+  var activeTier = 'diamond';
+  if (String(certData.level) === '1') activeTier = 'diamond';
+  else if (String(certData.level) === '2') activeTier = 'gold';
+  else if (String(certData.level) === '3') activeTier = 'silver';
+  else if (String(certData.level) === '4') activeTier = 'bronze';
+  
+  var photoHtml = certData.photoUrl
+    ? '<img src="' + certData.photoUrl + '" style="width:100%;height:100%;object-fit:cover;" />'
+    : '<span class="photo-label">사진 없음</span>';
+  
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISA 합격 자격증</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #060a12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .cert-wrap {
+    width: 100%;
+    min-height: 580px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .cert-card {
+    width: 100%;
+    max-width: 820px;
+    background: linear-gradient(135deg, #0d1b2e 0%, #0a1520 50%, #0f1e30 100%);
+    border-radius: 16px;
+    border: 1.5px solid #b8922a;
+    position: relative;
+    overflow: hidden;
+    padding: 32px;
+    box-shadow: 0 0 60px rgba(184,146,42,0.15), inset 0 0 80px rgba(0,30,60,0.5);
+    transition: transform 0.6s ease;
+  }
+
+  .corner-tl, .corner-tr, .corner-bl, .corner-br {
+    position: absolute; width: 40px; height: 40px;
+    border-color: #d4a83a; border-style: solid;
+  }
+  .corner-tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+  .wave-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; opacity: 0.18; }
+
+  .hologram-strip {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(100,200,255,0.015) 3px, rgba(100,200,255,0.015) 6px);
+    pointer-events: none;
+  }
+
+  .glow-orb {
+    position: absolute; width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(52,120,220,0.12) 0%, transparent 70%);
+    top: -80px; right: -60px; pointer-events: none;
+  }
+  .glow-orb2 {
+    position: absolute; width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,146,42,0.1) 0%, transparent 70%);
+    bottom: -60px; left: 20px; pointer-events: none;
+  }
+
+  .cert-body {
+    position: relative; z-index: 2;
+    display: grid; grid-template-columns: 200px 1fr; gap: 32px;
+  }
+
+  .left-panel { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+  .logo-inner {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #4a6fa5, #1a2d52 50%, #0a1020);
+    border: 2px solid #b8922a;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6), 0 0 30px rgba(184,146,42,0.2), inset 0 2px 4px rgba(255,255,255,0.1);
+  }
+
+  .logo-text-inner { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .logo-isa {
+    font-size: 22px; font-weight: 900; color: #d4a83a; letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(212,168,58,0.8), 0 0 20px rgba(212,168,58,0.4);
+  }
+
+  .org-name .en {
+    font-size: 9px; color: #4a7ab5; letter-spacing: 1.5px;
+    text-transform: uppercase; line-height: 1.4; text-align: center;
+  }
+  .org-name .kr { font-size: 13px; color: #c8a84e; font-weight: 700; margin-top: 4px; text-align: center; }
+
+  .photo-box {
+    width: 140px; height: 170px; border: 1.5px solid #b8922a; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.03); position: relative; overflow: hidden;
+  }
+  .photo-box::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(184,146,42,0.04) 4px, rgba(184,146,42,0.04) 8px);
+  }
+  .photo-label { font-size: 11px; color: #4a6080; letter-spacing: 1px; position: relative; z-index: 1; }
+  .issue-date-label {
+    font-size: 12px; color: #d4a83a; font-weight: 700; letter-spacing: 1px;
+    background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 4px;
+    border: 0.5px solid rgba(184,146,42,0.3); text-align: center; width: 100%;
+  }
+
+  .right-panel { display: flex; flex-direction: column; gap: 14px; }
+
+  .cert-header { border-bottom: 0.5px solid rgba(184,146,42,0.4); padding-bottom: 12px; }
+  .official-label { font-size: 10px; color: #4a7ab5; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+  .cert-title-kr {
+    font-size: 32px; font-weight: 900; color: #ffffff; line-height: 1;
+    text-shadow: 0 0 20px rgba(255,255,255,0.15); letter-spacing: -1px;
+  }
+  .cert-title-en { font-size: 12px; color: #4a7ab5; margin-top: 4px; letter-spacing: 1px; }
+
+  .field-label { font-size: 10px; color: #4a6080; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+
+  .name-value {
+    font-size: 38px; font-weight: 900; color: #ffffff; letter-spacing: -1px; line-height: 1;
+    text-shadow: 0 0 30px rgba(255,255,255,0.2);
+  }
+  .name-underline {
+    height: 2px; width: 100%;
+    background: linear-gradient(90deg, #d4a83a, transparent);
+    margin-top: 6px;
+  }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .info-box {
+    background: rgba(255,255,255,0.04); border: 0.5px solid rgba(184,146,42,0.25);
+    border-radius: 8px; padding: 12px 16px; position: relative; overflow: hidden;
+  }
+  .info-box::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(184,146,42,0.4), transparent);
+  }
+  .info-value { font-size: 16px; font-weight: 700; }
+  .info-value.gold { color: #d4a83a; }
+  .info-value.white { color: #ffffff; }
+
+  /* TIER SECTION */
+  .tier-section {
+    background: rgba(255,255,255,0.03); border: 0.5px solid rgba(184,146,42,0.2);
+    border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden;
+  }
+  .tier-section::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(184,146,42,0.4), transparent);
+  }
+
+  .tier-label { font-size: 10px; color: #4a6080; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+
+  .tier-track { display: flex; align-items: center; gap: 0; position: relative; padding: 0 4px; }
+
+  .tier-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    position: relative;
+  }
+
+  .tier-connector { flex: 0 0 24px; height: 2px; position: relative; top: -10px; }
+
+  .tier-badge {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; transition: transform 0.3s ease;
+  }
+  .tier-badge svg { width: 28px; height: 28px; }
+
+  .tier-name { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+  .tier-bronze .tier-badge {
+    background: radial-gradient(circle at 35% 30%, #c4784a, #7a3d1e);
+    border: 1.5px solid #c4784a; box-shadow: 0 2px 10px rgba(196,120,74,0.3);
+  }
+  .tier-bronze .tier-name { color: #c4784a; }
+  .tier-connector.bronze { background: linear-gradient(90deg, #7a3d1e, #8a8a8a); }
+
+  .tier-silver .tier-badge {
+    background: radial-gradient(circle at 35% 30%, #d0d0d0, #888);
+    border: 1.5px solid #c0c0c0; box-shadow: 0 2px 10px rgba(192,192,192,0.3);
+  }
+  .tier-silver .tier-name { color: #c0c0c0; }
+  .tier-connector.silver { background: linear-gradient(90deg, #888, #c8a820); }
+
+  .tier-gold .tier-badge {
+    background: radial-gradient(circle at 35% 30%, #f5d060, #b8820a);
+    border: 1.5px solid #d4a83a; box-shadow: 0 2px 14px rgba(212,168,58,0.5);
+  }
+  .tier-gold .tier-name { color: #d4a83a; }
+  .tier-connector.gold { background: linear-gradient(90deg, #c8a820, #5ab8e8); }
+
+  .tier-diamond .tier-badge {
+    background: radial-gradient(circle at 35% 30%, #a8e4ff, #2a7ab0);
+    border: 1.5px solid #7dd4f8; box-shadow: 0 2px 16px rgba(100,210,255,0.5);
+  }
+  .tier-diamond .tier-name { color: #7dd4f8; }
+
+  .tier-item.active .tier-badge::after {
+    content: ''; position: absolute; inset: -4px; border-radius: 50%;
+    border: 2px solid currentColor;
+  }
+  .tier-bronze.active .tier-badge::after { border-color: #c4784a; }
+  .tier-silver.active .tier-badge::after { border-color: #c0c0c0; }
+  .tier-gold.active .tier-badge::after { border-color: #d4a83a; }
+  .tier-diamond.active .tier-badge::after { border-color: #7dd4f8; }
+
+  .cert-num-wrapper { display: flex; align-items: center; justify-content: space-between; }
+  .cert-num { display: flex; align-items: center; gap: 8px; }
+  .cert-num-label { font-size: 10px; color: #4a6080; letter-spacing: 1.5px; }
+  .cert-num-value { font-size: 13px; color: #5a90c8; font-weight: 700; letter-spacing: 1px; font-family: monospace; }
+  
+  .qr-code img { width: 60px; height: 60px; border-radius: 4px; border: 1px solid rgba(184,146,42,0.4); }
+
+  .watermark-3d {
+    position: absolute; bottom: 30px; right: 40px;
+    font-size: 72px; font-weight: 900; color: rgba(184,146,42,0.06);
+    letter-spacing: 4px; pointer-events: none;
+    transform: perspective(300px) rotateX(20deg); z-index: 1;
+  }
+</style>
+</head>
+<body>
+<div class="cert-wrap">
+  <div class="cert-card" id="card">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="hologram-strip"></div>
+    <div class="glow-orb"></div><div class="glow-orb2"></div>
+    <canvas class="wave-canvas" id="waveCanvas"></canvas>
+    <div class="watermark-3d">ISA</div>
+
+    <div class="cert-body">
+      <!-- LEFT -->
+      <div class="left-panel">
+        <div class="logo-inner">
+          <div class="logo-text-inner">
+            <svg width="36" height="14" viewBox="0 0 36 14" fill="none">
+              <path d="M2 10 C6 3, 10 3, 14 8 C18 13, 22 13, 26 8 C30 3, 34 3, 36 6" stroke="#d4a83a" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M2 13 C6 6, 10 6, 14 11 C18 16, 22 16, 26 11 C30 6, 34 6, 36 9" stroke="rgba(212,168,58,0.4)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            </svg>
+            <span class="logo-isa">ISA</span>
+          </div>
+        </div>
+        <div class="org-name">
+          <div class="en">INTL. ARTIFICIAL<br>SURFING ASSOC.</div>
+          <div class="kr">국제인공서핑협회</div>
+        </div>
+        <div class="photo-box">
+          ${photoHtml}
+        </div>
+        <div class="issue-date-label">발급일: ${certData.issueDate}</div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-panel">
+        <div class="cert-header">
+          <div class="official-label">OFFICIAL CERTIFICATION</div>
+          <div class="cert-title-kr">합격 자격증</div>
+          <div class="cert-title-en">Certificate of Qualification</div>
+        </div>
+
+        <div>
+          <div class="field-label">성명 / NAME</div>
+          <div class="name-value">${certData.name}</div>
+          <div class="name-underline"></div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <div class="field-label">등급 / LEVEL</div>
+            <div class="info-value gold">${levelLabel}</div>
+          </div>
+          <div class="info-box">
+            <div class="field-label">종목 / DISCIPLINE</div>
+            <div class="info-value white">${certData.discipline}</div>
+          </div>
+        </div>
+
+        <!-- TIER -->
+        <div class="tier-section">
+          <div class="tier-label">티어 / TIER</div>
+          <div class="tier-track">
+
+            <div class="tier-item tier-bronze ${activeTier === 'bronze' ? 'active' : ''}">
+              <div class="tier-badge">
+                <svg viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="11" fill="url(#bronze-fill)" stroke="#c4784a" stroke-width="1"/>
+                  <text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,220,180,0.9)">B</text>
+                  <defs><radialGradient id="bronze-fill" cx="35%" cy="30%">
+                    <stop offset="0%" stop-color="#d4895a"/>
+                    <stop offset="100%" stop-color="#7a3d1e"/>
+                  </radialGradient></defs>
+                </svg>
+              </div>
+              <span class="tier-name">Bronze</span>
+            </div>
+
+            <div class="tier-connector bronze"></div>
+
+            <div class="tier-item tier-silver ${activeTier === 'silver' ? 'active' : ''}">
+              <div class="tier-badge">
+                <svg viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="11" fill="url(#silver-fill)" stroke="#c0c0c0" stroke-width="1"/>
+                  <text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,255,255,0.9)">S</text>
+                  <defs><radialGradient id="silver-fill" cx="35%" cy="30%">
+                    <stop offset="0%" stop-color="#d8d8d8"/>
+                    <stop offset="100%" stop-color="#808080"/>
+                  </radialGradient></defs>
+                </svg>
+              </div>
+              <span class="tier-name">Silver</span>
+            </div>
+
+            <div class="tier-connector silver"></div>
+
+            <div class="tier-item tier-gold ${activeTier === 'gold' ? 'active' : ''}">
+              <div class="tier-badge">
+                <svg viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="11" fill="url(#gold-fill)" stroke="#d4a83a" stroke-width="1"/>
+                  <text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,250,200,0.95)">G</text>
+                  <defs><radialGradient id="gold-fill" cx="35%" cy="30%">
+                    <stop offset="0%" stop-color="#f5d060"/>
+                    <stop offset="100%" stop-color="#a07010"/>
+                  </radialGradient></defs>
+                </svg>
+              </div>
+              <span class="tier-name">Gold</span>
+            </div>
+
+            <div class="tier-connector gold"></div>
+
+            <div class="tier-item tier-diamond ${activeTier === 'diamond' ? 'active' : ''}">
+              <div class="tier-badge">
+                <svg viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="11" fill="url(#diamond-fill)" stroke="#7dd4f8" stroke-width="1"/>
+                  <polygon points="14,5 20,11 14,22 8,11" fill="rgba(200,240,255,0.85)" stroke="rgba(150,220,255,0.6)" stroke-width="0.5"/>
+                  <defs><radialGradient id="diamond-fill" cx="35%" cy="30%">
+                    <stop offset="0%" stop-color="#b8eaff"/>
+                    <stop offset="100%" stop-color="#1a5a8a"/>
+                  </radialGradient></defs>
+                </svg>
+              </div>
+              <span class="tier-name">Diamond</span>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="cert-num-wrapper">
+          <div class="cert-num">
+            <span class="cert-num-label">자격증 번호 / CERT No.</span>
+            <span class="cert-num-value">${certData.certNumber}</span>
+          </div>
+          <div class="qr-code">
+            <img src="${qrUrl}" alt="QR" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('waveCanvas');
+if(canvas) {
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+  function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+  function drawWaves() {
+    if(!canvas.offsetWidth) return;
+    resize();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const waves = [
+      { amp: 22, freq: 0.012, speed: 0.018, y: 0.4, color: 'rgba(30,100,200,0.6)', width: 2 },
+      { amp: 16, freq: 0.018, speed: 0.025, y: 0.55, color: 'rgba(50,130,220,0.45)', width: 1.5 },
+      { amp: 28, freq: 0.008, speed: 0.012, y: 0.65, color: 'rgba(184,146,42,0.35)', width: 2.5 },
+      { amp: 12, freq: 0.022, speed: 0.03, y: 0.75, color: 'rgba(80,160,240,0.35)', width: 1 },
+    ];
+    waves.forEach(w => {
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height * w.y);
+      for (let x = 0; x <= canvas.width; x += 3) {
+        const y = canvas.height * w.y
+          + Math.sin(x * w.freq + t * w.speed * 60) * w.amp
+          + Math.sin(x * w.freq * 1.7 + t * w.speed * 40) * (w.amp * 0.4);
+        ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = w.color; ctx.lineWidth = w.width; ctx.stroke();
+    });
+    t += 0.016;
+    requestAnimationFrame(drawWaves);
+  }
+  drawWaves();
+}
+
+const card = document.getElementById('card');
+if(card) {
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.setProperty('--dx', (Math.random() * 60 - 30) + 'px');
+    p.style.animationDuration = (4 + Math.random() * 6) + 's';
+    p.style.animationDelay = (Math.random() * 6) + 's';
+    card.appendChild(p);
+  }
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(1000px) rotateY(${x * 6}deg) rotateX(${-y * 4}deg)`;
+    card.style.transition = 'transform 0.1s ease';
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+    card.style.transition = 'transform 0.6s ease';
+  });
+}
+</script>
+</body>
+</html>`;
+}
+"""
+
+# Replace in gas app
+pattern = re.compile(r'function getCertTemplate\(certData\) \{.*?\n\}', re.DOTALL)
+new_gas = pattern.sub(new_content.replace('\\', '\\\\'), content, 1)
+
+with open('google-apps-script-auth.js', 'w', encoding='utf-8') as f:
+    f.write(new_gas)
+
+# Write cert-preview.html
+dummy_preview = new_content.split('`', 1)[1].rsplit('`', 1)[0]
+dummy_preview = dummy_preview.replace('${photoHtml}', '<span class="photo-label">사진 없음</span>')
+dummy_preview = dummy_preview.replace('${certData.issueDate}', '2026년 4월 12일')
+dummy_preview = dummy_preview.replace('${certData.name}', '홍길동')
+dummy_preview = dummy_preview.replace('${levelLabel}', '1급 (Professional)')
+dummy_preview = dummy_preview.replace('${certData.discipline}', 'Wave Surfing')
+dummy_preview = dummy_preview.replace("${activeTier === 'bronze' ? 'active' : ''}", '')
+dummy_preview = dummy_preview.replace("${activeTier === 'silver' ? 'active' : ''}", '')
+dummy_preview = dummy_preview.replace("${activeTier === 'gold' ? 'active' : ''}", '')
+dummy_preview = dummy_preview.replace("${activeTier === 'diamond' ? 'active' : ''}", 'active')
+dummy_preview = dummy_preview.replace('${certData.certNumber}', 'ISA-2026-000001')
+dummy_preview = dummy_preview.replace('${qrUrl}', 'https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=isa-web-portal.vercel.app&choe=UTF-8')
+
+with open('cert-preview.html', 'w', encoding='utf-8') as f:
+    f.write(dummy_preview)
+
+print("Replacement successful")

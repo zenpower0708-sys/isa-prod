@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="국제인공서핑협회(ISA) 공식 플랫폼 - 자격증, 교육, 공제회">
+    <title>ISA - International Artificial Indoor Surfing</title>
+
+    <!-- PWA Manifest - 홈화면 추가 시 ISA 공식 로고 아이콘 표시 -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- 파비콘 및 앱 아이콘 (ISA 공식 로고) -->
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/isa-icon-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/isa-icon-192.png">
+
+    <!-- Apple (iPhone/iPad) 홈화면 추가 아이콘 -->
+    <link rel="apple-touch-icon" href="/images/isa-icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/images/isa-icon-512.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ISA">
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Government Badges Bar -->
+    <div id="gov-bar">
+        <div class="gov-badge">
+            <svg class="gov-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="white"/>
+                <path d="M50 2 A48 48 0 0 1 50 98 A24 24 0 0 0 50 50 A24 24 0 0 1 50 2" fill="#c1272d"/>
+                <path d="M50 98 A48 48 0 0 1 50 2 A24 24 0 0 0 50 50 A24 24 0 0 1 50 98" fill="#0047a0"/>
+            </svg>
+            <span id="gov-culture">문화체육관광부</span>
+        </div>
+        <div class="gov-badge">
+            <svg class="gov-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="#1a3a5c" stroke="#c5a23c" stroke-width="3"/>
+                <text x="50" y="42" text-anchor="middle" fill="#c5a23c" font-size="32" font-weight="bold">⚓</text>
+                <text x="50" y="70" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">KOREA</text>
+                <text x="50" y="84" text-anchor="middle" fill="#c5a23c" font-size="10" font-weight="bold" font-family="sans-serif">COAST GUARD</text>
+            </svg>
+            <span id="gov-coast">해양경찰청</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="main-nav" class="glass-panel">
+        <div class="nav-container">
+            <a href="#/" class="nav-logo" id="nav-logo-link">
+                <div class="logo-emblem-wrap">
+                    <img src="images/isa-emblem.png" alt="ISA" class="logo-emblem-img">
+                    <span class="logo-initial">ISA</span>
+                </div>
+                <div class="logo-text">
+                    <h1 id="nav-title">국제인공서핑협회</h1>
+                    <p class="logo-sub">INTL ARTIFICIAL SURFING ASSOC.</p>
+                </div>
+            </a>
+
+            <div class="nav-links" id="nav-links">
+                <a href="#/cert" class="nav-link" data-page="cert"><span id="nav-cert">자격증</span></a>
+                <a href="/mutualaid/" target="_blank" class="nav-link"><span id="nav-insurance">공제회</span></a>
+                <a href="#/shop" class="nav-link" data-page="shop"><span id="nav-shop">장비스토어</span></a>
+                <a href="#/map" class="nav-link" data-page="map"><span id="nav-map">인공서핑장현황</span></a>
+                <a href="#/edu" class="nav-link" data-page="edu"><span id="nav-edu">교육</span></a>
+            </div>
+
+            <div class="nav-actions">
+                <button id="lang-toggle" class="lang-btn" onclick="toggleLang()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <span id="lang-label">KO</span>
+                </button>
+                <button class="login-btn" onclick="openLoginModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span id="login-text">로그인</span>
+                </button>
+                <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Sub Nav -->
+        <div class="mobile-sub-nav" id="mobile-sub-nav">
+            <a href="#/cert" class="mobile-sub-link" data-page="cert"><span id="m-nav-cert">자격증</span></a>
+            <a href="/mutualaid/" target="_blank" class="mobile-sub-link"><span id="m-nav-insurance">공제회</span></a>
+            <a href="#/shop" class="mobile-sub-link" data-page="shop"><span id="m-nav-shop">장비스토어</span></a>
+            <a href="#/map" class="mobile-sub-link" data-page="map"><span id="m-nav-map">인공서핑장현황</span></a>
+            <a href="#/edu" class="mobile-sub-link" data-page="edu"><span id="m-nav-edu">교육</span></a>
+        </div>
+    </nav>
+
+    <!-- Quick Access Sidebar (Desktop) -->
+    <div class="quick-sidebar" id="quick-sidebar">
+        <button class="quick-btn" onclick="openQuickModal('event')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="q-event">이벤트</span>
+        </button>
+        <button class="quick-btn" onclick="openQuickModal('notice')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span id="q-notice">공지사항</span>
+        </button>
+        <button class="quick-btn" onclick="openQuickModal('appcheck')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span id="q-appcheck">접수확인</span>
+        </button>
+        <button class="quick-btn" onclick="openQuickModal('certcheck')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/></svg>
+            <span id="q-certcheck">자격증조회</span>
+        </button>
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="mobile-bottom-nav" id="mobile-bottom-nav">
+        <button class="bottom-nav-btn" onclick="openQuickModal('event')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="mb-event">이벤트</span>
+        </button>
+        <button class="bottom-nav-btn" onclick="openQuickModal('notice')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span id="mb-notice">공지사항</span>
+        </button>
+        <button class="bottom-nav-btn" onclick="openQuickModal('appcheck')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span id="mb-appcheck">접수확인</span>
+        </button>
+        <button class="bottom-nav-btn" onclick="openQuickModal('certcheck')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/></svg>
+            <span id="mb-certcheck">자격증조회</span>
+        </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main id="app-content">
+        <!-- Pages will be rendered here by JS -->
+    </main>
+
+    <!-- Footer -->
+    <footer id="main-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3 class="footer-title game-font" id="footer-org">국제인공서핑협회</h3>
+                <p>International Artificial Indoor Surfing Association</p>
+                <p>Registration No: 2025-000001</p>
+            </div>
+            <div class="footer-col">
+                <h4 id="footer-contact-title">연락처</h4>
+                <p id="footer-address">서울특별시 강남구 테헤란로 123</p>
+                <p>Tel: 02-554-2212</p>
+                <p>Email: info@isa-surfing.org</p>
+            </div>
+            <div class="footer-col">
+                <h4 id="footer-legal-title">법적 고지</h4>
+                <ul>
+                    <li><a href="#" onclick="openLegalModal('privacy')" id="footer-privacy">개인정보처리방침</a></li>
+                    <li><a href="#" onclick="openLegalModal('terms')" id="footer-terms">이용약관</a></li>
+                    <li><a href="#" onclick="openLegalModal('insurance')" id="footer-ins-terms">공제회 약관</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© <span id="footer-year"></span> ISA. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="login-modal" onclick="closeLoginModal(event)">
+        <div class="modal-box login-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeLoginModal()">✕</button>
+            <div class="login-header">
+                <h2 id="login-title" class="game-font">로그인</h2>
+                <p class="login-sub" id="login-sub">국제인공서핑협회 공식 플랫폼</p>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <!-- 회원가입 전용 필드 -->
+                <div id="signup-fields" style="display:none">
+                    <div class="form-group">
+                        <label id="label-name">이름 (실명)</label>
+                        <div class="input-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input type="text" id="signup-name" placeholder="이름을 입력하세요">
+                        </div>
+                    </div>
+
+                    <!-- 실명인증 방식 선택 -->
+                    <div class="auth-method-section">
+                        <div class="auth-method-label">🔐 실명인증 방식 선택 <span style="color:#ef4444;font-size:10px">(필수)</span></div>
+                        <div class="auth-method-grid">
+                            <button type="button" class="auth-method-btn" id="auth-pass" onclick="selectAuthMethod('pass')">
+                                <span class="amb-icon">📱</span>
+                                <span class="amb-name">PASS</span>
+                                <span class="amb-badge soon">준비중</span>
+                            </button>
+                            <button type="button" class="auth-method-btn" id="auth-kakao" onclick="selectAuthMethod('kakao')">
+                                <span class="amb-icon">🟡</span>
+                                <span class="amb-name">카카오</span>
+                                <span class="amb-badge soon">준비중</span>
+                            </button>
+                            <button type="button" class="auth-method-btn" id="auth-naver" onclick="selectAuthMethod('naver')">
+                                <span class="amb-icon">🟢</span>
+                                <span class="amb-name">네이버</span>
+                                <span class="amb-badge soon">준비중</span>
+                            </button>
+                            <button type="button" class="auth-method-btn" id="auth-toss" onclick="selectAuthMethod('toss')">
+                                <span class="amb-icon">💙</span>
+                                <span class="amb-name">토스</span>
+                                <span class="amb-badge soon">준비중</span>
+                            </button>
+                            <button type="button" class="auth-method-btn selected" id="auth-sms" onclick="selectAuthMethod('sms')">
+                                <span class="amb-icon">📨</span>
+                                <span class="amb-name">SMS</span>
+                                <span class="amb-badge">사용가능</span>
+                            </button>
+                            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;border-radius:10px;background:rgba(30,41,59,0.3);border:1px dashed rgba(255,255,255,0.08);gap:4px;">
+                                <span style="font-size:18px">🔜</span>
+                                <span style="font-size:9px;color:var(--text-dark);font-weight:700">추가예정</span>
+                            </div>
+                        </div>
+                        <!-- PG사 안내 메세지 -->
+                        <div id="auth-pg-notice" style="margin-top:8px;padding:8px 10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:11px;color:#fde68a;display:none">
+                            <strong>⚠️ PG사 연동 필요:</strong> PASS·카카오·네이버·토스 인증은 PG사(나이스페이먼츠/KG이니시스) 계약 후 활성화됩니다. 현재는 SMS 문자 인증을 이용해주세요.
+                        </div>
+                    </div>
+
+                    <div class="auth-divider"><span>SMS 본인인증</span></div>
+
+                    <div class="form-group">
+                        <label id="label-phone">연락처</label>
+                        <div style="display:flex;gap:8px">
+                            <div class="input-icon" style="flex:1">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/></svg>
+                                <input type="tel" id="signup-phone" placeholder="010-0000-0000">
+                            </div>
+                            <button type="button" id="send-code-btn" onclick="sendVerifyCode()" style="padding:0 16px;background:linear-gradient(135deg,#06b6d4,#2563eb);color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;min-width:100px;transition:opacity 0.3s">
+                                인증번호 발송
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 인증번호 입력 (인증번호 발송 후 표시) -->
+                    <div class="form-group" id="verify-code-group" style="display:none">
+                        <label id="label-verify-code" style="display:flex;align-items:center;gap:8px">
+                            인증번호 입력
+                            <span id="verify-timer" style="color:#facc15;font-size:12px;font-weight:700"></span>
+                        </label>
+                        <div style="display:flex;gap:8px">
+                            <div class="input-icon" style="flex:1">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                <input type="text" id="verify-code-input" placeholder="6자리 인증번호" maxlength="6"
+                                    style="letter-spacing:8px;font-weight:700;font-size:18px;text-align:center">
+                            </div>
+                            <button type="button" id="verify-code-btn" onclick="confirmVerifyCode()" style="padding:0 16px;background:rgba(34,197,94,0.2);color:#22c55e;border:1px solid rgba(34,197,94,0.4);border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;min-width:80px;transition:all 0.3s">
+                                확인
+                            </button>
+                        </div>
+                        <div id="verify-msg" style="font-size:12px;margin-top:6px;color:#94a3b8"></div>
+                    </div>
+                    <!-- 인증 완료 배지 -->
+                    <div id="verify-success-badge" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:12px 16px;margin-bottom:12px;align-items:center;gap:8px">
+                        <span style="font-size:20px">✅</span>
+                        <div>
+                            <div style="font-size:14px;font-weight:700;color:#22c55e" id="verify-success-text">본인인증 완료</div>
+                            <div style="font-size:12px;color:#64748b" id="verify-success-detail"></div>
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                        <div class="form-group">
+                            <label id="label-birth">생년월일</label>
+                            <div class="input-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                <input type="text" id="signup-birth" placeholder="YYMMDD" maxlength="6">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label id="label-gender">성별</label>
+                            <select id="signup-gender" style="width:100%;padding:12px;background:rgba(30,41,59,0.5);border:1px solid #374151;border-radius:12px;color:white;font-size:14px;outline:none;">
+                                <option value="M">남성 (Male)</option>
+                                <option value="F">여성 (Female)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="label-pw-confirm">비밀번호 확인</label>
+                        <div class="input-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input type="password" id="signup-pw-confirm" placeholder="비밀번호를 다시 입력하세요">
+                        </div>
+                    </div>
+                    <!-- 약관 동의 -->
+                    <div class="form-group" style="margin-top:4px">
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#94a3b8">
+                            <input type="checkbox" id="signup-agree" style="accent-color:#06b6d4;width:18px;height:18px">
+                            <span id="label-agree">개인정보 수집 및 이용에 동의합니다</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 공통 필드 -->
+                <div class="form-group">
+                    <label id="label-email">이메일</label>
+                    <div class="input-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        <input type="email" id="login-email" placeholder="surfer@isa.world" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="label-password">비밀번호</label>
+                    <div class="input-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div id="login-msg" class="login-msg"></div>
+                <button type="submit" class="login-submit" id="login-submit-btn">로그인</button>
+            </form>
+            <div class="login-toggle">
+                <button onclick="toggleLoginMode()" id="login-toggle-text">계정이 없으신가요? 회원가입</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal (로그인 후) -->
+    <div class="modal-overlay" id="profile-modal" onclick="closeProfileModal(event)">
+        <div class="modal-box profile-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeProfileModal()">✕</button>
+            <div class="profile-tabs">
+                <button class="profile-tab active" onclick="switchProfileTab('info')" id="tab-info">내 정보</button>
+                <button class="profile-tab" onclick="switchProfileTab('logbook')" id="tab-logbook">디지털 로그북</button>
+                <button class="profile-tab" onclick="switchProfileTab('cert');window.loadMyCerts&&window.loadMyCerts()" id="tab-cert">🏆 내 자격증</button>
+            </div>
+            
+            <div id="profile-info-content" class="tab-content active">
+                <div style="padding:32px;text-align:center">
+                    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#2563eb);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px;box-shadow:0 0 30px rgba(6,182,212,0.4)">👤</div>
+                    <h2 class="game-font" style="color:white;font-size:20px;margin-bottom:4px" id="profile-name"></h2>
+                    <p style="color:var(--cyan);font-size:14px;margin-bottom:24px" id="profile-email"></p>
+                    <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;border:1px solid var(--border);margin-bottom:24px;text-align:left">
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+                            <span style="color:var(--text-dark);font-size:13px" id="profile-label-phone">연락처</span>
+                            <span style="color:white;font-size:13px" id="profile-phone"></span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+                            <span style="color:var(--text-dark);font-size:13px" id="profile-label-birth">생년월일</span>
+                            <span style="color:white;font-size:13px" id="profile-birth"></span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+                            <span style="color:var(--text-dark);font-size:13px" id="profile-label-gender">성별</span>
+                            <span style="color:white;font-size:13px" id="profile-gender"></span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0">
+                            <span style="color:var(--text-dark);font-size:13px" id="profile-label-joined">가입일</span>
+                            <span style="color:white;font-size:13px" id="profile-joined"></span>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:12px">
+                        <button onclick="closeProfileModal()" style="flex:1;padding:12px;background:rgba(255,255,255,0.1);color:white;font-weight:700;border-radius:12px;transition:background 0.3s;border:1px solid var(--border)" id="profile-close-btn">닫기</button>
+                        <button onclick="handleLogout()" style="flex:1;padding:12px;background:rgba(239,68,68,0.2);color:#ef4444;font-weight:700;border-radius:12px;transition:background 0.3s;border:1px solid rgba(239,68,68,0.3)" id="profile-logout-btn">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile-logbook-content" class="tab-content">
+                <div class="logbook-container">
+                    <div class="logbook-header">
+                        <div class="total-hours-box">
+                            <span class="th-label">누적 훈련 시간</span>
+                            <span class="th-value" id="total-training-hours">0시간</span>
+                        </div>
+                        <button class="add-log-btn" onclick="openAddLogForm()">+ 새 기록 등록</button>
+                    </div>
+                    
+                    <!-- 로그북 리스트 -->
+                    <div id="logbook-list" class="logbook-list">
+                        <!-- JS에서 렌더링 -->
+                    </div>
+
+                    <!-- 로그북 등록 폼 (기본 숨김) -->
+                    <div id="logbook-form-area" style="display:none" class="logbook-form-area">
+                        <h4 style="color:white;margin-bottom:16px;font-size:16px">📋 훈련 기록 등록</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>훈련 일자</label>
+                                <input type="date" id="log-date">
+                            </div>
+                            <div class="form-group">
+                                <label>훈련 장소</label>
+                                <input type="text" id="log-place" placeholder="예: 시흥 웨이브파크">
+                            </div>
+                            <div class="form-group">
+                                <label>훈련 시간</label>
+                                <select id="log-hours">
+                                    <option value="1">1시간</option>
+                                    <option value="2">2시간</option>
+                                    <option value="3">3시간</option>
+                                    <option value="4">4시간</option>
+                                    <option value="5">5시간 이상</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>증빙 자료 (최대 3장)</label>
+                                <input type="file" id="log-files" multiple accept="image/*,.pdf" onchange="handleLogFiles(event)">
+                                <div id="file-preview" class="file-preview"></div>
+                                <p class="file-help">JPG, PNG, PDF (파일당 10MB 제한)</p>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:20px">
+                            <button class="btn-cancel" onclick="closeAddLogForm()">취소</button>
+                            <button class="btn-submit" onclick="submitLogbook()">등록하기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 자격증 탭 -->
+            <div id="profile-cert-content" class="tab-content">
+                <div style="padding:24px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <h4 style="color:white;font-size:15px;font-weight:700;">🏆 내 자격증 목록</h4>
+                        <a href="#/verify" onclick="closeProfileModal()" style="font-size:12px;color:var(--cyan);">진위 확인 →</a>
+                    </div>
+                    <div id="my-cert-list">
+                        <p style="color:#64748b;text-align:center;padding:20px;">탭을 클릭하면 자격증을 불러옵니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Modal -->
+    <div class="modal-overlay" id="quick-modal" onclick="closeQuickModal(event)">
+        <div class="modal-box quick-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="quick-modal-title" class="modal-title"></h3>
+                <button class="modal-close" onclick="closeQuickModal()">✕</button>
+            </div>
+            <div id="quick-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Legal Modal -->
+    <div class="modal-overlay" id="legal-modal" onclick="closeLegalModal(event)">
+        <div class="modal-box legal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="legal-modal-title" class="modal-title game-font"></h3>
+                <button class="modal-close" onclick="closeLegalModalDirect()">✕</button>
+            </div>
+            <div id="legal-modal-content" class="legal-content"></div>
+            <div class="modal-footer">
+                <button onclick="closeLegalModalDirect()" class="btn-primary">닫기</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- AI Chat Assistant Interface -->
+    <div id="ai-chat-btn" onclick="toggleAIChat()" title="ISA AI 비서에게 문의하기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <div id="ai-chat-window">
+        <div class="ai-chat-header">
+            <h3><span class="status-dot"></span> ISA AI 비서</h3>
+            <button onclick="toggleAIChat()" style="color:#94a3b8">✕</button>
+        </div>
+        <div id="ai-chat-messages">
+            <div class="chat-bubble ai">안녕하세요! 국제인공서핑협회(ISA) 공식 AI 비서입니다. 무엇을 도와드릴까요?</div>
+        </div>
+        <div class="ai-chat-footer">
+            <input type="text" id="ai-chat-input" placeholder="질문을 입력하세요..." onkeydown="handleAIChatKey(event)">
+            <button class="ai-send-btn" onclick="sendAIMessage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="ai-manager.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

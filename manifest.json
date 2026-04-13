@@ -1,0 +1,24 @@
+{
+  "name": "ISA - 국제인공서핑협회",
+  "short_name": "ISA",
+  "description": "국제인공서핑협회(ISA) 공식 플랫폼 - 자격증, 교육, 공제회",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/isa-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/isa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
