@@ -16,7 +16,7 @@ let isLoginMode = true;
 let selectedDiscipline = 'Standing/Flow Board';
 let selectedLevel = null;
 // ===== CONFIG =====
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNnUhGtxCc9hxaJDU71N0zO2Fv4R10j6Uxl9fAvLRoOeBezXqCI5zZZE_2l8w2caAyYg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwamlSbrY7nLUBeGrJFOzt5d2K1oruOEYOIBwl5Cgv-bsKp1xEydZPIuGjmL5O6xq9DQ/exec';
 
 const WeatherManager = {
     cacheKey: 'isa_weather_data_v1.1', // 캐시 갱신을 위해 키 변경
@@ -135,11 +135,11 @@ function updateLangUI() {
     const safeSet = (id, val) => { const el = $(id); if (el) el.textContent = val; };
     
     safeSet('lang-label', currentLang);
-    safeSet('nav-title', t.common.appName);
+    safeSet('nav-title', t.common.headerName);
     safeSet('gov-culture', t.common.govCulture);
     safeSet('gov-coast', t.common.govCoast);
     
-    ['cert', 'insurance', 'shop', 'map', 'edu'].forEach(key => {
+    ['cert', 'insurance', 'shop', 'map', 'edu', 'book', 'instructor'].forEach(key => {
         safeSet(`nav-${key}`, t.nav[key]);
         safeSet(`m-nav-${key}`, t.nav[key]);
     });
@@ -150,7 +150,7 @@ function updateLangUI() {
         safeSet(`mb-${key}`, labelText);
     });
 
-    safeSet('footer-org', t.common.appName);
+    safeSet('footer-org', t.common.footerName);
     safeSet('footer-contact-title', t.common.footer.contact);
     safeSet('footer-address', currentLang === 'KO' ? SITE_CONFIG.addressKR : SITE_CONFIG.address);
     safeSet('footer-legal-title', t.common.footer.legal);
@@ -268,7 +268,7 @@ function renderCertDetail(t, cd) {
     const isRetakeEligible = hasPaidBefore && failRecord;
     
     const steps = [
-        { title: t.cert.step1, desc: t.cert.step1Desc, status: 'completed', icon: '✔' },
+        { title: t.cert.step1, desc: t.cert.step1Desc, status: 'training-upload', icon: '📋' },
         { title: t.cert.step2, desc: t.cert.step2Desc, status: 'current', icon: '📝' },
         { title: t.cert.step3, desc: t.cert.step3Desc, status: (selectedLevel >= 1) ? 'active-form' : 'locked', icon: '🎥' },
         { title: t.cert.step4, desc: t.cert.step4Desc, status: 'locked', icon: '🏆' }
@@ -287,28 +287,28 @@ function renderCertDetail(t, cd) {
                             // 종목별 기술 요구사항 데이터
                             const skillReqMap = {
                                 'Standing/Flow Board': {
-                                    4: { skills: ['전/측/후방 입수 (택1)', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '' },
-                                    3: { skills: ['측면 점프/후방 입수 (택1)', '(남) 기술 3개↑', '(여) 기술 2개↑', '핸드플립 가산점', '콤보 가산점'], details: '* 지정 기술: 알리, 셔빗, 쓰리 셔빗, 원에이티, 본래스(패스트플랜트) 이상' },
-                                    2: { skills: ['후방 입수 (필수)', '(남) 기술 3개 (택3)', '(여) 기술 2개 (택2)', '핸드플립 가산점', '콤보 가산점'], details: '* 지정 기술: 알리, 쓰리셔빗, 능숙한 알리, 원에이티' },
-                                    1: { skills: ['(남) 지정 기술 3개↑', '(여) 지정 기술 3개↑', '핸드플립 가산점', '콤보 가산점'], details: '[기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>(남) 쓰리셔빗 이상, 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>(여) 팝셔빗, 쓰리셔빗, 원에이티, 킥플립 이상 기술 중 3개 이상' }
+                                    4: { skills: ['전/측/후방 입수 (택1)', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+                                    3: { skills: ['측면 점프/후방 입수 (택1)', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 알리, 셔빗, 쓰리 셔빗, 원에이티, 본래스(패스트플랜트), 빅스핀 이상' },
+                                    2: { skills: ['후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀, 킥플립 이상' },
+                                    1: { skills: ['(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>(남) 쓰리셔빗 이상, 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>(여) 팝셔빗, 쓰리셔빗, 원에이티, 킥플립 이상 기술 중 3개 이상' }
                                 },
                                 'Body/Boogie Board': {
-                                    4: { skills: ['전/측/후방 입수 (택1)', '원드롭니 균형 (10초↑)', '원드롭니 슬라럼 (좌우/상하 각 5회)', '원/투드롭니 360° 턴'], details: '' },
-                                    3: { skills: ['지정 기술 중 3개 포함', '콤보 가산점'], details: '* 지정 기술: 원/투드롭니 540° 스핀 이상, 바디 헬리콥터 이상(YoYo, Umbrella 등), 바디 롤 이상, 바디 로데오 이상' },
-                                    2: { skills: ['(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점'], details: '* 지정 기술: 360° 바디턴 이상, 360° 바디로데오 이상, 허브, 허브캡, 180° 셔빗 이상, 드롭니 롤 이상, 디테이 이상, 드롭니 로데오 이상' },
-                                    1: { skills: ['(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점'], details: '[기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 540° 바디턴 이상, 540° 바디로데오 이상, 디테이 이상(오버로드), 디테이 프론 이상, 드롭니 로데오 이상, 드롭니 로데오 프론 이상, 180° 셔빗 이상, 허브캡(멀티) 이상' }
+                                    4: { skills: ['전/측/후방 입수 (택1)', '원드롭니 균형 (10초↑)', '원드롭니 슬라럼 (좌우/상하 각 5회)', '원/투드롭니 360°(1바퀴돌기) 턴'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+                                    3: { skills: ['지정 기술 중 3개 포함', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 원/투드롭니 540° 스핀(2바퀴돌기), 헬리콥터, YoYo, Umbrella, 바디 롤, 바디 로데오, 빅스핀, 리버스 이상의 기술' },
+                                    2: { skills: ['(남) 지정 기술 중 5개 이상', '(여) 지정 기술 중 4개 이상', '가산점: 콤보(3개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 360°(1바퀴돌기)이상의 바디턴, 360°(1바퀴돌기)이상의 바디로데오, 허브, 허브캡, 180° 셔빗, 드롭니 롤, 디테이, 드롭니 로데오, 빅스핀, 리버스 이상의 기술' },
+                                    1: { skills: ['(남) 지정 기술 중 5개 이상', '(여) 지정 기술 중 4개 이상', '가산점: 콤보(4개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 540° 바디턴, 540° 바디로데오, 디테이(오버로드), 디테이 프론, 드롭니 로데오, 드롭니 로데오 프론, 180° 셔빗, 허브캡(멀티), 빅스핀 이상의 기술' }
                                 },
                                 'Wake Surfing': {
-                                    4: { skills: ['밸런스 탑승', '웨이크 파도 유지', '기본 자세'], details: '' },
-                                    3: { skills: ['웨이크 투 웨이크', '올리 시도', '스위치 탑승'], details: '' },
-                                    2: { skills: ['360° 스핀', '에어 시도', '래일 턴 완성'], details: '' },
-                                    1: { skills: ['에어 트릭 완성', '콤보 라이딩', '코칭 능력'], details: '[기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' }
+                                    4: { skills: ['밸런스 탑승', '웨이크 파도 유지', '기본 자세', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+                                    3: { skills: ['웨이크 투 웨이크', '올리 시도', '스위치 탑승', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 셔빗, 쓰리 셔빗, 원에이티 이상' },
+                                    2: { skills: ['360° 스핀', '에어 시도', '래일 턴 완성', '후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀 이상' },
+                                    1: { skills: ['에어 트릭 완성', '콤보 라이딩', '코칭 능력', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: (남) 쓰리셔빗 이상 / (여) 쓰리셔빗, 원에이티 이상 기술 중 3개 이상<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
                                 },
                                 'Wave Surfing': {
-                                    4: { skills: ['파도 탑승 기초', '트림 라이딩', '폼위에서 균형'], details: '' },
-                                    3: { skills: ['커팅백', '탑턴', '파도 읽기'], details: '' },
-                                    2: { skills: ['에어리얼', '튜브 라이딩 시도', '고난이도 턴'], details: '' },
-                                    1: { skills: ['에어리얼 완성', '채점 기준 이해', '심판·강사 자격'], details: '[기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' }
+                                    4: { skills: ['파도 탑승 기초', '트림 라이딩', '폼위에서 균형', '밸런스 탑승', '웨이크 파도 유지', '기본 자세', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+                                    3: { skills: ['커팅백', '탑턴', '파도 읽기', '웨이크 투 웨이크', '올리 시도', '스위치 탑승', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 셔빗, 쓰리 셔빗, 원에이티 이상' },
+                                    2: { skills: ['에어리얼', '튜브 라이딩 시도', '고난이도 턴', '360° 스핀', '에어 시도', '래일 턴 완성', '후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀 이상' },
+                                    1: { skills: ['에어리얼 완성', '채점 기준 이해', '심판·강사 자격', '에어 트릭 완성', '콤보 라이딩', '코칭 능력', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: (남) 쓰리셔빗 이상 / (여) 쓰리셔빗, 원에이티 이상 기술 중 3개 이상<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
                                 }
                             };
                             const req = (skillReqMap[selectedDiscipline] || {})[selectedLevel];
@@ -355,6 +355,50 @@ function renderCertDetail(t, cd) {
                         <button class="action-btn" style="background:var(--cyan); color:black; border:none; padding:8px; font-weight:800; border-radius:4px; cursor:pointer"
                                 onclick="handlePracticalSubmit(this)">🎬 영상 제출하기</button>
                         <p style="font-size:11px;color:var(--cyan)">※ 영상을 '일부 공개'로 설정한 후 링크를 제출해 주세요.</p>
+                    </div>
+                ` : ''}
+                ${s.status === 'training-upload' ? `
+                    <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+                        <div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:14px;">
+                            <p style="color:#fde68a;font-size:12px;margin:0 0 10px;font-weight:700;">⏱️ ${isKO ? '급수별 최소 실습 이수 시간 (응시 자격 조건)' : 'Minimum Training Hours Required'}</p>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+                                ${[{lv:4,h:10},{lv:3,h:20},{lv:2,h:30},{lv:1,h:50}].map(r => `
+                                <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:6px;
+                                    background:${selectedLevel===r.lv ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)'};
+                                    border:1px solid ${selectedLevel===r.lv ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.06)'};
+                                    opacity:${selectedLevel===r.lv ? '1' : '0.5'};">
+                                    <span style="font-size:11px;color:${selectedLevel===r.lv ? '#fde68a' : '#94a3b8'};font-weight:${selectedLevel===r.lv ? '700' : '400'};">
+                                        ${selectedLevel===r.lv ? '▶ ' : ''}강사 ${r.lv}급
+                                    </span>
+                                    <span style="font-size:12px;color:${selectedLevel===r.lv ? '#fbbf24' : '#64748b'};font-weight:700;margin-left:auto;">
+                                        ${r.h}시간 이상
+                                    </span>
+                                </div>`).join('')}
+                            </div>
+                            <p style="color:#92400e;font-size:11px;margin:0;line-height:1.6;background:rgba(0,0,0,0.2);padding:8px;border-radius:4px;">
+                                ${isKO
+                                    ? `※ 각 급수별로 정해진 현장 실습(안전교육 및 기술동작 교습법 등) 시간을 수료해야만 해당 등급의 자격시험에 응시할 수 있습니다.`
+                                    : `※ You must complete the required field training hours (safety education, technique instruction, etc.) for your level before applying for the qualification exam.`}
+                            </p>
+                        </div>
+                        <div style="background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.2);border-radius:8px;padding:14px;">
+                            <p style="color:#7dd3fc;font-size:12px;margin:0 0 6px;font-weight:700;">📎 실습 이수 증빙 자료 첨부</p>
+                            <p style="color:#64748b;font-size:11px;margin:0 0 10px;line-height:1.6;">강사 확인 서명지, 이수 확인서, 수강 사진 등 증빙 서류를 첨부해주세요.<br>이미지(JPG/PNG) 또는 PDF · 최대 5개 · 각 10MB 이하</p>
+                            <input type="file" id="training-proof-input" multiple accept="image/*,.pdf"
+                                style="display:none;" onchange="previewTrainingProof(this)">
+                            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+                                <button onclick="document.getElementById('training-proof-input').click()"
+                                    style="padding:8px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#94a3b8;font-size:12px;cursor:pointer;">
+                                    📂 파일 선택
+                                </button>
+                                <span id="training-proof-count" style="font-size:11px;color:#475569;">선택된 파일 없음</span>
+                            </div>
+                            <div id="training-proof-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+                            <button onclick="submitTrainingProof(this)"
+                                style="width:100%;padding:10px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.4);border-radius:6px;color:#06b6d4;font-size:13px;cursor:pointer;font-weight:700;">
+                                📎 실습 이수 증빙 제출하기
+                            </button>
+                        </div>
                     </div>
                 ` : ''}
                 ${idx === 3 ? `
@@ -459,11 +503,46 @@ function renderCertDetail(t, cd) {
                         <span>Total</span>
                         <span>₩${feePrice.toLocaleString()}</span>
                     </div>
+                    <div style="margin-top:8px; padding:8px 12px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:12px; color:#22c55e; font-weight:700;">🎁 ${isKO ? '적립 예정 포인트 (1%)' : 'Expected Points (1%)'}</span>
+                        <span style="font-size:13px; color:#22c55e; font-weight:800;">+${(feePrice * 0.01).toLocaleString()}P</span>
+                    </div>
                     <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">${isKO ? '* 실기 이수시간(이용료) 별도' : '* Practice fee not included'}</p>
+
+                    <!-- 실습 이수 시간 안내 -->
+                    ${(() => {
+                        const reqHours = {4:10, 3:20, 2:30, 1:50}[selectedLevel] || 0;
+                        return `
+                        <div style="margin-top:16px;padding:14px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.3);border-radius:10px;">
+                            <p style="font-size:12px;color:#fde68a;font-weight:700;margin:0 0 8px;">⏱️ ${isKO ? '응시 자격 조건 : 최소 실습 이수 시간' : 'Eligibility : Minimum Training Hours'}</p>
+                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                                <span style="font-size:22px;font-weight:900;color:#fbbf24;">${reqHours}시간</span>
+                                <span style="font-size:12px;color:#94a3b8;line-height:1.5;">${isKO ? `강사 ${selectedLevel}급 응시를 위해<br>현장 실습 <strong style="color:#fde68a">${reqHours}시간 이상</strong> 수료 필요` : `${reqHours}+ hours of field training<br>required for Level ${selectedLevel} exam`}</span>
+                            </div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                ${[{lv:4,h:10},{lv:3,h:20},{lv:2,h:30},{lv:1,h:50}].map(r=>`
+                                <span style="font-size:10px;padding:2px 8px;border-radius:12px;
+                                    background:${selectedLevel===r.lv?'rgba(245,158,11,0.25)':'rgba(255,255,255,0.04)'};
+                                    border:1px solid ${selectedLevel===r.lv?'rgba(245,158,11,0.6)':'rgba(255,255,255,0.08)'};
+                                    color:${selectedLevel===r.lv?'#fbbf24':'#475569'};
+                                    font-weight:${selectedLevel===r.lv?'700':'400'};">
+                                    ${r.lv}급 ${r.h}h+
+                                </span>`).join('')}
+                            </div>
+                        </div>`;
+                    })()}
 
                     <!-- 결제 전 동의 체크박스 -->
                     <div class="cert-agree-box" style="margin-top:16px">
                         <p style="font-size:12px;color:var(--text-dark);margin-bottom:10px;font-weight:700">${isKO ? '📌 결제 전 필수 동의사항' : '📌 Required Agreements Before Payment'}</p>
+                        <label class="cert-agree-item">
+                            <input type="checkbox" id="agree-training-hours" style="accent-color:#f59e0b;width:16px;height:16px;flex-shrink:0">
+                            <span>${isKO
+                                ? `강사 ${selectedLevel}급 응시 자격인 최소 실습 이수 시간(<strong style="color:#fbbf24">${{4:10,3:20,2:30,1:50}[selectedLevel]}시간 이상</strong>)을 충족하였음을 확인하였습니다.`
+                                : `I confirm that I have completed the minimum required training hours (<strong style="color:#fbbf24">${{4:10,3:20,2:30,1:50}[selectedLevel]}h+</strong>) for Level ${selectedLevel}.`
+                            }</span>
+                            <span class="required-badge">${isKO ? '필수' : 'Required'}</span>
+                        </label>
                         <label class="cert-agree-item">
                             <input type="checkbox" id="agree-no-refund" style="accent-color:#ef4444;width:16px;height:16px;flex-shrink:0">
                             <span>${isKO ? '결제 후 환불이 불가함을 확인하였습니다.' : 'I understand that no refunds are available after payment.'}</span>
@@ -481,6 +560,25 @@ function renderCertDetail(t, cd) {
                         </label>
                     </div>
                     
+                    <!-- 결제 수단 선택 -->
+                    <div style="margin-top:20px; background:rgba(0,0,0,0.3); padding:16px; border-radius:8px; border:1px solid rgba(6,182,212,0.2);">
+                        <h4 style="color:white; font-size:14px; margin-bottom:12px;">${isKO ? '결제 수단 선택' : 'Select Payment Method'}</h4>
+                        <div style="display:flex; gap:12px;">
+                            <label style="flex:1; cursor:pointer; display:flex; align-items:center; gap:8px; padding:10px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:6px; color:#cbd5e1; font-size:13px;">
+                                <input type="radio" name="cert-pay-method" value="card" checked onclick="document.getElementById('cert-bank-info').style.display='none'" style="accent-color:var(--cyan);">
+                                💳 ${isKO ? '카드' : 'Card'}
+                            </label>
+                            <label style="flex:1; cursor:pointer; display:flex; align-items:center; gap:8px; padding:10px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:6px; color:#cbd5e1; font-size:13px;">
+                                <input type="radio" name="cert-pay-method" value="bank" onclick="document.getElementById('cert-bank-info').style.display='block'" style="accent-color:var(--cyan);">
+                                🏦 ${isKO ? '무통장' : 'Bank'}
+                            </label>
+                        </div>
+                        <div id="cert-bank-info" style="display:none; margin-top:12px; padding:12px; background:rgba(6,182,212,0.1); border:1px solid var(--cyan); border-radius:8px;">
+                            <p style="font-size:13px; color:white; margin-bottom:4px; font-weight:700;">토스뱅크 1000-7587-9085</p>
+                            <p style="font-size:11px; color:var(--text-dim);">예금주: 곽세영 (국제인공서핑협회)</p>
+                        </div>
+                    </div>
+
                     <!-- 결제 버튼 (일반 응시) -->
                     ${hasPaidBefore && !failRecord ? `
                     <div class="cert-warning-box cyan" style="margin-top:12px">
@@ -883,28 +981,28 @@ function renderIntroPage() {
     // 등급별 기술 요구사항
     const skillMap = isKO ? {
         'Standing/Flow Board': [
-            { level: 4, skills: ['전/측/후방 입수 (택1)', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '' },
-            { level: 3, skills: ['측면 점프/후방 입수 (택1)', '(남) 기술 3개↑', '(여) 기술 2개↑', '핸드플립 가산점', '콤보 가산점'], details: '* 지정 기술: 알리, 셔빗, 쓰리 셔빗, 원에이티, 본래스(패스트플랜트) 이상' },
-            { level: 2, skills: ['후방 입수 (필수)', '(남) 기술 3개 (택3)', '(여) 기술 2개 (택2)', '핸드플립 가산점', '콤보 가산점'], details: '* 지정 기술: 알리, 쓰리셔빗, 능숙한 알리, 원에이티' },
-            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 3개↑', '(여) 지정 기술 3개↑', '강습 영상 (3분~5분 이내)'], details: '[1. 기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>(남) 쓰리셔빗 이상, 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>(여) 팝셔빗, 쓰리셔빗, 원에이티, 킥플립 이상 기술 중 3개 이상<br><br>[2. 강습 영상] 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
+            { level: 4, skills: ['전/측/후방 입수 (택1)', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+            { level: 3, skills: ['측면 점프/후방 입수 (택1)', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 알리, 셔빗, 쓰리 셔빗, 원에이티, 본래스(패스트플랜트), 빅스핀 이상' },
+            { level: 2, skills: ['후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀, 킥플립 이상' },
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일', '강습 영상 (3분~5분 이내)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>(남) 쓰리셔빗 이상, 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>(여) 팝셔빗, 쓰리셔빗, 원에이티, 킥플립 이상 기술 중 3개 이상<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
         ],
         'Body/Boogie Board': [
-            { level: 4, skills: ['전/측/후방 입수 (택1)', '원드롭니 균형 (10초↑)', '원드롭니 슬라럼 (좌우/상하 각 5회)', '원/투드롭니 360° 턴'], details: '' },
-            { level: 3, skills: ['지정 기술 중 3개 포함', '콤보 가산점'], details: '* 지정 기술: 원/투드롭니 540° 스핀 이상, 바디 헬리콥터 이상(YoYo, Umbrella 등), 바디 롤 이상, 바디 로데오 이상' },
-            { level: 2, skills: ['(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점'], details: '* 지정 기술: 360° 바디턴 이상, 360° 바디로데오 이상, 허브, 허브캡, 180° 셔빗 이상, 드롭니 롤 이상, 디테이 이상, 드롭니 로데오 이상' },
-            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 5개↑', '(여) 지정 기술 4개↑', '콤보 가산점', '강습 영상 (3분~5분 이내)'], details: '[1. 기술 영상] 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 540° 바디턴 이상, 540° 바디로데오 이상, 디테이 이상(오버로드), 디테이 프론 이상, 드롭니 로데오 이상, 드롭니 로데오 프론 이상, 180° 셔빗 이상, 허브캡(멀티) 이상<br><br>[2. 강습 영상] 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
+            { level: 4, skills: ['전/측/후방 입수 (택1)', '원드롭니 균형 (10초↑)', '원드롭니 슬라럼 (좌우/상하 각 5회)', '원/투드롭니 360°(1바퀴돌기) 턴'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+            { level: 3, skills: ['지정 기술 중 3개 포함', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 원/투드롭니 540° 스핀(2바퀴돌기), 헬리콥터, YoYo, Umbrella, 바디 롤, 바디 로데오, 빅스핀, 리버스 이상의 기술' },
+            { level: 2, skills: ['(남) 지정 기술 중 5개 이상', '(여) 지정 기술 중 4개 이상', '가산점: 콤보(3개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 360°(1바퀴돌기)이상의 바디턴, 360°(1바퀴돌기)이상의 바디로데오, 허브, 허브캡, 180° 셔빗, 드롭니 롤, 디테이, 드롭니 로데오, 빅스핀, 리버스 이상의 기술' },
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 중 5개 이상', '(여) 지정 기술 중 4개 이상', '가산점: 콤보(4개 이상 기술 연계), 능숙함, 스타일', '강습 영상 (3분~5분 이내)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 540° 바디턴, 540° 바디로데오, 디테이(오버로드), 디테이 프론, 드롭니 로데오, 드롭니 로데오 프론, 180° 셔빗, 허브캡(멀티), 빅스핀 이상의 기술<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
         ],
         'Wake Surfing': [
-            { level: 4, skills: ['밸런스 탑승', '웨이크 파도 유지', '기본 자세'], details: '' },
-            { level: 3, skills: ['웨이크 투 웨이크', '올리 시도', '스위치 탑승'], details: '' },
-            { level: 2, skills: ['360° 스핀', '에어 시도', '래일 턴 완성'], details: '' },
-            { level: 1, skills: ['에어 트릭 완성', '콤보 라이딩', '코칭 능력'], details: '' }
+            { level: 4, skills: ['밸런스 탑승', '웨이크 파도 유지', '기본 자세', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+            { level: 3, skills: ['웨이크 투 웨이크', '올리 시도', '스위치 탑승', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 셔빗, 쓰리 셔빗, 원에이티 이상' },
+            { level: 2, skills: ['360° 스핀', '에어 시도', '래일 턴 완성', '후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀 이상' },
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '에어 트릭 완성', '콤보 라이딩', '코칭 능력', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일', '강습 영상 (3분~5분 이내)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: (남) 쓰리셔빗 이상 / (여) 쓰리셔빗, 원에이티 이상 기술 중 3개 이상<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
         ],
         'Wave Surfing': [
-            { level: 4, skills: ['파도 탑승 기초', '트림 라이딩', '폼위에서 균형'], details: '' },
-            { level: 3, skills: ['커팅백', '탑턴', '파도 읽기'], details: '' },
-            { level: 2, skills: ['에어리얼', '튜브 라이딩 시도', '고난이도 턴'], details: '' },
-            { level: 1, skills: ['에어리얼 완성', '채점 기준 이해', '심판·강사 자격'], details: '' }
+            { level: 4, skills: ['파도 탑승 기초', '트림 라이딩', '폼위에서 균형', '밸런스 탑승', '웨이크 파도 유지', '기본 자세', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+            { level: 3, skills: ['커팅백', '탑턴', '파도 읽기', '웨이크 투 웨이크', '올리 시도', '스위치 탑승', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 셔빗, 쓰리 셔빗, 원에이티 이상' },
+            { level: 2, skills: ['에어리얼', '튜브 라이딩 시도', '고난이도 턴', '360° 스핀', '에어 시도', '래일 턴 완성', '후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀 이상' },
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '에어리얼 완성', '채점 기준 이해', '심판·강사 자격', '에어 트릭 완성', '콤보 라이딩', '코칭 능력', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일', '강습 영상 (3분~5분 이내)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: (남) 쓰리셔빗 이상 / (여) 쓰리셔빗, 원에이티 이상 기술 중 3개 이상<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
         ]
     } : {
         'Standing/Flow Board': [
@@ -1188,10 +1286,21 @@ function certApplyCheck() {
         return; 
     }
     // 동의 체크박스 확인
+    const agreeTrainingHours = document.getElementById('agree-training-hours');
     const agreeNoRefund = document.getElementById('agree-no-refund');
     const agree48hr = document.getElementById('agree-48hr');
     const agree1year = document.getElementById('agree-1year');
-    
+
+    const reqHoursMap = {4:10, 3:20, 2:30, 1:50};
+    const reqHours = reqHoursMap[selectedLevel] || 0;
+
+    if (!agreeTrainingHours?.checked) {
+        alert(currentLang === 'KO'
+            ? `⚠️ 강사 ${selectedLevel}급 응시 자격 조건인 최소 실습 이수 시간(${reqHours}시간 이상) 충족 여부를 확인해주세요.`
+            : `⚠️ Please confirm you have completed the minimum ${reqHours}+ training hours required for Level ${selectedLevel}.`);
+        agreeTrainingHours?.focus();
+        return;
+    }
     if (!agreeNoRefund?.checked) {
         alert(currentLang === 'KO' ? '⚠️ 환불 불가 조항에 동의해주세요.' : '⚠️ Please agree to the no-refund policy.');
         agreeNoRefund?.focus();
@@ -1210,21 +1319,47 @@ function certApplyCheck() {
     
     // 최종 결제 확인
     const feePrice = (selectedLevel >= 3) ? 300000 : 500000;
-    const msg = currentLang === 'KO' 
-        ? `✅ 결제 금액: ₩${feePrice.toLocaleString()}\n\n⚠️ 결제 후 환불이 절대 불가합니다.\n⏰ 결제 후 48시간 이내 필기시험을 응시해야 합니다.\n\n결제를 진행하시겠습니까?`
-        : `✅ Payment: ₩${feePrice.toLocaleString()}\n\n⚠️ No refunds after payment.\n⏰ You must take the exam within 48 hours.\n\nProceed with payment?`;
+    const payMethod = document.querySelector('input[name="cert-pay-method"]:checked')?.value || 'card';
+    
+    let msg = '';
+    if (payMethod === 'bank') {
+        msg = currentLang === 'KO'
+            ? `✅ 결제 신청 (무통장 입금)\n금액: ₩${feePrice.toLocaleString()}\n\n🏦 입금 계좌: 토스뱅크 1000-7587-9085 (곽세영)\n\n신청 후 입금이 확인되면 필기시험 응시 권한이 부여됩니다. 진행하시겠습니까?`
+            : `✅ Apply with Bank Transfer\nAmount: ₩${feePrice.toLocaleString()}\n\n🏦 Account: Toss Bank 1000-7587-9085 (Kwak Se-young)\n\nExam access will be granted after deposit. Proceed?`;
+    } else {
+        msg = currentLang === 'KO' 
+            ? `✅ 결제 금액: ₩${feePrice.toLocaleString()}\n\n⚠️ 결제 후 환불이 절대 불가합니다.\n⏰ 결제 후 48시간 이내 필기시험을 응시해야 합니다.\n\n결제를 진행하시겠습니까?`
+            : `✅ Payment: ₩${feePrice.toLocaleString()}\n\n⚠️ No refunds after payment.\n⏰ You must take the exam within 48 hours.\n\nProceed with payment?`;
+    }
     
     if (confirm(msg)) {
-        // 결제 완료 처리 (실제 PG사 연동 전 임시 저장)
-        localStorage.setItem(`isa_exam_paid_${user.email}_lv${selectedLevel}`, JSON.stringify({
+        // 관리자 알림을 위해 서버에 신청 정보 전송
+        callGAS({
+            action: 'certApply',
+            email: user.email,
+            name: user.name,
             level: selectedLevel,
             discipline: selectedDiscipline,
-            paidAt: new Date().toISOString(),
-            fee: feePrice
-        }));
-        alert(currentLang === 'KO' 
-            ? `✅ 결제가 완료되었습니다!\n\n📌 필기시험 응시 가능 시간: ${new Date(Date.now() + 48*3600000).toLocaleString()} 까지\n\n아래 링크에서 바로 응시하실 수 있습니다:\nhttps://isa-web-portal.vercel.app/exam`
-            : `✅ Payment successful!\n\n📌 You can take the exam until: ${new Date(Date.now() + 48*3600000).toLocaleString()}\n\nYou can take the exam at:\nhttps://isa-web-portal.vercel.app/exam`);
+            payMethod: payMethod,
+            amount: feePrice
+        });
+
+        if (payMethod === 'bank') {
+            alert(currentLang === 'KO'
+                ? `✅ 신청이 접수되었습니다!\n\n토스뱅크 1000-7587-9085 (곽세영) 계좌로 입금해 주세요. 확인 후 최대 1시간 이내에 시험 응시 권한이 활성화됩니다.`
+                : `✅ Application received!\n\nPlease transfer to Toss Bank 1000-7587-9085 (Kwak Se-young). Access will be granted within 1 hour after confirmation.`);
+        } else {
+            // 결제 완료 처리 (카드 결제 시뮬레이션)
+            localStorage.setItem(`isa_exam_paid_${user.email}_lv${selectedLevel}`, JSON.stringify({
+                level: selectedLevel,
+                discipline: selectedDiscipline,
+                paidAt: new Date().toISOString(),
+                fee: feePrice
+            }));
+            alert(currentLang === 'KO' 
+                ? `✅ 결제가 완료되었습니다!\n\n📌 필기시험 응시 가능 시간: ${new Date(Date.now() + 48*3600000).toLocaleString()} 까지\n\n아래 링크에서 바로 응시하실 수 있습니다:\nhttps://isa-web-portal.vercel.app/exam`
+                : `✅ Payment successful!\n\n📌 You can take the exam until: ${new Date(Date.now() + 48*3600000).toLocaleString()}\n\nYou can take the exam at:\nhttps://isa-web-portal.vercel.app/exam`);
+        }
         renderPage('cert');
     }
 }
@@ -1233,33 +1368,39 @@ function certRetakeCheck() {
     const user = getSession();
     if (!user) { openLoginModal(); return; }
     
-    const hasPaid = localStorage.getItem(`isa_exam_paid_${user.email}_lv${selectedLevel}`);
-    const hasFailed = localStorage.getItem(`isa_exam_fail_${user.email}_lv${selectedLevel}`);
-    
-    if (!hasPaid || !hasFailed) {
-        alert(currentLang === 'KO' 
-            ? '재응시는 기준 응시료를 결제하고 필기시험에 통과하지 못한 응시자만 가능합니다.'
-            : 'Retake is only available for applicants who paid the standard fee but did not pass the written exam.');
-        return;
-    }
-    
+    const payMethod = document.querySelector('input[name="cert-pay-method"]:checked')?.value || 'card';
     const msg = currentLang === 'KO'
-        ? '재응시료 ₩10,000을 결제하시겠습니까?\n\n⏰ 결제 후 48시간 이내 필기시험을 응시해야 합니다.'
-        : 'Pay retake fee of ₩10,000?\n\n⏰ You must take the exam within 48 hours of payment.';
+        ? `재응시료 ₩10,000을 결제하시겠습니까?${payMethod === 'bank' ? '\n(토스뱅크 1000-7587-9085 곽세영)' : ''}\n\n⏰ 결제 후 48시간 이내 필기시험을 응시해야 합니다.`
+        : `Pay retake fee of ₩10,000?${payMethod === 'bank' ? '\n(Toss Bank 1000-7587-9085)' : ''}\n\n⏰ You must take the exam within 48 hours of payment.`;
     
     if (confirm(msg)) {
-        // 재응시 결제 완료 처리
-        localStorage.setItem(`isa_exam_paid_${user.email}_lv${selectedLevel}`, JSON.stringify({
+        // 서버 전송
+        callGAS({
+            action: 'certApply',
+            email: user.email,
+            name: user.name,
             level: selectedLevel,
             discipline: selectedDiscipline,
-            paidAt: new Date().toISOString(),
-            fee: 10000,
+            payMethod: payMethod,
+            amount: 10000,
             isRetake: true
-        }));
-        localStorage.removeItem(`isa_exam_fail_${user.email}_lv${selectedLevel}`);
-        alert(currentLang === 'KO'
-            ? '✅ 재응시 결제가 완료되었습니다!\n\n아래 링크에서 바로 응시하실 수 있습니다:\nhttps://isa-web-portal.vercel.app/exam'
-            : '✅ Retake payment successful!\n\nYou can take the exam at:\nhttps://isa-web-portal.vercel.app/exam');
+        });
+
+        if (payMethod === 'bank') {
+            alert(currentLang === 'KO' ? '✅ 재응시 신청이 접수되었습니다. 입금 확인 후 시험 권한이 부여됩니다.' : '✅ Retake application received. Access granted after deposit.');
+        } else {
+            localStorage.setItem(`isa_exam_paid_${user.email}_lv${selectedLevel}`, JSON.stringify({
+                level: selectedLevel,
+                discipline: selectedDiscipline,
+                paidAt: new Date().toISOString(),
+                fee: 10000,
+                isRetake: true
+            }));
+            localStorage.removeItem(`isa_exam_fail_${user.email}_lv${selectedLevel}`);
+            alert(currentLang === 'KO'
+                ? '✅ 재응시 결제가 완료되었습니다!\n\n아래 링크에서 바로 응시하실 수 있습니다:\nhttps://isa-web-portal.vercel.app/exam'
+                : '✅ Retake payment successful!\n\nYou can take the exam at:\nhttps://isa-web-portal.vercel.app/exam');
+        }
         renderPage('cert');
     }
 }
@@ -1295,6 +1436,196 @@ function openQuickModal(type) {
     }
 }
 function closeQuickModal() { const m = $('quick-modal'); if(m) m.classList.remove('open'); }
+
+function openInstructorModal() {
+    const m = $('instructor-modal');
+    if (m) {
+        m.classList.add('open');
+        const input = $('instructor-cert-input');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+        $('instructor-verify-result').innerHTML = '';
+    }
+}
+
+function closeInstructorModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const m = $('instructor-modal');
+    if (m) m.classList.remove('open');
+}
+
+window.verifyInstructorCert = async function() {
+    const input = $('instructor-cert-input');
+    const resultEl = $('instructor-verify-result');
+    if (!input || !resultEl) return;
+    
+    const certId = input.value.trim().toUpperCase();
+    if (!certId) {
+        resultEl.innerHTML = `<p style="color:#ef4444;font-size:13px;text-align:center;margin:0;">자격증 번호를 입력해주세요.</p>`;
+        return;
+    }
+    
+    const isKO = currentLang === 'KO';
+    resultEl.innerHTML = `<div style="text-align:center;"><div style="display:inline-block;width:20px;height:20px;border:2px solid var(--cyan);border-top:2px solid transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div>`;
+    
+    try {
+        const url = GOOGLE_SCRIPT_URL + '?action=verifyCertificate&certId=' + encodeURIComponent(certId);
+        const res = await fetch(url);
+        const json = await res.json();
+        
+        if (json.status === 'success' && json.valid) {
+            const c = json.cert;
+            // Check if level is 1급 or 2급
+            const levelNum = parseInt(c.level) || (c.level.includes('1') ? 1 : c.level.includes('2') ? 2 : 0);
+            
+            if (c.level.includes('1급') || c.level.includes('2급') || levelNum === 1 || levelNum === 2) {
+                resultEl.innerHTML = `
+                <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:12px;text-align:center;">
+                    <p style="color:#10b981;font-weight:700;margin:0 0 4px;">✅ 인증 성공: ${c.name} 강사님</p>
+                    <p style="color:#94a3b8;font-size:11px;margin:0;">등급: ${c.level} | 종목: ${c.discipline}</p>
+                    <button onclick="window.location.href='#/instructor-dashboard';closeInstructorModal();" class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:12px;">강사 전용 페이지 이동</button>
+                </div>`;
+                // Store instructor session locally
+                localStorage.setItem('isa_instructor_verified', JSON.stringify({
+                    certId: c.certNumber,
+                    name: c.name,
+                    level: c.level,
+                    verifiedAt: new Date().toISOString()
+                }));
+            } else {
+                resultEl.innerHTML = `
+                <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px;text-align:center;">
+                    <p style="color:#f59e0b;font-weight:700;margin:0 0 4px;">⚠️ 권한 부족</p>
+                    <p style="color:#94a3b8;font-size:11px;margin:0;">해당 자격증(${c.level})은 강사 전용 기능을 이용할 수 없습니다.<br>(2급 이상 필요)</p>
+                </div>`;
+            }
+        } else {
+            resultEl.innerHTML = `
+            <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px;text-align:center;">
+                <p style="color:#ef4444;font-weight:700;margin:0 0 4px;">❌ 인증 실패</p>
+                <p style="color:#94a3b8;font-size:11px;margin:0;">${json.message || '유효하지 않은 자격증 번호입니다.'}</p>
+            </div>`;
+        }
+    } catch (e) {
+        resultEl.innerHTML = `<p style="color:#ef4444;font-size:12px;text-align:center;">서버 연결 오류가 발생했습니다.</p>`;
+    }
+};
+
+
+function initAuth() {
+    const session = getSession();
+    if (session) {
+        updateAuthUI(session);
+    }
+    
+    // Google Identity Services 초기화
+    if (window.google) {
+        google.accounts.id.initialize({
+            client_id: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com", // 사용자의 클라이언트 ID로 교체 필요
+            callback: onGoogleSignIn
+        });
+    }
+}
+
+// 구글 로그인 핸들러
+function handleGoogleLogin() {
+    // 현재 Google Client ID가 없어 실제 구글 연동(OAuth)이 불가능하므로,
+    // 데모/테스트 목적으로 이메일 입력을 받아 소셜 로그인을 시뮬레이션합니다.
+    const mockEmail = prompt("구글 로그인을 진행합니다.\n연동할 구글 계정 이메일을 입력하세요:", "");
+    if (mockEmail && mockEmail.includes('@')) {
+        const socialData = {
+            action: 'socialLogin',
+            provider: 'google',
+            email: mockEmail,
+            name: mockEmail.split('@')[0]
+        };
+        
+        const msgEl = document.getElementById('login-msg');
+        if (msgEl) {
+            msgEl.textContent = "구글 계정 연동 중...";
+            msgEl.style.display = "block";
+            msgEl.className = "login-msg success";
+        }
+        
+        if (typeof GOOGLE_SCRIPT_URL !== 'undefined' && GOOGLE_SCRIPT_URL) {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(socialData)
+            }).then(res => res.json()).then(result => {
+                if (result.status === 'success') {
+                    localStorage.setItem('isa_session_v1', JSON.stringify(result.data));
+                    initAuth();
+                    closeLoginModal();
+                    alert(`${result.data.name}님, 구글 계정으로 로그인되었습니다.`);
+                    if(typeof renderPage === 'function') renderPage('home'); // 화면 갱신
+                } else {
+                    alert("구글 로그인 실패: " + result.message);
+                }
+            }).catch(err => {
+                alert("구글 연동 중 오류가 발생했습니다.");
+            });
+        } else {
+            localStorage.setItem('isa_session_v1', JSON.stringify({ name: socialData.name, email: socialData.email }));
+            initAuth();
+            closeLoginModal();
+            alert(`${socialData.name}님, 구글 계정으로 로그인되었습니다. (테스트)`);
+        }
+    } else if (mockEmail) {
+        alert("유효한 이메일 형식을 입력해주세요.");
+    }
+}
+
+function onGoogleSignIn(response) {
+    // decodeJwt는 아래에 정의
+    const payload = decodeJwt(response.credential);
+    console.log("Google User:", payload);
+    
+    const socialData = {
+        action: 'socialLogin',
+        provider: 'google',
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture
+    };
+    
+    showLoginMsg("구글 계정 확인 중...", "cyan");
+    
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', // GAS의 한계로 no-cors 사용 시 응답을 못받으므로 실제로는 폼 전송이나 JSONP 방식을 쓰기도 함
+        body: JSON.stringify(socialData)
+    })
+    .then(() => {
+        // no-cors는 성공 여부를 알 수 없으므로, 별도의 확인 로직이 필요함
+        // 보통 GAS는 redirect를 하므로 처리가 까다로움. 
+        // 여기서는 기존 app.js의 callGAS 스타일을 따름 (JSONP 지원 시)
+        callGAS(socialData, (res) => {
+            if (res.status === 'success') {
+                saveSession(res.data);
+                updateAuthUI(res.data);
+                closeLoginModal();
+                alert(`${res.data.name}님, 구글 계정으로 로그인되었습니다.`);
+            } else {
+                showLoginMsg(res.message, "red");
+            }
+        });
+    });
+}
+
+function decodeJwt(token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+}
+
+function handleAppleLogin() {
+    alert("애플 로그인은 현재 준비 중입니다. 구글 로그인 또는 이메일 로그인을 이용해 주세요.");
+}
 
 function renderAppCheckContent(isKO) {
     const session = getSession();
@@ -1406,12 +1737,118 @@ window.searchCertificate = function() {
 
 function renderNoticeContent(isKO) {
     const notices = [
+        { date: '2026.04.20', title: isKO ? '저작권 고지' : 'Copyright Notice', isNew: true, content: isKO
+            ? `<p style="margin:0 0 8px;">본 웹사이트에 게시된 모든 콘텐츠(텍스트, 이미지, 영상, 로고, 디자인 등)의 저작권은 <strong style="color:#e2e8f0;">국제인공서핑협회(ISA)</strong>에 귀속됩니다.</p>
+               <p style="margin:0 0 8px;">사전 서면 동의 없이 복제, 배포, 수정, 전송, 재출판하거나 상업적 목적으로 이용하는 행위를 금합니다.</p>
+               <p style="margin:0 0 8px;">개인적·비상업적 용도의 인용은 출처를 명확히 표기하는 조건 하에 허용될 수 있습니다.</p>
+               <p style="margin:0 0 8px;">저작권 관련 문의: <a href="mailto:zenpower0708@gmail.com" style="color:#67e8f9;text-decoration:none;">zenpower0708@gmail.com</a></p>
+               <p style="margin:8px 0 0;color:#475569;font-size:11px;">© 2026 국제인공서핑협회 (ISA). All Rights Reserved.</p>`
+            : `<p style="margin:0 0 8px;">All content published on this website (text, images, videos, logos, designs, etc.) is the intellectual property of <strong style="color:#e2e8f0;">ISA (International Artificial Surfing Association)</strong>.</p>
+               <p style="margin:0 0 8px;">Reproduction, distribution, modification, transmission, republication, or commercial use without prior written consent is strictly prohibited.</p>
+               <p style="margin:0 0 8px;">Quotation for personal, non-commercial purposes is permitted provided the source is clearly attributed.</p>
+               <p style="margin:0 0 8px;">Copyright inquiries: <a href="mailto:zenpower0708@gmail.com" style="color:#67e8f9;text-decoration:none;">zenpower0708@gmail.com</a></p>
+               <p style="margin:8px 0 0;color:#475569;font-size:11px;">© 2026 ISA (International Artificial Surfing Association). All Rights Reserved.</p>`
+        },
+        { date: '2026.04.20', title: isKO ? '2026.04.20 NEW — 종목별 급수별 기술요구사항 정리 (전 종목)' : '2026.04.20 NEW — Technical Requirements Summary (All Disciplines)', isNew: true },
+        { date: '2026.04.20', title: isKO ? '2026.04.20 NEW — 종목별 실기평가 기술 요구사항 공고 — Wave Surfing' : '2026.04.20 NEW — Practical Skill Requirements Notice — Wave Surfing', isNew: true },
+        { date: '2026.04.20', title: isKO ? '2026.04.20 NEW — 종목별 실기평가 기술 요구사항 공고 — Wake Surfing' : '2026.04.20 NEW — Practical Skill Requirements Notice — Wake Surfing', isNew: true },
+        { date: '2026.04.20', title: isKO ? '2026.04.20 NEW — 종목별 실기평가 기술 요구사항 공고 — Body / Boogie Board' : '2026.04.20 NEW — Practical Skill Requirements Notice — Body / Boogie Board', isNew: true },
+        { date: '2026.04.20', title: isKO ? '2026.04.20 — 종목별 실기평가 기술 요구사항 공고 — Standing / Flow Board' : '2026.04.20 — Practical Skill Requirements Notice — Standing / Flow Board' },
+        { date: '2026.04.18', title: isKO ? '실습 이수 확인서 양식 배포 안내' : 'Training Completion Certificate Form Released' },
         { date: '2026.04.10', title: isKO ? '2026년 2분기 자격검정 일정 공고' : '2026 Q2 Certification Exam Schedule' },
         { date: '2026.03.25', title: isKO ? '실기평가 업로드 시스템 개선 안내' : 'Practical Evaluation Upload System Improvement' },
         { date: '2026.03.15', title: isKO ? '필기시험 재응시 제도 시행 안내' : 'Written Exam Retake Policy Notice' },
         { date: '2026.02.28', title: isKO ? '국제인공서핑협회 공식 인증 강사 목록 공개' : 'Official Certified Instructor List Released' },
     ];
-    return `<div class="quick-list">${notices.map(n => `<div class="quick-item"><div class="date">${n.date}</div><div class="title">${n.title}</div></div>`).join('')}</div>`;
+
+    const downloadBox = `
+        <div class="notice-download-box">
+            <div class="ndl-badge">📎 ${isKO ? '서식 자료실' : 'FORMS & DOCUMENTS'}</div>
+            <div class="ndl-title">${isKO ? '실습 이수 확인서' : 'Practical Training Completion Certificate'}</div>
+            <div class="ndl-desc">${isKO
+                ? '자격증 신청 시 제출하는 실습 이수 확인서입니다. 강사 서명 후 업로드하세요.'
+                : 'Required for certification applications. Have your instructor sign before uploading.'
+            }</div>
+            <div class="notice-download-btns">
+                <a class="notice-dl-btn ko" href="/실습이수확인서.html" target="_blank">
+                    📄 ${isKO ? '한국어 양식' : 'Korean Form (KO)'}
+                </a>
+                <a class="notice-dl-btn en" href="/training-cert-en.html" target="_blank">
+                    📄 ${isKO ? '영문 양식' : 'English Form (EN)'}
+                </a>
+            </div>
+            
+            <!-- 섹션 구분선 -->
+            <div style="border-top: 1px solid rgba(255,255,255,0.06); margin: 16px 0 14px;"></div>
+            
+            <div class="ndl-title" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 10px; background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); border-radius: 5px; padding: 2px 8px; font-weight: 800; text-transform: uppercase;">🏥 ${isKO ? '공제금 청구 서식' : 'Claim Forms'}</span>
+                <span style="font-weight: 700;">${isKO ? '공제금 청구서' : 'Mutual Aid Claim Form'}</span>
+            </div>
+            <div class="ndl-desc">${isKO
+                ? '서핑 중 사고 발생 시 제출하는 공제금 청구서입니다. 운영자 서명 후 업로드하세요.'
+                : 'Submit this form for mutual aid benefits after an accident. Operator signature required.'
+            }</div>
+            <div class="notice-download-btns">
+                <a class="notice-dl-btn ko" href="/mutualaid/claim-form.html" target="_blank" style="background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); color: #fca5a5;">
+                    📄 ${isKO ? '한국어 청구서' : 'Korean Form (KO)'}
+                </a>
+                <a class="notice-dl-btn en" href="/mutualaid/claim-form-en.html" target="_blank" style="background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: var(--text-dark);">
+                    📄 ${isKO ? '영문 청구서' : 'English Form (EN)'}
+                </a>
+            </div>
+        </div>
+        <div class="notice-download-box" style="margin-top:10px;">
+            <div class="ndl-badge" style="background:rgba(8,145,178,0.85);color:#fff;">📋 ${isKO ? '실기평가 기술 요구사항' : 'SKILL REQUIREMENTS'}</div>
+            <div class="ndl-title">${isKO ? '종목별 실기평가 기술 요구사항' : 'Practical Skill Requirements by Discipline'}</div>
+            <div class="ndl-desc">${isKO
+                ? '급수별 지정 기술, 영상 제출 기준, 가산점 항목을 확인하세요.'
+                : 'Check designated skills, video submission requirements, and bonus criteria by level.'
+            }</div>
+            <div class="notice-download-btns">
+                <a class="notice-dl-btn ko" href="/skill-requirements-sf.html" target="_blank">
+                    🏄 ${isKO ? 'Standing / Flow Board' : 'Standing / Flow Board'}
+                </a>
+                <a class="notice-dl-btn ko" href="/skill-requirements-bb.html" target="_blank" style="background:rgba(139,92,246,0.12);border-color:rgba(139,92,246,0.4);color:#7c3aed;">
+                    🛹 ${isKO ? 'Body / Boogie Board' : 'Body / Boogie Board'}
+                </a>
+                <a class="notice-dl-btn ko" href="/skill-requirements-ws.html" target="_blank" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.4);color:#059669;">
+                    🌊 ${isKO ? 'Wake Surfing' : 'Wake Surfing'}
+                </a>
+                <a class="notice-dl-btn ko" href="/skill-requirements-wave.html" target="_blank" style="background:rgba(249,115,22,0.12);border-color:rgba(249,115,22,0.4);color:#ea580c;">
+                    🏖️ ${isKO ? 'Wave Surfing' : 'Wave Surfing'}
+                </a>
+            </div>
+        </div>`;
+
+    const renderNoticeItem = (n) => n.content ? `
+            <div class="quick-item" style="cursor:pointer;user-select:none;" onclick="(function(el){var c=el.querySelector('.ni-content');var a=el.querySelector('.ni-arrow');if(c.style.display==='none'||c.style.display===''){c.style.display='block';a.style.transform='rotate(180deg)';}else{c.style.display='none';a.style.transform='rotate(0deg)';}})(this)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                    <div style="flex:1;">
+                        <div class="date">${n.date}${n.isNew ? ` <span style="display:inline-block;background:var(--cyan);color:#000;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;vertical-align:middle;margin-left:4px">NEW</span>` : ''}</div>
+                        <div class="title">${n.title}</div>
+                    </div>
+                    <span class="ni-arrow" style="color:#64748b;font-size:11px;margin-top:4px;transition:transform 0.2s;display:inline-block;">▼</span>
+                </div>
+                <div class="ni-content" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);font-size:12px;color:#94a3b8;line-height:1.75;">${n.content}</div>
+            </div>` : `
+            <div class="quick-item">
+                <div class="date">${n.date}${n.isNew ? ` <span style="display:inline-block;background:var(--cyan);color:#000;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;vertical-align:middle;margin-left:4px">NEW</span>` : ''}</div>
+                <div class="title">${n.title}</div>
+            </div>`;
+
+    const pinnedNotices = notices.filter(n => n.content);
+    const restNotices = notices.filter(n => !n.content);
+
+    const pinnedHTML = pinnedNotices.length ? `
+        <div class="notice-section-label">${isKO ? '공지' : 'Notice'}</div>
+        ${pinnedNotices.map(renderNoticeItem).join('')}` : '';
+
+    const noticeList = `
+        <div class="notice-section-label" style="margin-top:8px;">${isKO ? '최근 공지' : 'Recent Notices'}</div>
+        ${restNotices.map(renderNoticeItem).join('')}`;
+
+    return `<div class="quick-list">${pinnedHTML}${downloadBox}${noticeList}</div>`;
 }
 
 function renderEventContent(isKO) {
@@ -1434,7 +1871,8 @@ function updateNavbarAuth(user) {
     const btn = document.querySelector('.login-btn');
     if (!btn) return;
     if (user && user.name) {
-        btn.innerHTML = `<span style="font-size:12px;background:var(--cyan);color:black;padding:2px 8px;border-radius:999px;font-weight:900">${user.name.charAt(0)}</span> ${user.name}`;
+        const pointsStr = (user.points !== undefined) ? ` <span style="font-size:10px;color:var(--cyan);margin-left:4px;font-weight:700">${user.points.toLocaleString()}P</span>` : '';
+        btn.innerHTML = `<span style="font-size:12px;background:var(--cyan);color:black;padding:2px 8px;border-radius:999px;font-weight:900">${user.name.charAt(0)}</span> ${user.name}${pointsStr}`;
         btn.onclick = () => openProfileModal();
     } else {
         btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${currentLang === 'KO' ? '로그인' : 'Login'}`;
@@ -1459,6 +1897,12 @@ window.handleLogin = async function(e) {
         if (!name || !email || !password) { alert('필수 정보를 입력해주세요.'); return; }
         if (password !== confirm) { alert('비밀번호가 일치하지 않습니다.'); return; }
         if (!agree) { alert('개인정보 약관에 동의해주세요.'); return; }
+        
+        const smsBadge = document.getElementById('verify-success-badge');
+        if (smsBadge && smsBadge.style.display !== 'flex') {
+            alert(currentLang === 'KO' ? '휴대폰 본인인증을 완료해주세요.' : 'Please complete SMS verification.');
+            return;
+        }
 
         if (!GOOGLE_SCRIPT_URL) {
             // URL이 없으면 테스트용 로컬 저장만 수행
@@ -1566,6 +2010,7 @@ window.openLegalModal = function(type) {
     if (!modal || !contentEl) return;
 
     const titles = {
+        copyright: '저작권 및 지식재산권 고지',
         privacy: '개인정보처리방침',
         terms: '이용약관',
         insurance: '공제회 이용약관'
@@ -1620,7 +2065,7 @@ window.closeLegalModalDirect = function() {
 
 // 실명인증 방식 선택
 window.selectAuthMethod = function(method) {
-    const methods = ['pass', 'kakao', 'naver', 'toss', 'sms'];
+    const methods = ['pass', 'kakao', 'naver', 'toss', 'google', 'sms'];
     methods.forEach(m => {
         const btn = document.getElementById(`auth-${m}`);
         if (btn) btn.classList.remove('selected');
@@ -1643,6 +2088,66 @@ window.selectAuthMethod = function(method) {
         selected?.classList.remove('selected');
     } else {
         if (pgNotice) pgNotice.style.display = 'none';
+    }
+};
+
+let verifyTimerInterval;
+let verifyTimeLeft = 180;
+
+window.sendVerifyCode = function() {
+    const phone = document.getElementById('signup-phone')?.value;
+    if (!phone || phone.length < 10) {
+        alert(currentLang === 'KO' ? '올바른 휴대폰 번호를 입력해주세요.' : 'Please enter a valid phone number.');
+        return;
+    }
+    
+    alert(currentLang === 'KO' ? '인증번호가 발송되었습니다. (테스트 모드: 123456)' : 'Verification code sent. (Test mode: 123456)');
+    
+    document.getElementById('verify-code-group').style.display = 'block';
+    
+    clearInterval(verifyTimerInterval);
+    verifyTimeLeft = 180;
+    updateVerifyTimerDisplay();
+    
+    verifyTimerInterval = setInterval(() => {
+        verifyTimeLeft--;
+        if (verifyTimeLeft <= 0) {
+            clearInterval(verifyTimerInterval);
+            document.getElementById('verify-timer').textContent = currentLang === 'KO' ? '시간 초과' : 'Time out';
+            document.getElementById('verify-msg').textContent = currentLang === 'KO' ? '인증시간이 만료되었습니다. 다시 시도해주세요.' : 'Verification time expired. Please try again.';
+            document.getElementById('verify-msg').style.color = '#ef4444';
+        } else {
+            updateVerifyTimerDisplay();
+        }
+    }, 1000);
+};
+
+function updateVerifyTimerDisplay() {
+    const min = Math.floor(verifyTimeLeft / 60);
+    const sec = verifyTimeLeft % 60;
+    document.getElementById('verify-timer').textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+}
+
+window.confirmVerifyCode = function() {
+    if (verifyTimeLeft <= 0) {
+        alert(currentLang === 'KO' ? '인증시간이 만료되었습니다.' : 'Verification time expired.');
+        return;
+    }
+    
+    const code = document.getElementById('verify-code-input')?.value;
+    if (code === '123456') {
+        clearInterval(verifyTimerInterval);
+        document.getElementById('verify-code-group').style.display = 'none';
+        document.getElementById('verify-success-badge').style.display = 'flex';
+        
+        const phone = document.getElementById('signup-phone').value;
+        document.getElementById('verify-success-detail').textContent = phone;
+        
+        document.getElementById('signup-phone').disabled = true;
+        document.getElementById('send-code-btn').style.display = 'none';
+    } else {
+        document.getElementById('verify-msg').textContent = currentLang === 'KO' ? '인증번호가 일치하지 않습니다.' : 'Invalid verification code.';
+        document.getElementById('verify-msg').style.color = '#ef4444';
     }
 };
 
@@ -1907,6 +2412,130 @@ async function uploadPhotoToGAS(file) {
     });
 }
 
+// ===== 실습 이수 증빙 업로드 =====
+window.previewTrainingProof = function(input) {
+    const preview = document.getElementById('training-proof-preview');
+    const countEl = document.getElementById('training-proof-count');
+    if (!preview) return;
+    
+    preview.innerHTML = '';
+    const files = Array.from(input.files).slice(0, 5);
+    
+    if (countEl) {
+        countEl.textContent = files.length > 0 ? `${files.length}개 선택됨 (최대 5개)` : '선택된 파일 없음';
+    }
+    
+    files.forEach((file, i) => {
+        const item = document.createElement('div');
+        item.className = 'proof-item';
+        
+        if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            const reader = new FileReader();
+            reader.onload = (e) => { img.src = e.target.result; };
+            reader.readAsDataURL(file);
+            item.appendChild(img);
+        } else {
+            const icon = document.createElement('span');
+            icon.className = 'file-icon';
+            icon.textContent = '📄';
+            item.appendChild(icon);
+        }
+        
+        const fileName = document.createElement('span');
+        fileName.className = 'file-name';
+        fileName.textContent = file.name;
+        item.appendChild(fileName);
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.textContent = '✕';
+        removeBtn.title = '삭제';
+        removeBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const dt = new DataTransfer();
+            const inputEl = document.getElementById('training-proof-input');
+            Array.from(inputEl.files).forEach((f, idx) => {
+                if (idx !== i) dt.items.add(f);
+            });
+            inputEl.files = dt.files;
+            window.previewTrainingProof(inputEl);
+        };
+        item.appendChild(removeBtn);
+        
+        preview.appendChild(item);
+    });
+};
+
+
+window.submitTrainingProof = async function(btn) {
+    const user = getSession();
+    if (!user) {
+        alert(currentLang === 'KO' ? '로그인이 필요합니다.' : 'Login required.');
+        openLoginModal(); return;
+    }
+    const input = document.getElementById('training-proof-input');
+    if (!input || !input.files || input.files.length === 0) {
+        alert(currentLang === 'KO' ? '증빙 자료를 최소 1개 첨부해주세요.' : 'Please attach at least 1 proof file.');
+        return;
+    }
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = currentLang === 'KO' ? '제출 중...' : 'Submitting...';
+    try {
+        const files = Array.from(input.files);
+        const uploadedUrls = [];
+        for (const file of files) {
+            const url = await uploadTrainingFileToGAS(file);
+            uploadedUrls.push(url || file.name);
+        }
+        const payload = {
+            action: 'saveTrainingProof',
+            email: user.email,
+            name: user.name,
+            discipline: selectedDiscipline,
+            level: selectedLevel,
+            proofFiles: uploadedUrls.join(','),
+            submittedAt: new Date().toISOString()
+        };
+        await callGAS(payload);
+        alert(currentLang === 'KO'
+            ? '✅ 실습 이수 증빙이 제출되었습니다.\n관리자 검토 후 처리됩니다.'
+            : '✅ Training proof submitted.\nWill be reviewed by admin.');
+        if (input) input.value = '';
+        const preview = document.getElementById('training-proof-preview');
+        if (preview) preview.innerHTML = '';
+        const countEl = document.getElementById('training-proof-count');
+        if (countEl) countEl.textContent = '선택된 파일 없음';
+    } catch(err) {
+        console.error('실습 증빙 제출 오류:', err);
+        alert(currentLang === 'KO' ? '제출 중 오류가 발생했습니다.' : 'An error occurred during submission.');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+};
+
+async function uploadTrainingFileToGAS(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const res = await callGAS({
+                    action: 'saveFile',
+                    fileType: 'trainingProof',
+                    base64: e.target.result,
+                    mimeType: file.type,
+                    fileName: file.name
+                });
+                resolve(res.url || '');
+            } catch(err) { console.error('파일 업로드 실패:', err); resolve(''); }
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
 // callGAS Helper
 async function callGAS(data) {
     const url = GOOGLE_SCRIPT_URL || '';
@@ -1980,9 +2609,9 @@ async function handlePracticalSubmit(btn) {
     btn.disabled = true;
     const originalText = btn.textContent;
     btn.textContent = "...";
-    
+
     const success = await submitPracticalEval();
-    
+
     if (success) {
         alert(currentLang === 'KO' ? "실기 평가 영상이 성공적으로 제출되었습니다!" : "Practical video submitted successfully!");
         renderPage('cert'); // UI 갱신
@@ -1991,3 +2620,286 @@ async function handlePracticalSubmit(btn) {
         btn.textContent = originalText;
     }
 }
+
+// ============================================================
+// ★ ISA 포인트 시스템 (v1 - ISA-Prod)
+// ============================================================
+
+// 세션 저장 헬퍼
+function saveSession(data) {
+    localStorage.setItem('isa_session_v1', JSON.stringify(data));
+}
+
+// ── 기존 openProfileModal 오버라이드 (포인트 표시 추가) ──
+function openProfileModal() {
+    const user = getSession();
+    if (!user) { openLoginModal(); return; }
+
+    const nm = document.getElementById('profile-name');
+    const em = document.getElementById('profile-email');
+    const ph = document.getElementById('profile-phone');
+    const bi = document.getElementById('profile-birth');
+    const ge = document.getElementById('profile-gender');
+    const jo = document.getElementById('profile-joined');
+
+    if (nm) nm.textContent = user.name;
+    if (em) em.textContent = user.email;
+    if (ph) ph.textContent = user.phone || '-';
+    if (bi) bi.textContent = user.birth || '-';
+    if (ge) ge.textContent = user.gender === 'M' ? (currentLang === 'KO' ? '남성' : 'Male') : (currentLang === 'KO' ? '여성' : 'Female');
+    if (jo) jo.textContent = user.joined || '-';
+
+    // 포인트 즉시 표시 (캐시)
+    const ptEl = document.getElementById('profile-points-value');
+    if (ptEl) ptEl.textContent = (user.points || 0).toLocaleString() + ' P';
+
+    // 기본 탭: 내 정보
+    switchProfileTab('info');
+    const m = document.getElementById('profile-modal');
+    if (m) m.classList.add('open');
+
+    fetchLogbook();
+
+    // 서버에서 최신 포인트 비동기 갱신
+    fetchMyPoints(user.email).then(freshPoints => {
+        const el = document.getElementById('profile-points-value');
+        if (el) el.textContent = freshPoints.toLocaleString() + ' P';
+        const sess = getSession();
+        if (sess) { sess.points = freshPoints; saveSession(sess); }
+    }).catch(() => {});
+}
+
+// ── 포인트/적립 탭 처리를 위한 switchProfileTab 오버라이드 ──
+function switchProfileTab(tab) {
+    // 기존 탭 비활성화
+    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    // 새 탭 활성화
+    const tabBtn = document.getElementById('tab-' + tab);
+    if (tabBtn) tabBtn.classList.add('active');
+
+    const tabContent = document.getElementById('profile-' + tab + '-content');
+    if (tabContent) tabContent.classList.add('active');
+
+    // 포인트 내역 탭 렌더링
+    if (tab === 'points') {
+        const session = getSession();
+        const content = document.getElementById('profile-points-content');
+        if (content && session) {
+            content.innerHTML = '<div style="text-align:center;padding:32px;color:#64748b;font-size:13px">📊 내역 불러오는 중...</div>';
+            fetchMyPointHistory(session.email).then(result => {
+                if (!result || !result.data || result.data.length === 0) {
+                    content.innerHTML = '<div style="text-align:center;padding:32px;color:#64748b;font-size:13px">아직 포인트 내역이 없습니다.</div>';
+                    return;
+                }
+                const rows = result.data.map(item => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                        <div>
+                            <div style="font-size:13px;color:white;font-weight:600">${item.reason}</div>
+                            <div style="font-size:11px;color:#64748b;margin-top:2px">${item.date}</div>
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;margin-left:12px">
+                            <div style="font-size:14px;font-weight:700;color:${item.points > 0 ? '#22c55e' : '#ef4444'}">${item.points > 0 ? '+' : ''}${item.points.toLocaleString()}P</div>
+                            <div style="font-size:11px;color:#64748b">잔액 ${(item.balance||0).toLocaleString()}P</div>
+                        </div>
+                    </div>`).join('');
+                content.innerHTML = `
+                    <div style="padding:16px">
+                        <div style="font-size:11px;color:#64748b;margin-bottom:8px;text-align:right">총 ${result.data.length}건</div>
+                        <div style="max-height:320px;overflow-y:auto;padding-right:4px">${rows}</div>
+                    </div>`;
+            }).catch(() => {
+                content.innerHTML = '<div style="text-align:center;padding:32px;color:#ef4444;font-size:12px">내역을 불러오지 못했습니다.</div>';
+            });
+        }
+    }
+
+    // 포인트 적립 탭 렌더링
+    if (tab === 'earn') {
+        const content = document.getElementById('profile-earn-content');
+        if (content) {
+            content.innerHTML = `
+            <div style="padding:16px;display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto">
+
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px">
+                    <div style="margin-bottom:10px">
+                        <div style="font-size:13px;font-weight:700;color:white;margin-bottom:2px">📢 SNS 홍보 게시글</div>
+                        <div style="font-size:11px;color:#64748b">승인 후 1,000P 적립 · 월 5회 한도</div>
+                    </div>
+                    <div style="display:flex;gap:6px;margin-bottom:6px">
+                        <select id="promo-platform" style="flex:0 0 110px;padding:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:white;font-size:12px;outline:none">
+                            <option value="인스타그램">인스타그램</option>
+                            <option value="네이버블로그">네이버 블로그</option>
+                            <option value="네이버카페">네이버 카페</option>
+                            <option value="유튜브">유튜브</option>
+                            <option value="기타SNS">기타 SNS</option>
+                        </select>
+                        <input id="promo-link" type="url" placeholder="게시글 링크 (https://...)"
+                            style="flex:1;padding:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:white;font-size:12px;outline:none;min-width:0">
+                    </div>
+                    <button onclick="submitPromoPostForm()"
+                        style="width:100%;padding:9px;background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(37,99,235,0.15));color:#06b6d4;border:1px solid rgba(6,182,212,0.3);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">
+                        제출하기
+                    </button>
+                    <div id="promo-msg" style="font-size:11px;margin-top:6px;color:#94a3b8;text-align:center;min-height:16px"></div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px">
+                    <div style="margin-bottom:10px">
+                        <div style="font-size:13px;font-weight:700;color:white;margin-bottom:2px">⭐ 리뷰 작성</div>
+                        <div style="font-size:11px;color:#64748b">200P 적립 · 하루 5회 한도</div>
+                    </div>
+                    <select id="review-target"
+                        style="width:100%;padding:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:white;font-size:12px;outline:none;margin-bottom:6px">
+                        <option value="자격증 과정">자격증 과정 리뷰</option>
+                        <option value="장비 스토어">장비 스토어 리뷰</option>
+                        <option value="강사 매칭">강사 매칭 서비스 리뷰</option>
+                        <option value="협회 서비스">협회 서비스 전체 리뷰</option>
+                    </select>
+                    <textarea id="review-text" placeholder="리뷰 내용을 입력하세요 (20자 이상)"
+                        style="width:100%;padding:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:white;font-size:12px;outline:none;resize:none;height:62px;box-sizing:border-box"></textarea>
+                    <button onclick="submitReviewForm()"
+                        style="width:100%;margin-top:6px;padding:9px;background:linear-gradient(135deg,rgba(234,179,8,0.15),rgba(239,68,68,0.15));color:#facc15;border:1px solid rgba(234,179,8,0.3);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">
+                        리뷰 등록 +200P
+                    </button>
+                    <div id="review-msg" style="font-size:11px;margin-top:6px;color:#94a3b8;text-align:center;min-height:16px"></div>
+                </div>
+            </div>`;
+        }
+    }
+
+    // 자격증 탭
+    if (tab === 'cert') {
+        window.loadMyCerts && window.loadMyCerts();
+    }
+}
+
+// ── 포인트 API ──
+async function fetchMyPoints(email) {
+    const url = `${GOOGLE_SCRIPT_URL}?action=getPoints&email=${encodeURIComponent(email)}`;
+    try {
+        const res = await fetch(url);
+        const result = await res.json();
+        if (result.status === 'success') return result.points;
+    } catch(e) { console.warn('포인트 조회 실패:', e); }
+    return 0;
+}
+
+async function fetchMyPointHistory(email) {
+    const url = `${GOOGLE_SCRIPT_URL}?action=getPointHistory&email=${encodeURIComponent(email)}`;
+    try {
+        const res = await fetch(url);
+        return await res.json();
+    } catch(e) { console.warn('포인트 내역 조회 실패:', e); }
+    return { data: [], total: 0 };
+}
+
+async function submitPromoPostForm() {
+    const session = getSession();
+    if (!session) return;
+    const link     = document.getElementById('promo-link')?.value?.trim();
+    const platform = document.getElementById('promo-platform')?.value;
+    const msg      = document.getElementById('promo-msg');
+
+    if (!link || !link.startsWith('http')) {
+        if (msg) { msg.style.color = '#ef4444'; msg.textContent = '올바른 링크를 입력해주세요. (https://...)'; }
+        return;
+    }
+    if (msg) { msg.style.color = '#94a3b8'; msg.textContent = '제출 중...'; }
+
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+            method:  'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'submitPromoPost', email: session.email, name: session.name, link, platform })
+        });
+        const result = await res.json();
+        if (msg) { msg.style.color = result.status === 'success' ? '#22c55e' : '#ef4444'; msg.textContent = result.message; }
+        if (result.status === 'success') { const el = document.getElementById('promo-link'); if (el) el.value = ''; }
+    } catch(e) {
+        if (msg) { msg.style.color = '#ef4444'; msg.textContent = '제출 중 오류가 발생했습니다.'; }
+    }
+}
+window.submitPromoPostForm = submitPromoPostForm;
+
+async function submitReviewForm() {
+    const session    = getSession();
+    if (!session) return;
+    const reviewText = document.getElementById('review-text')?.value?.trim();
+    const targetType = document.getElementById('review-target')?.value;
+    const msg        = document.getElementById('review-msg');
+
+    if (!reviewText || reviewText.length < 20) {
+        if (msg) { msg.style.color = '#ef4444'; msg.textContent = '리뷰를 20자 이상 입력해주세요.'; }
+        return;
+    }
+    if (msg) { msg.style.color = '#94a3b8'; msg.textContent = '등록 중...'; }
+
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+            method:  'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'submitReview', email: session.email, name: session.name, reviewText, targetType })
+        });
+        const result = await res.json();
+        if (msg) { msg.style.color = result.status === 'success' ? '#22c55e' : '#ef4444'; msg.textContent = result.message; }
+        if (result.status === 'success') {
+            const newPoints = result.balance || 0;
+            const ptEl = document.getElementById('profile-points-value');
+            if (ptEl) ptEl.textContent = newPoints.toLocaleString() + ' P';
+            const sess = getSession(); if (sess) { sess.points = newPoints; saveSession(sess); }
+            const textEl = document.getElementById('review-text');
+            if (textEl) textEl.value = '';
+        }
+    } catch(e) {
+        if (msg) { msg.style.color = '#ef4444'; msg.textContent = '등록 중 오류가 발생했습니다.'; }
+    }
+}
+window.submitReviewForm = submitReviewForm;
+
+// ── 포인트 토스트 ──
+function showPointsToast(amount, reason) {
+    const toast = document.createElement('div');
+    toast.style.cssText = [
+        'position:fixed;top:110px;left:50%;transform:translateX(-50%);z-index:9999;',
+        'background:linear-gradient(135deg,rgba(15,23,42,0.97),rgba(30,58,138,0.95));',
+        'border:1px solid rgba(234,179,8,0.55);padding:16px 28px;border-radius:16px;',
+        'color:white;font-weight:700;font-size:14px;text-align:center;min-width:220px;',
+        'box-shadow:0 8px 32px rgba(234,179,8,0.2);'
+    ].join('');
+    toast.innerHTML = '🏆 <span style="color:#facc15">+' + amount.toLocaleString() + 'P</span> 적립!<br>' +
+        '<span style="font-size:12px;color:#94a3b8;font-weight:400">' + reason + '</span>';
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.transition = 'opacity 0.4s ease';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 420);
+    }, 3200);
+}
+
+// ── 가입 축하 포인트 토스트 자동 표시 ──
+(function patchNavbarForSignupToast() {
+    const _orig = window.updateNavbarAuth;
+    if (!_orig) return;
+    window.updateNavbarAuth = function(user) {
+        _orig.call(this, user);
+        if (user && sessionStorage.getItem('isa_signup_toast')) {
+            sessionStorage.removeItem('isa_signup_toast');
+            setTimeout(() => showPointsToast(500, '가입 축하 포인트'), 400);
+        }
+    };
+})();
+
+// ── handleLogin 패치: 회원가입 성공 시 플래그 설정 ──
+(function patchHandleLoginForPoints() {
+    const _orig = window.handleLogin;
+    if (!_orig) return;
+    window.handleLogin = async function(e) {
+        const wasSignup = !isLoginMode;
+        await _orig.call(this, e);
+        if (wasSignup && getSession()) {
+            sessionStorage.setItem('isa_signup_toast', '1');
+        }
+    };
+})();
