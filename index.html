@@ -55,6 +55,8 @@
     <link rel="stylesheet" href="styles.css?v=20260429v1">
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Innopay PG SDK -->
+    <script src="https://pg.innopay.co.kr/tpay/js/innopay.js"></script>
 </head>
 <body>
     <!-- Government Badges Bar -->
@@ -95,11 +97,12 @@
             <div class="nav-links" id="nav-links">
                 <a href="#/cert" class="nav-link" data-page="cert"><span id="nav-cert">자격증</span></a>
                 <!-- <a href="/mutualaid/" target="_blank" class="nav-link"><span id="nav-insurance">공제회</span></a> -->
-                <a href="#/shop" class="nav-link" data-page="shop"><span id="nav-shop">장비스토어</span></a>
-                <a href="#/map" class="nav-link" data-page="map"><span id="nav-map">인공서핑장현황</span></a>
-                <a href="#/edu" class="nav-link" data-page="edu"><span id="nav-edu">교육</span></a>
                 <a href="https://isa-book-store.vercel.app/" target="_blank" class="nav-link"><span id="nav-book">교재</span></a>
                 <a href="javascript:void(0)" onclick="openInstructorModal()" class="nav-link" id="nav-instructor-link"><span id="nav-instructor">강사전용</span></a>
+                <a href="#/board" class="nav-link" data-page="board"><span id="nav-board">게시판</span></a>
+                <a href="#/shop" class="nav-link" data-page="shop"><span id="nav-shop">장비스토어</span></a>
+                <a href="#/edu" class="nav-link" data-page="edu"><span id="nav-edu">교육</span></a>
+                <a href="#/map" class="nav-link" data-page="map"><span id="nav-map">인공서핑장현황</span></a>
             </div>
 
             <div class="nav-actions">
@@ -121,11 +124,12 @@
         <div class="mobile-sub-nav" id="mobile-sub-nav">
             <a href="#/cert" class="mobile-sub-link" data-page="cert"><span id="m-nav-cert">자격증</span></a>
             <!-- <a href="/mutualaid/" target="_blank" class="mobile-sub-link"><span id="m-nav-insurance">공제회</span></a> -->
-            <a href="#/shop" class="mobile-sub-link" data-page="shop"><span id="m-nav-shop">장비스토어</span></a>
-            <a href="#/map" class="mobile-sub-link" data-page="map"><span id="m-nav-map">인공서핑장현황</span></a>
-            <a href="#/edu" class="mobile-sub-link" data-page="edu"><span id="m-nav-edu">교육</span></a>
             <a href="https://isa-book-store.vercel.app/" target="_blank" class="mobile-sub-link"><span id="m-nav-book">교재</span></a>
             <a href="javascript:void(0)" onclick="openInstructorModal()" class="mobile-sub-link" id="m-nav-instructor-link"><span id="m-nav-instructor">강사전용</span></a>
+            <a href="#/board" class="mobile-sub-link" data-page="board"><span id="m-nav-board">게시판</span></a>
+            <a href="#/shop" class="mobile-sub-link" data-page="shop"><span id="m-nav-shop">장비스토어</span></a>
+            <a href="#/edu" class="mobile-sub-link" data-page="edu"><span id="m-nav-edu">교육</span></a>
+            <a href="#/map" class="mobile-sub-link" data-page="map"><span id="m-nav-map">인공서핑장현황</span></a>
         </div>
     </nav>
 
@@ -219,10 +223,6 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                         이메일로 로그인
                     </button>
-                    <button type="button" class="login-method-btn mobile" onclick="showMobileLogin()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                        휴대폰 번호로 로그인
-                    </button>
                 </div>
 
 
@@ -258,87 +258,19 @@
                         </div>
                     </div>
 
-                    <!-- 실명인증 방식 선택 -->
-                    <div class="auth-method-section">
-                        <div class="auth-method-label">🔐 실명인증 방식 선택 <span style="color:#ef4444;font-size:10px">(필수)</span></div>
-                        <div class="auth-method-grid">
-                            <button type="button" class="auth-method-btn" id="auth-pass" onclick="selectAuthMethod('pass')">
-                                <span class="amb-icon">📱</span>
-                                <span class="amb-name">PASS</span>
-                                <span class="amb-badge soon">준비중</span>
-                            </button>
-                            <button type="button" class="auth-method-btn" id="auth-kakao" onclick="selectAuthMethod('kakao')">
-                                <span class="amb-icon">🟡</span>
-                                <span class="amb-name">카카오</span>
-                                <span class="amb-badge soon">준비중</span>
-                            </button>
-                            <button type="button" class="auth-method-btn" id="auth-naver" onclick="selectAuthMethod('naver')">
-                                <span class="amb-icon">🟢</span>
-                                <span class="amb-name">네이버</span>
-                                <span class="amb-badge soon">준비중</span>
-                            </button>
-                            <button type="button" class="auth-method-btn" id="auth-toss" onclick="selectAuthMethod('toss')">
-                                <span class="amb-icon">💙</span>
-                                <span class="amb-name">토스</span>
-                                <span class="amb-badge soon">준비중</span>
-                            </button>
-                            <button type="button" class="auth-method-btn selected" id="auth-sms" onclick="selectAuthMethod('sms')">
-                                <span class="amb-icon">📨</span>
-                                <span class="amb-name">SMS</span>
-                                <span class="amb-badge">사용가능</span>
-                            </button>
-                            <button type="button" class="auth-method-btn" id="auth-google" onclick="selectAuthMethod('google')">
-                                <span class="amb-icon">
-                                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" height="20" alt="Google" style="margin-bottom:2px">
-                                </span>
-                                <span class="amb-name">구글</span>
-                                <span class="amb-badge soon">준비중</span>
-                            </button>
-                        </div>
-                        <!-- PG사 안내 메세지 -->
-                        <div id="auth-pg-notice" style="margin-top:8px;padding:8px 10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:11px;color:#fde68a;display:none">
-                            <strong>⚠️ PG사 연동 필요:</strong> PASS·카카오·네이버·토스·구글 인증은 PG사(나이스페이먼츠/KG이니시스) 계약 후 활성화됩니다. 현재는 SMS 문자 인증을 이용해주세요.
+                    <div class="form-group">
+                        <label id="label-email-signup">이메일 주소</label>
+                        <div class="input-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                            <input type="email" id="signup-email" placeholder="이메일을 입력하세요">
                         </div>
                     </div>
-
-                    <div class="auth-divider"><span>SMS 본인인증</span></div>
 
                     <div class="form-group">
-                        <label id="label-phone">연락처</label>
-                        <div style="display:flex;gap:8px">
-                            <div class="input-icon" style="flex:1">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/></svg>
-                                <input type="tel" id="signup-phone" placeholder="010-0000-0000">
-                            </div>
-                            <button type="button" id="send-code-btn" onclick="sendVerifyCode()" style="padding:0 16px;background:linear-gradient(135deg,#06b6d4,#2563eb);color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;min-width:100px;transition:opacity 0.3s">
-                                인증번호 발송
-                            </button>
-                        </div>
-                    </div>
-                    <!-- 인증번호 입력 (인증번호 발송 후 표시) -->
-                    <div class="form-group" id="verify-code-group" style="display:none">
-                        <label id="label-verify-code" style="display:flex;align-items:center;gap:8px">
-                            인증번호 입력
-                            <span id="verify-timer" style="color:#facc15;font-size:12px;font-weight:700"></span>
-                        </label>
-                        <div style="display:flex;gap:8px">
-                            <div class="input-icon" style="flex:1">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                <input type="text" id="verify-code-input" placeholder="6자리 인증번호" maxlength="6"
-                                    style="letter-spacing:8px;font-weight:700;font-size:18px;text-align:center">
-                            </div>
-                            <button type="button" id="verify-code-btn" onclick="confirmVerifyCode()" style="padding:0 16px;background:rgba(34,197,94,0.2);color:#22c55e;border:1px solid rgba(34,197,94,0.4);border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;min-width:80px;transition:all 0.3s">
-                                확인
-                            </button>
-                        </div>
-                        <div id="verify-msg" style="font-size:12px;margin-top:6px;color:#94a3b8"></div>
-                    </div>
-                    <!-- 인증 완료 배지 -->
-                    <div id="verify-success-badge" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:12px 16px;margin-bottom:12px;align-items:center;gap:8px">
-                        <span style="font-size:20px">✅</span>
-                        <div>
-                            <div style="font-size:14px;font-weight:700;color:#22c55e" id="verify-success-text">본인인증 완료</div>
-                            <div style="font-size:12px;color:#64748b" id="verify-success-detail"></div>
+                        <label>휴대폰 번호</label>
+                        <div class="input-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72"/></svg>
+                            <input type="tel" id="signup-phone" placeholder="010-0000-0000">
                         </div>
                     </div>
 
@@ -374,19 +306,21 @@
                     </div>
                 </div>
 
-                <!-- 공통 필드 -->
-                <div class="form-group">
-                    <label id="label-email">이메일</label>
-                    <div class="input-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                        <input type="email" id="login-email" placeholder="surfer@isa.world" required>
+                <!-- 공통 필드 (로그인 시 사용) -->
+                <div id="login-fields-only">
+                    <div class="form-group">
+                        <label id="label-email">이메일</label>
+                        <div class="input-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                            <input type="email" id="login-email" placeholder="surfer@isa.world">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label id="label-password">비밀번호</label>
-                    <div class="input-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    <div class="form-group">
+                        <label id="label-password">비밀번호</label>
+                        <div class="input-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input type="password" id="login-password" placeholder="••••••••">
+                        </div>
                     </div>
                 </div>
                 <div id="login-msg" class="login-msg"></div>
@@ -396,6 +330,31 @@
                 <button type="button" onclick="backToLoginOptions()" style="margin-right:16px;">← 뒤로가기</button>
                 <button type="button" onclick="toggleLoginMode()" id="login-toggle-text">계정이 없으신가요? 회원가입</button>
             </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Welcome Points Modal -->
+    <div class="modal-overlay" id="welcome-points-modal" onclick="closeWelcomeModal(event)">
+        <div class="modal-box" style="max-width:400px; overflow:hidden;" onclick="event.stopPropagation()">
+            <div style="height:120px; background:linear-gradient(135deg, #06b6d4, #2563eb); display:flex; align-items:center; justify-content:center; position:relative;">
+                <div style="font-size:60px;">🎁</div>
+                <div style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0.3; background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 20px 20px;"></div>
+            </div>
+            <div style="padding:32px 24px; text-align:center;">
+                <h2 class="game-font" style="font-size:24px; color:white; margin-bottom:8px;">가입을 축하합니다!</h2>
+                <p style="color:#94a3b8; font-size:15px; margin-bottom:24px; line-height:1.6;">
+                    ISA 국제인공서핑협회의 회원이 되신 것을 환영합니다.<br>
+                    감사의 의미로 **가입 축하 포인트**를 지급해 드렸습니다.
+                </p>
+                <div style="background:rgba(250,204,21,0.1); border:1px solid rgba(250,204,21,0.3); border-radius:16px; padding:20px; margin-bottom:28px; display:flex; flex-direction:column; align-items:center; gap:8px;">
+                    <span style="font-size:12px; color:#facc15; font-weight:700; letter-spacing:1px;">SIGNUP BONUS</span>
+                    <span style="font-size:32px; font-weight:900; color:#facc15;">1,000 P</span>
+                </div>
+                <button onclick="closeWelcomeModal()" class="btn-primary" style="width:100%; padding:14px; font-weight:800; font-size:16px;">
+                    포인트 확인하고 시작하기
+                </button>
             </div>
         </div>
     </div>
@@ -413,10 +372,10 @@
             </div>
             <div class="profile-tabs">
                 <button class="profile-tab active" onclick="switchProfileTab('info')" id="tab-info">내 정보</button>
-                <button class="profile-tab" onclick="switchProfileTab('logbook')" id="tab-logbook">로그북</button>
-                <button class="profile-tab" onclick="switchProfileTab('cert')" id="tab-cert">내 자격증</button>
-                <button class="profile-tab" onclick="switchProfileTab('points')" id="tab-points">포인트 내역</button>
-                <button class="profile-tab" onclick="switchProfileTab('earn')" id="tab-earn">포인트 적립</button>
+                <button class="profile-tab" onclick="switchProfileTab('charge')" id="tab-charge">포인트 충전</button>
+                <button class="profile-tab" onclick="switchProfileTab('cert')" id="tab-cert" style="white-space:nowrap">내 자격증</button>
+                <button class="profile-tab" onclick="switchProfileTab('points')" id="tab-points" style="white-space:nowrap">포인트 내역</button>
+                <button class="profile-tab" onclick="switchProfileTab('earn')" id="tab-earn" style="white-space:nowrap">포인트 적립</button>
             </div>
             
             <div id="profile-info-content" class="tab-content active">
@@ -449,7 +408,51 @@
                 </div>
             </div>
 
-            <div id="profile-logbook-content" class="tab-content">
+            <div id="profile-charge-content" class="tab-content">
+                <div style="padding:24px;">
+                    <div style="background:rgba(6,182,212,0.05); border:1px solid rgba(6,182,212,0.2); border-radius:12px; padding:20px; margin-bottom:24px; text-align:center;">
+                        <p style="color:#94a3b8; font-size:13px; margin-bottom:8px;">현재 보유 포인트</p>
+                        <p style="color:white; font-size:28px; font-weight:800; font-family:'Orbitron', sans-serif;"><span id="profile-charge-current-pts">0</span> P</p>
+                    </div>
+                    
+                    <h4 style="color:white; font-size:16px; margin-bottom:16px;">충전 금액 선택</h4>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
+                        <button onclick="selectChargeAmount(5000, 5000)" class="charge-opt-btn" id="charge-btn-5000">
+                            <span class="pts">5,000 P</span>
+                            <span class="price">5,000원</span>
+                        </button>
+                        <button onclick="selectChargeAmount(10000, 10000)" class="charge-opt-btn" id="charge-btn-10000">
+                            <span class="pts">10,000 P</span>
+                            <span class="price">10,000원</span>
+                        </button>
+                        <button onclick="selectChargeAmount(30000, 30000)" class="charge-opt-btn" id="charge-btn-30000">
+                            <span class="pts">30,000 P</span>
+                            <span class="price">30,000원</span>
+                        </button>
+                        <button onclick="selectChargeAmount(50000, 50000)" class="charge-opt-btn" id="charge-btn-50000">
+                            <span class="pts">50,000 P</span>
+                            <span class="price">50,000원</span>
+                        </button>
+                    </div>
+
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:24px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span style="color:#94a3b8; font-size:13px;">결제 금액</span>
+                            <span style="color:white; font-size:16px; font-weight:700;" id="charge-final-price">0원</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span style="color:#94a3b8; font-size:13px;">충전 후 잔액</span>
+                            <span style="color:var(--cyan); font-size:16px; font-weight:700;" id="charge-after-pts">0 P</span>
+                        </div>
+                    </div>
+
+                    <button onclick="startPointCharge()" class="btn-primary" style="width:100%; padding:16px; font-weight:800; font-size:16px;">
+                        충전하기 (결제창 호출)
+                    </button>
+                </div>
+            </div>
+
+            <div id="profile-logbook-content" class="tab-content" style="display:none">
                 <div class="logbook-container">
                     <div class="logbook-header">
                         <div class="total-hours-box">
@@ -622,9 +625,25 @@
             document.getElementById('login-options-view').style.display = 'none';
             document.getElementById('login-form-view').style.display = 'block';
             document.getElementById('login-sub').style.display = 'block';
+            
+            // 필드 노출 보장
+            const loginFields = document.getElementById('login-fields-only');
+            if (loginFields) loginFields.style.display = 'block';
+            const signupFields = document.getElementById('signup-fields');
+            if (signupFields) signupFields.style.display = 'none';
+            
             document.getElementById('label-email').innerText = '이메일';
             document.getElementById('login-email').placeholder = 'surfer@isa.world';
             document.getElementById('login-email').type = 'email';
+            
+            // 로그인 모드로 초기화
+            if (typeof isLoginMode !== 'undefined') isLoginMode = true;
+            const title = document.getElementById('login-title');
+            if (title) title.innerText = '로그인';
+            const btn = document.getElementById('login-submit-btn');
+            if (btn) btn.innerText = '로그인';
+            const toggleText = document.getElementById('login-toggle-text');
+            if (toggleText) toggleText.innerText = '계정이 없으신가요? 회원가입';
         }
         function showMobileLogin() {
             currentLoginMethod = 'mobile';

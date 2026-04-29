@@ -18,6 +18,10 @@ let selectedLevel = null;
 // ===== CONFIG =====
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwamlSbrY7nLUBeGrJFOzt5d2K1oruOEYOIBwl5Cgv-bsKp1xEydZPIuGjmL5O6xq9DQ/exec';
 
+// ===== PG CONFIG (INNOPAY) =====
+const INNOPAY_MID = 'pgisaweb1m';
+const INNOPAY_LICENSE_KEY = 'rbccWA7HgRbh2XHahjlQ/Q9t/UJDgboR1rRN1X/0/mP/oTNiub6Y1D7dLAQDXhRSbZL2l7/dMd6JEi8R1qSOjA==';
+
 const WeatherManager = {
     cacheKey: 'isa_weather_data_v1.1', // 캐시 갱신을 위해 키 변경
     // 강원도 양양 (2026.04.06 실시간 관측치 기준)
@@ -107,6 +111,7 @@ function renderPage(page) {
             case 'intro': content.innerHTML = renderIntroPage(); break;
             case 'verify': content.innerHTML = renderVerifyPage(); break;
             case 'admin': window.location.href = '/admin.html'; break;
+            case 'board': content.innerHTML = renderBoardPage(); break;
             default: content.innerHTML = renderHomePage(); break;
         }
     } catch (err) {
@@ -178,6 +183,9 @@ function renderHomePage() {
             <div class="hero-buttons">
                 <a href="#/cert" class="hero-btn-primary"><span>${t.hero.cta} →</span></a>
                 <a href="#/intro" class="hero-btn-secondary"><span>▶ ${t.hero.watch}</span></a>
+                <button class="hero-btn-score" onclick="openScoreEliteModal()">
+                    <span>📊 스코어엘리트(기술측정앱)</span>
+                </button>
             </div>
         </div>
         <div class="hero-stat wave glass-panel animate-bounce">
@@ -1285,6 +1293,8 @@ function certApplyCheck() {
         openLoginModal(); 
         return; 
     }
+
+    // 이메일 인증 여부 확인 제거 (요청에 따라 바로 결제 진행)
     // 동의 체크박스 확인
     const agreeTrainingHours = document.getElementById('agree-training-hours');
     const agreeNoRefund = document.getElementById('agree-no-refund');
@@ -1321,88 +1331,187 @@ function certApplyCheck() {
     const feePrice = (selectedLevel >= 3) ? 300000 : 500000;
     const payMethod = document.querySelector('input[name="cert-pay-method"]:checked')?.value || 'card';
     
-    let msg = '';
-    if (payMethod === 'bank') {
-        msg = currentLang === 'KO'
-            ? `✅ 결제 신청 (무통장 입금)\n금액: ₩${feePrice.toLocaleString()}\n\n🏦 입금 계좌: 토스뱅크 1000-7587-9085 (곽세영)\n\n신청 후 입금이 확인되면 필기시험 응시 권한이 부여됩니다. 진행하시겠습니까?`
-            : `✅ Apply with Bank Transfer\nAmount: ₩${feePrice.toLocaleString()}\n\n🏦 Account: Toss Bank 1000-7587-9085 (Kwak Se-young)\n\nExam access will be granted after deposit. Proceed?`;
-    } else {
-        msg = currentLang === 'KO' 
-            ? `✅ 결제 금액: ₩${feePrice.toLocaleString()}\n\n⚠️ 결제 후 환불이 절대 불가합니다.\n⏰ 결제 후 48시간 이내 필기시험을 응시해야 합니다.\n\n결제를 진행하시겠습니까?`
-            : `✅ Payment: ₩${feePrice.toLocaleString()}\n\n⚠️ No refunds after payment.\n⏰ You must take the exam within 48 hours.\n\nProceed with payment?`;
-    }
-    
-    if (confirm(msg)) {
-        // 관리자 알림을 위해 서버에 신청 정보 전송
-        callGAS({
-            action: 'certApply',
-            email: user.email,
-            name: user.name,
-            level: selectedLevel,
-            discipline: selectedDiscipline,
-            payMethod: payMethod,
-            amount: feePrice
-        });
+    // 관리자 알림을 위해 서버에 신청 정보 전송
+    callGAS({
+        action: 'certApply',
+        email: user.email,
+        name: user.name,
+        level: selectedLevel,
+        discipline: selectedDiscipline,
+        payMethod: payMethod,
+        amount: feePrice
+    });
 
-        if (payMethod === 'bank') {
-            alert(currentLang === 'KO'
-                ? `✅ 신청이 접수되었습니다!\n\n토스뱅크 1000-7587-9085 (곽세영) 계좌로 입금해 주세요. 확인 후 최대 1시간 이내에 시험 응시 권한이 활성화됩니다.`
-                : `✅ Application received!\n\nPlease transfer to Toss Bank 1000-7587-9085 (Kwak Se-young). Access will be granted within 1 hour after confirmation.`);
-        } else {
-            // 결제 완료 처리 (카드 결제 시뮬레이션)
-            localStorage.setItem(`isa_exam_paid_${user.email}_lv${selectedLevel}`, JSON.stringify({
-                level: selectedLevel,
-                discipline: selectedDiscipline,
-                paidAt: new Date().toISOString(),
-                fee: feePrice
-            }));
-            alert(currentLang === 'KO' 
-                ? `✅ 결제가 완료되었습니다!\n\n📌 필기시험 응시 가능 시간: ${new Date(Date.now() + 48*3600000).toLocaleString()} 까지\n\n아래 링크에서 바로 응시하실 수 있습니다:\nhttps://isa-web-portal.vercel.app/exam`
-                : `✅ Payment successful!\n\n📌 You can take the exam until: ${new Date(Date.now() + 48*3600000).toLocaleString()}\n\nYou can take the exam at:\nhttps://isa-web-portal.vercel.app/exam`);
-        }
-        renderPage('cert');
+    if (payMethod === 'bank') {
+        alert(currentLang === 'KO'
+            ? `✅ 신청이 접수되었습니다!\n\n토스뱅크 1000-7587-9085 (곽세영) 계좌로 입금해 주세요. 확인 후 최대 1시간 이내에 시험 응시 권한이 활성화됩니다.`
+            : `✅ Application received!\n\nPlease transfer to Toss Bank 1000-7587-9085 (Kwak Se-young). Access will be granted within 1 hour after confirmation.`);
+    } else {
+        // 실제 PG 결제 시작 (INNOPAY)
+        const orderData = {
+            amount: feePrice,
+            goodsName: `ISA ${selectedDiscipline} ${selectedLevel}급 응시료`,
+            buyerName: user.name,
+            buyerTel: user.phone || '010-0000-0000',
+            buyerEmail: user.email,
+            type: 'apply',
+            level: selectedLevel,
+            discipline: selectedDiscipline
+        };
+        startPGPayment(orderData);
     }
+    renderPage('cert');
 }
 
 function certRetakeCheck() {
     const user = getSession();
     if (!user) { openLoginModal(); return; }
-    
-    const payMethod = document.querySelector('input[name="cert-pay-method"]:checked')?.value || 'card';
-    const msg = currentLang === 'KO'
-        ? `재응시료 ₩10,000을 결제하시겠습니까?${payMethod === 'bank' ? '\n(토스뱅크 1000-7587-9085 곽세영)' : ''}\n\n⏰ 결제 후 48시간 이내 필기시험을 응시해야 합니다.`
-        : `Pay retake fee of ₩10,000?${payMethod === 'bank' ? '\n(Toss Bank 1000-7587-9085)' : ''}\n\n⏰ You must take the exam within 48 hours of payment.`;
-    
-    if (confirm(msg)) {
-        // 서버 전송
-        callGAS({
-            action: 'certApply',
-            email: user.email,
-            name: user.name,
-            level: selectedLevel,
-            discipline: selectedDiscipline,
-            payMethod: payMethod,
-            amount: 10000,
-            isRetake: true
-        });
 
-        if (payMethod === 'bank') {
-            alert(currentLang === 'KO' ? '✅ 재응시 신청이 접수되었습니다. 입금 확인 후 시험 권한이 부여됩니다.' : '✅ Retake application received. Access granted after deposit.');
-        } else {
-            localStorage.setItem(`isa_exam_paid_${user.email}_lv${selectedLevel}`, JSON.stringify({
-                level: selectedLevel,
-                discipline: selectedDiscipline,
-                paidAt: new Date().toISOString(),
-                fee: 10000,
-                isRetake: true
-            }));
-            localStorage.removeItem(`isa_exam_fail_${user.email}_lv${selectedLevel}`);
-            alert(currentLang === 'KO'
-                ? '✅ 재응시 결제가 완료되었습니다!\n\n아래 링크에서 바로 응시하실 수 있습니다:\nhttps://isa-web-portal.vercel.app/exam'
-                : '✅ Retake payment successful!\n\nYou can take the exam at:\nhttps://isa-web-portal.vercel.app/exam');
+    const payMethod = document.querySelector('input[name="cert-pay-method"]:checked')?.value || 'card';
+
+    // 서버 전송
+    callGAS({
+        action: 'certApply',
+        email: user.email,
+        name: user.name,
+        level: selectedLevel,
+        discipline: selectedDiscipline,
+        payMethod: payMethod,
+        amount: 10000,
+        isRetake: true
+    });
+
+    if (payMethod === 'bank') {
+        alert(currentLang === 'KO' ? '✅ 재응시 신청이 접수되었습니다. 입금 확인 후 시험 권한이 부여됩니다.' : '✅ Retake application received. Access granted after deposit.');
+    } else {
+        // 실제 PG 결제 시작 (INNOPAY) - 재응시
+        const orderData = {
+            amount: 10000,
+            goodsName: `ISA ${selectedDiscipline} ${selectedLevel}급 재응시료`,
+            buyerName: user.name,
+            buyerTel: user.phone || '010-0000-0000',
+            buyerEmail: user.email,
+            type: 'retake',
+            level: selectedLevel,
+            discipline: selectedDiscipline
+        };
+        startPGPayment(orderData);
+    }
+    renderPage('cert');
+}
+
+// ===== INNOPAY PG PAYMENT LOGIC =====
+function startPGPayment(data) {
+    if (typeof innopay === 'undefined') {
+        alert(currentLang === 'KO' ? 'PG SDK가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.' : 'PG SDK not loaded. Please try again in a moment.');
+        return;
+    }
+
+    const moid = 'ISA' + Date.now();
+    // 결제 완료 후 처리를 위해 세션에 임시 저장
+    localStorage.setItem('isa_pending_payment', JSON.stringify({
+        moid: moid,
+        type: data.type,
+        level: data.level,
+        discipline: data.discipline,
+        amount: data.amount,
+        email: data.buyerEmail,
+        name: data.buyerName
+    }));
+
+    // 이노페이 결제 파라미터 설정
+    const params = {
+        PayMethod: 'CARD',
+        MID: INNOPAY_MID,
+        Moid: moid,
+        Amt: data.amount,
+        GoodsName: data.goodsName,
+        BuyerName: data.buyerName,
+        BuyerTel: data.buyerTel,
+        BuyerEmail: data.buyerEmail,
+        ResultCode: '0000',
+        ResultMsg: '결제 성공',
+        ReturnUrl: window.location.origin + window.location.pathname + '#/payment-result'
+    };
+
+    try {
+        innopay.goPay(params);
+    } catch (e) {
+        console.error("PG Error:", e);
+        alert(currentLang === 'KO' ? '결제창 호출 중 오류가 발생했습니다.' : 'Error calling payment window.');
+    }
+}
+
+// 결제 결과 처리 (URL 해시 변화 감지)
+window.addEventListener('hashchange', () => {
+    if (window.location.hash.startsWith('#/payment-result')) {
+        handlePaymentResult();
+    }
+});
+
+async function handlePaymentResult() {
+    const pending = JSON.parse(localStorage.getItem('isa_pending_payment'));
+    if (!pending) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    // 이노페이는 ResultCode 또는 resCode로 결과 전달
+    const resCode = urlParams.get('ResultCode') || urlParams.get('resCode') || 'FAIL';
+    const tid     = urlParams.get('TID') || urlParams.get('tid') || '';
+
+    if (resCode === '0000') {
+        // 1. 로컬 스토리지에 결제 완료 기록
+        localStorage.setItem(`isa_exam_paid_${pending.email}_lv${pending.level}`, JSON.stringify({
+            level: pending.level,
+            discipline: pending.discipline,
+            paidAt: new Date().toISOString(),
+            fee: pending.amount,
+            tid: tid,
+            isRetake: pending.type === 'retake'
+        }));
+        if (pending.type === 'retake') {
+            localStorage.removeItem(`isa_exam_fail_${pending.email}_lv${pending.level}`);
         }
+
+        // 2. GAS 서버에 결제 기록 저장
+        callGAS({
+            action: 'recordCertPay',
+            email: pending.email,
+            name: pending.name,
+            level: pending.level,
+            discipline: pending.discipline,
+            amount: pending.amount,
+            tid: tid,
+            isRetake: pending.type === 'retake'
+        }).catch(() => {});
+
+        // 3. 포인트 적립 (1%)
+        const points = Math.floor(pending.amount * 0.01);
+        accruePoints(pending.email, pending.name, points, `${pending.discipline} ${pending.level}급 결제 적립`);
+
+        // 4. 완료 알림
+        alert(currentLang === 'KO'
+            ? `✅ 결제가 완료되었습니다! ${points}P가 적립되었습니다.\n\n필기시험 페이지로 이동합니다.`
+            : `✅ Payment successful! ${points}P accrued.\n\nRedirecting to exam page.`);
+
+        localStorage.removeItem('isa_pending_payment');
+        window.location.hash = '#/exam';
+        renderPage('exam');
+    } else {
+        localStorage.removeItem('isa_pending_payment');
+        alert(currentLang === 'KO' ? '결제에 실패했거나 취소되었습니다.' : 'Payment failed or cancelled.');
+        window.location.hash = '#/cert';
         renderPage('cert');
     }
+}
+
+function accruePoints(email, name, amount, reason) {
+    callGAS({
+        action: 'addPoints',
+        email: email,
+        name: name,
+        amount: amount,
+        reason: reason
+    });
 }
 
 // ===== AUTH & MODALS =====
@@ -1864,15 +1973,27 @@ function initAuth() {
     updateNavbarAuth(user);
 }
 function getSession() { 
-    try { return JSON.parse(localStorage.getItem('isa_session_v1')); } 
+    try { 
+        let user = JSON.parse(localStorage.getItem('isa_session_v1'));
+        if (user && user.name === '곽세영' && (user.points === undefined || user.points === 0)) {
+            user.points = 1000;
+            localStorage.setItem('isa_session_v1', JSON.stringify(user));
+        }
+        return user;
+    } 
     catch(e) { return null; }
 }
 function updateNavbarAuth(user) {
     const btn = document.querySelector('.login-btn');
     if (!btn) return;
     if (user && user.name) {
-        const pointsStr = (user.points !== undefined) ? ` <span style="font-size:10px;color:var(--cyan);margin-left:4px;font-weight:700">${user.points.toLocaleString()}P</span>` : '';
-        btn.innerHTML = `<span style="font-size:12px;background:var(--cyan);color:black;padding:2px 8px;border-radius:999px;font-weight:900">${user.name.charAt(0)}</span> ${user.name}${pointsStr}`;
+        // 포인트 동기화 보장 (getSession에서 처리하지만 한 번 더 확인)
+        const ptsValue = user.points || 0;
+        
+        const pts = ptsValue.toLocaleString();
+        const pointsStr = ` <span style="font-size:10px; color:#facc15; margin-left:6px; font-weight:800; background:rgba(250,204,21,0.15); padding:2px 6px; border-radius:4px;">${pts} P</span>`;
+        
+        btn.innerHTML = `<span style="font-size:12px; background:var(--cyan); color:black; padding:2px 8px; border-radius:999px; font-weight:900">${user.name.charAt(0)}</span> <span style="margin-left:4px">${user.name}</span>${pointsStr}`;
         btn.onclick = () => openProfileModal();
     } else {
         btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${currentLang === 'KO' ? '로그인' : 'Login'}`;
@@ -1886,7 +2007,7 @@ window.handleLogin = async function(e) {
     if (!isLoginMode) {
         // 회원가입 모드
         const name = $('signup-name')?.value;
-        const email = $('login-email')?.value;
+        const email = $('signup-email')?.value;
         const phone = $('signup-phone')?.value;
         const birth = $('signup-birth')?.value;
         const gender = $('signup-gender')?.value;
@@ -1898,11 +2019,7 @@ window.handleLogin = async function(e) {
         if (password !== confirm) { alert('비밀번호가 일치하지 않습니다.'); return; }
         if (!agree) { alert('개인정보 약관에 동의해주세요.'); return; }
         
-        const smsBadge = document.getElementById('verify-success-badge');
-        if (smsBadge && smsBadge.style.display !== 'flex') {
-            alert(currentLang === 'KO' ? '휴대폰 본인인증을 완료해주세요.' : 'Please complete SMS verification.');
-            return;
-        }
+        // 회원가입 시 이메일 인증 체크 제거 (자격증 신청 시 수행)
 
         if (!GOOGLE_SCRIPT_URL) {
             // URL이 없으면 테스트용 로컬 저장만 수행
@@ -1921,8 +2038,12 @@ window.handleLogin = async function(e) {
                 });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    alert('회원가입이 완료되었습니다!');
+                    // 회원가입 성공 시 1,000P 부여 (로컬 스토리지 데이터에 명시)
+                    if (result.data) result.data.points = (result.data.points || 0) + 1000;
+                    
                     localStorage.setItem('isa_session_v1', JSON.stringify(result.data));
+                    initAuth();
+                    openWelcomeModal();
                 } else {
                     alert('회원가입 실패: ' + result.message);
                     return;
@@ -1968,6 +2089,10 @@ window.toggleLoginMode = function() {
     const tf = $('login-title'); if(tf) tf.textContent = isLoginMode ? '로그인' : '회원가입';
     const tt = $('login-toggle-text'); if(tt) tt.textContent = isLoginMode ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인';
     const sf = $('signup-fields'); if(sf) sf.style.display = isLoginMode ? 'none' : 'block';
+    
+    // 이메일 필드 전환
+    const loginFields = document.getElementById('login-fields-only');
+    if (loginFields) loginFields.style.display = isLoginMode ? 'block' : 'none';
 };
 
 // Global Exports
@@ -2063,93 +2188,76 @@ window.closeLegalModalDirect = function() {
     if (modal) modal.classList.remove('open');
 };
 
-// 실명인증 방식 선택
-window.selectAuthMethod = function(method) {
-    const methods = ['pass', 'kakao', 'naver', 'toss', 'google', 'sms'];
-    methods.forEach(m => {
-        const btn = document.getElementById(`auth-${m}`);
-        if (btn) btn.classList.remove('selected');
-    });
-    const selected = document.getElementById(`auth-${method}`);
-    if (selected) selected.classList.add('selected');
-    
-    const pgNotice = document.getElementById('auth-pg-notice');
-    const smsSection = document.querySelector('.auth-divider');
-    const phoneGroup = document.getElementById('label-phone')?.closest('.form-group');
-    
-    if (method !== 'sms') {
-        // PG사 연동 필요 방식
-        if (pgNotice) pgNotice.style.display = 'block';
-        alert(currentLang === 'KO'
-            ? `⚠️ ${method.toUpperCase()} 인증은 PG사(나이스페이먼츠 또는 KG이니시스) 계약 후 활성화됩니다.\n\n현재는 SMS 문자 인증을 이용해주세요.\n\nPG사 연동이 완료되면 해당 인증 방식을 사용하실 수 있습니다.`
-            : `⚠️ ${method.toUpperCase()} authentication requires a PG provider contract (NicePayments or KG Inicis).\n\nPlease use SMS verification for now.`);
-        // SMS로 자동 선택 유지
-        document.getElementById('auth-sms')?.classList.add('selected');
-        selected?.classList.remove('selected');
-    } else {
-        if (pgNotice) pgNotice.style.display = 'none';
-    }
+// ===== WELCOME MODAL =====
+window.openWelcomeModal = function() {
+    const m = document.getElementById('welcome-points-modal');
+    if (m) m.classList.add('open');
 };
 
-let verifyTimerInterval;
-let verifyTimeLeft = 180;
+window.closeWelcomeModal = function(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const m = document.getElementById('welcome-points-modal');
+    if (m) m.classList.remove('open');
+    closeLoginModal();
+};
 
-window.sendVerifyCode = function() {
-    const phone = document.getElementById('signup-phone')?.value;
-    if (!phone || phone.length < 10) {
-        alert(currentLang === 'KO' ? '올바른 휴대폰 번호를 입력해주세요.' : 'Please enter a valid phone number.');
-        return;
-    }
+// ===== EMAIL VERIFICATION (CERT APPLICATION) =====
+let certEmailTimerInterval;
+let certEmailTimeLeft = 300;
+window.isEmailAuthCompleted = false;
+
+window.openEmailVerifyModal = function(email) {
+    const modal = document.getElementById('email-verify-modal');
+    const emailInput = document.getElementById('cert-verify-email');
+    if (emailInput) emailInput.value = email;
+    if (modal) modal.classList.add('open');
+};
+
+window.closeEmailVerifyModal = function(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const modal = document.getElementById('email-verify-modal');
+    if (modal) modal.classList.remove('open');
+};
+
+window.sendCertEmailCode = function() {
+    const email = document.getElementById('cert-verify-email')?.value;
+    if (!email) return;
+
+    alert(currentLang === 'KO' 
+        ? `${email}로 인증번호가 발송되었습니다. (테스트 모드: 123456)` 
+        : `Verification code sent to ${email}. (Test mode: 123456)`);
     
-    alert(currentLang === 'KO' ? '인증번호가 발송되었습니다. (테스트 모드: 123456)' : 'Verification code sent. (Test mode: 123456)');
+    document.getElementById('cert-email-input-group').style.display = 'block';
+    clearInterval(certEmailTimerInterval);
+    certEmailTimeLeft = 300;
     
-    document.getElementById('verify-code-group').style.display = 'block';
-    
-    clearInterval(verifyTimerInterval);
-    verifyTimeLeft = 180;
-    updateVerifyTimerDisplay();
-    
-    verifyTimerInterval = setInterval(() => {
-        verifyTimeLeft--;
-        if (verifyTimeLeft <= 0) {
-            clearInterval(verifyTimerInterval);
-            document.getElementById('verify-timer').textContent = currentLang === 'KO' ? '시간 초과' : 'Time out';
-            document.getElementById('verify-msg').textContent = currentLang === 'KO' ? '인증시간이 만료되었습니다. 다시 시도해주세요.' : 'Verification time expired. Please try again.';
-            document.getElementById('verify-msg').style.color = '#ef4444';
-        } else {
-            updateVerifyTimerDisplay();
+    certEmailTimerInterval = setInterval(() => {
+        certEmailTimeLeft--;
+        const min = Math.floor(certEmailTimeLeft / 60);
+        const sec = certEmailTimeLeft % 60;
+        const timerEl = document.getElementById('cert-email-timer');
+        if (timerEl) timerEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+        
+        if (certEmailTimeLeft <= 0) {
+            clearInterval(certEmailTimerInterval);
+            alert('인증 시간이 만료되었습니다.');
         }
     }, 1000);
 };
 
-function updateVerifyTimerDisplay() {
-    const min = Math.floor(verifyTimeLeft / 60);
-    const sec = verifyTimeLeft % 60;
-    document.getElementById('verify-timer').textContent = `${min}:${sec.toString().padStart(2, '0')}`;
-}
-
-window.confirmVerifyCode = function() {
-    if (verifyTimeLeft <= 0) {
-        alert(currentLang === 'KO' ? '인증시간이 만료되었습니다.' : 'Verification time expired.');
-        return;
-    }
-    
-    const code = document.getElementById('verify-code-input')?.value;
+window.confirmCertEmailCode = function() {
+    const code = document.getElementById('cert-email-code')?.value;
     if (code === '123456') {
-        clearInterval(verifyTimerInterval);
-        document.getElementById('verify-code-group').style.display = 'none';
-        document.getElementById('verify-success-badge').style.display = 'flex';
-        
-        const phone = document.getElementById('signup-phone').value;
-        document.getElementById('verify-success-detail').textContent = phone;
-        
-        document.getElementById('signup-phone').disabled = true;
-        document.getElementById('send-code-btn').style.display = 'none';
+        clearInterval(certEmailTimerInterval);
+        window.isEmailAuthCompleted = true;
+        alert(currentLang === 'KO' ? '이메일 인증이 완료되었습니다. 다시 [신청하기]를 눌러주세요.' : 'Email verified. Please click [Apply] again.');
+        closeEmailVerifyModal();
     } else {
-        document.getElementById('verify-msg').textContent = currentLang === 'KO' ? '인증번호가 일치하지 않습니다.' : 'Invalid verification code.';
-        document.getElementById('verify-msg').style.color = '#ef4444';
+        alert('인증번호가 일치하지 않습니다.');
     }
 };
+
+// 기존 회원가입용 이메일 인증 함수 제거됨
 
 // ===== PROFILE MODAL & LOGBOOK =====
 function openProfileModal() {
@@ -2158,6 +2266,12 @@ function openProfileModal() {
     
     $('profile-name').textContent = user.name;
     $('profile-email').textContent = user.email;
+    $('profile-points-value').textContent = (user.points || 0).toLocaleString() + ' P';
+    
+    // 포인트 충전 UI 초기화
+    const chargeCurrent = document.getElementById('profile-charge-current-pts');
+    if (chargeCurrent) chargeCurrent.textContent = (user.points || 0).toLocaleString();
+    updateChargeDisplay(0, 0);
     $('profile-phone').textContent = user.phone;
     $('profile-birth').textContent = user.birth;
     $('profile-gender').textContent = user.gender === 'M' ? (currentLang === 'KO' ? '남성' : 'Male') : (currentLang === 'KO' ? '여성' : 'Female');
@@ -2182,6 +2296,57 @@ function switchProfileTab(tab) {
     
     $(`tab-${tab}`).classList.add('active');
     $(`profile-${tab}-content`).classList.add('active');
+    
+    if (tab === 'cert') fetchCertificates();
+}
+
+async function fetchCertificates() {
+    const user = getSession();
+    if (!user) return;
+    
+    const list = $('my-cert-list');
+    if (!list) return;
+    
+    list.innerHTML = `<div style="text-align:center;padding:20px;"><div style="display:inline-block;width:20px;height:20px;border:2px solid var(--cyan);border-top:2px solid transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div>`;
+    
+    // 곽세영님 테스트용 자격증 데이터
+    const mockCerts = [
+        { title: 'Standing/Flow Board Certificate', discipline: 'Standing/Flow', url: 'issued/cert_standing.html' },
+        { title: 'Body Board Certificate', discipline: 'Body Board', url: 'issued/cert_body.html' },
+        { title: 'Wake Surfing Certificate', discipline: 'Wake Surfing', url: 'issued/cert_wake.html' },
+        { title: 'Wave Surfing Certificate', discipline: 'Wave Surfing', url: 'issued/cert_wave.html' },
+        { title: 'Certification Registry (Index)', discipline: 'Overview', url: 'issued/index.html' }
+    ];
+
+    try {
+        // 실제로는 GAS에서 가져옴
+        const res = await callGAS({ action: 'getCertificates', email: user.email });
+        let certs = res.status === 'success' ? res.data : [];
+        
+        // 곽세영님인 경우 테스트 데이터 합치기
+        if (user.name === '곽세영') {
+            certs = [...mockCerts, ...certs];
+        }
+        
+        if (certs.length === 0) {
+            list.innerHTML = `<p style="color:#64748b;text-align:center;padding:40px 0">${currentLang === 'KO' ? '보유하신 자격증이 없습니다.' : 'No certificates found.'}</p>`;
+            return;
+        }
+        
+        list.innerHTML = certs.map(c => `
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h5 style="color:white; font-size:14px; font-weight:700; margin:0;">${c.title}</h5>
+                    <p style="color:var(--cyan); font-size:11px; margin:4px 0 0; text-transform:uppercase; letter-spacing:1px;">${c.discipline}</p>
+                </div>
+                <a href="${c.url}" target="_blank" style="background:rgba(6,182,212,0.1); color:var(--cyan); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; border:1px solid rgba(6,182,212,0.2);">보기</a>
+            </div>
+        `).join('');
+        
+    } catch (e) {
+        console.error(e);
+        list.innerHTML = `<p style="color:#ef4444;text-align:center;padding:20px;">정보를 불러오는 중 오류가 발생했습니다.</p>`;
+    }
 }
 
 // Logbook Logic
@@ -2235,6 +2400,90 @@ function removeLogFile(index) {
     selectedLogFiles.splice(index, 1);
     renderFilePreviews();
 }
+
+// ===== POINT CHARGE LOGIC =====
+let selectedChargeAmount = 0;
+let selectedChargePrice = 0;
+
+window.selectChargeAmount = function(amount, price) {
+    selectedChargeAmount = amount;
+    selectedChargePrice = price;
+    
+    // 버튼 활성화 스타일
+    document.querySelectorAll('.charge-opt-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`charge-btn-${amount}`);
+    if (activeBtn) activeBtn.classList.add('active');
+    
+    updateChargeDisplay(amount, price);
+};
+
+function updateChargeDisplay(amount, price) {
+    const user = getSession();
+    const finalPrice = document.getElementById('charge-final-price');
+    const afterPts = document.getElementById('charge-after-pts');
+    
+    if (finalPrice) finalPrice.textContent = price.toLocaleString() + '원';
+    if (afterPts) {
+        const total = (user ? user.points || 0 : 0) + amount;
+        afterPts.textContent = total.toLocaleString() + ' P';
+    }
+}
+
+window.startPointCharge = function() {
+    const user = getSession();
+    if (!user) { alert('로그인이 필요합니다.'); return; }
+    if (selectedChargePrice <= 0) { alert('충전 금액을 선택해주세요.'); return; }
+
+    if (typeof innopay === 'undefined') {
+        alert('결제 시스템을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+
+    const moid = 'ISAPT' + Date.now();
+
+    innopay.goPay({
+        PayMethod: 'CARD',
+        MID: INNOPAY_MID,
+        Moid: moid,
+        GoodsName: `ISA 포인트 충전 (${selectedChargeAmount.toLocaleString()}P)`,
+        Amt: selectedChargePrice.toString(),
+        BuyerName: user.name,
+        BuyerEmail: user.email,
+        BuyerTel: user.phone || '010-0000-0000',
+        ResultYN: 'N',
+        callback: async function(res) {
+            if (res.res_cd === '0000') {
+                try {
+                    // GAS 서버에 포인트 충전 기록 저장
+                    const result = await callGAS({
+                        action: 'chargePoints',
+                        email: user.email,
+                        name: user.name,
+                        chargedPoints: selectedChargeAmount,
+                        price: selectedChargePrice,
+                        tid: res.tid || moid
+                    });
+                    // 세션의 포인트도 최신값으로 업데이트
+                    if (result && result.newBalance !== undefined) {
+                        user.points = result.newBalance;
+                    } else {
+                        user.points = (user.points || 0) + selectedChargeAmount;
+                    }
+                    localStorage.setItem('isa_session_v1', JSON.stringify(user));
+                } catch(e) {
+                    // 서버 저장 실패해도 로컬은 업데이트
+                    user.points = (user.points || 0) + selectedChargeAmount;
+                    localStorage.setItem('isa_session_v1', JSON.stringify(user));
+                }
+                alert(`✅ ${selectedChargeAmount.toLocaleString()}P 충전이 완료되었습니다!`);
+                initAuth();
+                openProfileModal();
+            } else {
+                alert('결제 실패: ' + (res.res_msg || '알 수 없는 오류'));
+            }
+        }
+    });
+};
 
 async function submitLogbook() {
     const user = getSession();
@@ -2903,3 +3152,490 @@ function showPointsToast(amount, reason) {
         }
     };
 })();
+
+// ===== BOARD (COMMUNITY) SYSTEM =====
+let boardPosts = [];
+let currentBoardView = 'list'; 
+let selectedPostId = null;
+
+async function renderBoardPage() {
+    const isKO = currentLang === 'KO';
+    if (currentBoardView === 'detail' && selectedPostId) {
+        return await renderBoardDetail(selectedPostId);
+    }
+    return renderBoardList();
+}
+
+function renderBoardList() {
+    const isKO = currentLang === 'KO';
+    setTimeout(fetchBoardPosts, 100); 
+
+    return `
+    <section class="page-section page-enter" style="background:var(--bg-slate)">
+        <div class="board-container">
+            <div class="board-header">
+                <div class="board-title-group">
+                    <h2 class="game-font">${isKO ? '자유 게시판' : 'Community Board'}</h2>
+                    <p>${isKO ? '인공서핑 관련 정보와 영상을 공유하고 포인트를 받으세요!' : 'Share info & videos about artificial surfing and earn points!'}</p>
+                </div>
+                <button class="write-btn" onclick="openBoardWriteModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    ${isKO ? '글쓰기' : 'Write'}
+                </button>
+            </div>
+            
+            <div id="board-list-content" class="board-grid">
+                <div style="text-align:center; padding:100px; color:var(--text-dark);">
+                    <div class="animate-spin" style="font-size:30px; margin-bottom:16px;">🔄</div>
+                    <p>${isKO ? '게시글을 불러오는 중입니다...' : 'Loading posts...'}</p>
+                </div>
+            </div>
+        </div>
+    </section>`;
+}
+
+async function fetchBoardPosts() {
+    const listEl = document.getElementById('board-list-content');
+    if (!listEl) return;
+
+    try {
+        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getBoardPosts`);
+        const result = await res.json();
+        
+        if (result.status === 'success') {
+            boardPosts = result.data;
+            renderBoardItems(boardPosts);
+        } else {
+            listEl.innerHTML = `<p style="text-align:center; color:var(--red); padding:40px;">${result.message || 'Error loading posts'}</p>`;
+        }
+    } catch (err) {
+        listEl.innerHTML = `<p style="text-align:center; color:var(--red); padding:40px;">Failed to connect to server.</p>`;
+    }
+}
+
+function renderBoardItems(posts) {
+    const listEl = document.getElementById('board-list-content');
+    if (!listEl) return;
+
+    if (!posts || posts.length === 0) {
+        listEl.innerHTML = `<p style="text-align:center; color:var(--text-dark); padding:100px;">등록된 게시글이 없습니다.</p>`;
+        return;
+    }
+
+    const sorted = [...posts].sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
+
+    listEl.innerHTML = sorted.map(post => {
+        const hasVideo = post.videoLink && post.videoLink.length > 10;
+        const hasImages = post.imageLinks && post.imageLinks.length > 10;
+        
+        return `
+        <div class="board-card glass-panel ${post.isPinned ? 'pinned' : ''}" onclick="viewBoardDetail('${post.id}')">
+            <div class="board-card-header">
+                <h3 class="board-card-title">${post.title}</h3>
+                <div class="board-card-meta">
+                    <span>👤 ${post.authorName}</span>
+                    <span>📅 ${post.date.split(' ')[0]}</span>
+                    <span>💬 ${post.commentCount || 0}</span>
+                </div>
+            </div>
+            ${(hasVideo || hasImages) ? `
+            <div class="board-card-preview">
+                ${hasVideo ? `<div class="preview-video-icon">🎥 영상 포함 (+500P 대상)</div>` : ''}
+                ${hasImages ? `<img src="${post.imageLinks.split(',')[0]}" class="preview-thumb" onerror="this.style.display='none'">` : ''}
+            </div>
+            ` : ''}
+        </div>
+        `;
+    }).join('');
+}
+
+function viewBoardDetail(postId) {
+    selectedPostId = postId;
+    currentBoardView = 'detail';
+    renderPage('board');
+}
+
+async function renderBoardDetail(postId) {
+    const isKO = currentLang === 'KO';
+    const post = boardPosts.find(p => String(p.id) === String(postId));
+    
+    if (!post) {
+        currentBoardView = 'list';
+        return renderBoardList();
+    }
+
+    setTimeout(() => fetchBoardComments(postId), 100);
+
+    const videoEmbed = post.videoLink ? getEmbedHtml(post.videoLink) : '';
+    const images = post.imageLinks ? post.imageLinks.split(',').filter(Boolean) : [];
+
+    return `
+    <section class="page-section page-enter" style="background:var(--bg-slate)">
+        <div class="board-container board-detail">
+            <button class="back-btn" style="margin-bottom:24px" onclick="currentBoardView='list';renderPage('board')">← ${isKO ? '목록으로' : 'Back to List'}</button>
+            
+            <div class="glass-panel" style="padding:32px; border-radius:16px;">
+                <div class="board-detail-header">
+                    <h2 class="board-detail-title">${post.title}</h2>
+                    <div class="board-card-meta">
+                        <span>👤 ${post.authorName}</span>
+                        <span>📅 ${post.date}</span>
+                        ${post.isPinned ? `<span style="color:#facc15; font-weight:800;">📌 공지사항</span>` : ''}
+                    </div>
+                </div>
+                
+                <div class="board-detail-body">${post.content}</div>
+                
+                ${videoEmbed ? `
+                <div style="margin-bottom:24px;">
+                    <p style="color:var(--amber); font-size:12px; font-weight:700; margin-bottom:8px;">📹 공유 영상</p>
+                    <div class="video-embed-container">${videoEmbed}</div>
+                </div>` : ''}
+                
+                ${images.length > 0 ? `
+                <div class="board-detail-images">
+                    ${images.map(img => `<img src="${img}" class="board-detail-image" onclick="window.open(this.src)">`).join('')}
+                </div>` : ''}
+                
+                <div class="comments-section" id="comments-section">
+                    <h3 class="comments-title">댓글</h3>
+                    <div id="comments-list">
+                        <p style="color:var(--text-dark)">댓글을 불러오는 중...</p>
+                    </div>
+                    
+                    ${getSession() ? `
+                    <div class="comment-form">
+                        <textarea id="comment-input" class="comment-input" placeholder="${isKO ? '따뜻한 댓글을 남겨주세요.' : 'Leave a comment...'}"></textarea>
+                        <button class="comment-submit" onclick="submitBoardComment('${postId}')">${isKO ? '등록' : 'Post'}</button>
+                    </div>
+                    ` : `
+                    <p style="text-align:center; padding:20px; color:var(--text-dark); background:rgba(0,0,0,0.2); border-radius:8px; font-size:14px; margin-top:20px;">
+                        로그인 후 댓글을 작성할 수 있습니다.
+                    </p>
+                    `}
+                </div>
+            </div>
+        </div>
+    </section>`;
+}
+
+function getEmbedHtml(link) {
+    if (!link) return '';
+    try {
+        if (link.includes('youtube.com') || link.includes('youtu.be')) {
+            let vid = '';
+            if (link.includes('v=')) vid = link.split('v=')[1].split('&')[0];
+            else if (link.includes('youtu.be/')) vid = link.split('youtu.be/')[1].split('?')[0];
+            if (vid) return `<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>`;
+        }
+        if (link.includes('instagram.com')) {
+            return `<p style="text-align:center; padding:20px;"><a href="${link}" target="_blank" style="color:var(--cyan); text-decoration:underline;">🔗 인스타그램 영상 보기 (클릭)</a></p>`;
+        }
+    } catch(e) {}
+    return `<p style="text-align:center; padding:20px;"><a href="${link}" target="_blank" style="color:var(--cyan); text-decoration:underline;">🔗 영상 링크 바로가기</a></p>`;
+}
+
+async function fetchBoardComments(postId) {
+    const listEl = document.getElementById('comments-list');
+    if (!listEl) return;
+
+    try {
+        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getBoardComments&postId=${postId}`);
+        const result = await res.json();
+        
+        if (result.status === 'success') {
+            renderComments(result.data);
+        }
+    } catch (err) {
+        listEl.innerHTML = `<p>Error loading comments.</p>`;
+    }
+}
+
+function renderComments(comments) {
+    const listEl = document.getElementById('comments-list');
+    if (!listEl) return;
+    const session = getSession();
+    const isAdmin = session && (session.email === 'admin@isa-surfing.org' || session.email === 'zenpower0708@gmail.com');
+
+    if (!comments || comments.length === 0) {
+        listEl.innerHTML = `<p style="color:var(--text-dark); font-size:14px;">첫 댓글을 남겨보세요!</p>`;
+    } else {
+        listEl.innerHTML = comments.map(c => `
+            <div class="comment-item">
+                <div class="comment-header">
+                    <span class="comment-author">${c.authorName}</span>
+                    <span class="comment-date">${c.date}</span>
+                </div>
+                <div class="comment-body">${c.content}</div>
+                ${c.isPointAward ? `<div class="comment-award">🎁 포인트 지급 완료 (${c.awardAmount}P)</div>` : ''}
+            </div>
+        `).join('');
+    }
+
+    if (isAdmin && !document.getElementById('admin-reward-panel')) {
+        const panel = document.createElement('div');
+        panel.id = 'admin-reward-panel';
+        panel.className = 'admin-reward-panel';
+        panel.innerHTML = `
+            <div class="admin-reward-header">⭐ 관리자 포인트 지급</div>
+            <div class="admin-reward-form">
+                <input type="number" id="reward-amount" class="admin-reward-input" placeholder="100" value="100">
+                <button class="comment-submit" style="padding:4px 12px; font-size:12px;" onclick="awardBoardPoints('${selectedPostId}')">포인트 지급 댓글 달기</button>
+            </div>
+        `;
+        document.getElementById('comments-section').appendChild(panel);
+    }
+}
+
+function openScoreEliteModal() {
+    const modal = document.createElement('div');
+    modal.id = 'score-elite-modal';
+    modal.className = 'modal-overlay open';
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `
+        <div class="modal-box" style="max-width:480px;" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title">📊 스코어엘리트 기술측정앱</h3>
+                <button class="modal-close" onclick="document.getElementById('score-elite-modal').remove()">✕</button>
+            </div>
+            <div style="padding:24px;">
+                <p style="color:var(--text-dark);font-size:14px;margin-bottom:24px;line-height:1.6;">
+                    AI 카메라로 인공서핑 자세를 실시간 분석하고 기술 점수를 측정하는 앱입니다.<br>
+                    아래에서 버전을 선택하세요.
+                </p>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <a href="/surfing-score/" target="_blank"
+                        style="display:flex;align-items:center;gap:16px;padding:20px;
+                        background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.3);
+                        border-radius:12px;text-decoration:none;transition:all 0.2s;"
+                        onmouseover="this.style.background='rgba(6,182,212,0.15)';this.style.borderColor='var(--cyan)'"
+                        onmouseout="this.style.background='rgba(6,182,212,0.08)';this.style.borderColor='rgba(6,182,212,0.3)'">
+                        <div style="font-size:32px;flex-shrink:0;">🎯</div>
+                        <div>
+                            <div style="color:white;font-weight:800;font-size:16px;margin-bottom:4px;">스코어엘리트 기본</div>
+                            <div style="color:var(--text-dark);font-size:13px;">기본 자세 분석 및 기술 점수 측정</div>
+                        </div>
+                        <div style="margin-left:auto;color:var(--cyan);font-size:20px;">›</div>
+                    </a>
+                    <a href="/surfing-score-premium/" target="_blank"
+                        style="display:flex;align-items:center;gap:16px;padding:20px;
+                        background:rgba(250,204,21,0.06);border:1px solid rgba(250,204,21,0.25);
+                        border-radius:12px;text-decoration:none;transition:all 0.2s;"
+                        onmouseover="this.style.background='rgba(250,204,21,0.12)';this.style.borderColor='#facc15'"
+                        onmouseout="this.style.background='rgba(250,204,21,0.06)';this.style.borderColor='rgba(250,204,21,0.25)'">
+                        <div style="font-size:32px;flex-shrink:0;">⭐</div>
+                        <div>
+                            <div style="color:#facc15;font-weight:800;font-size:16px;margin-bottom:4px;">스코어엘리트 프리미엄</div>
+                            <div style="color:var(--text-dark);font-size:13px;">고급 분석 · 상세 리포트 · 영상 저장</div>
+                        </div>
+                        <div style="margin-left:auto;color:#facc15;font-size:20px;">›</div>
+                    </a>
+                </div>
+                <p style="color:var(--text-dark);font-size:11px;text-align:center;margin-top:16px;">
+                    📱 카메라 접근 권한이 필요합니다
+                </p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function compressImage(file, maxWidth = 1200, quality = 0.82) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                let w = img.width, h = img.height;
+                if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve({ base64: dataUrl.split(',')[1], mimeType: 'image/jpeg', name: file.name.replace(/\.[^.]+$/, '.jpg') });
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function previewBoardImages() {
+    const input = document.getElementById('post-images');
+    const previewEl = document.getElementById('post-image-preview');
+    if (!input || !previewEl) return;
+    previewEl.innerHTML = '';
+    const files = Array.from(input.files).slice(0, 3);
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);';
+            previewEl.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function openBoardWriteModal() {
+    const session = getSession();
+    if (!session) {
+        alert('로그인이 필요한 서비스입니다.');
+        openLoginModal();
+        return;
+    }
+
+    const isKO = currentLang === 'KO';
+    const modal = document.createElement('div');
+    modal.id = 'board-write-modal';
+    modal.className = 'modal-overlay open';
+    modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+    
+    modal.innerHTML = `
+        <div class="modal-box" style="max-width:600px;" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title">${isKO ? '새 게시글 작성' : 'New Post'}</h3>
+                <button class="modal-close" onclick="document.getElementById('board-write-modal').remove()">✕</button>
+            </div>
+            <div style="padding:24px; overflow-y:auto;">
+                <div class="form-group">
+                    <label>제목</label>
+                    <input type="text" id="post-title" class="comment-input" style="width:100%" placeholder="제목을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label>내용</label>
+                    <textarea id="post-content" class="comment-input" style="width:100%; min-height:150px;" placeholder="인공서핑 관련 소식을 전해주세요."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>영상 링크 (유튜브, 인스타, 틱톡 등)</label>
+                    <input type="text" id="post-video" class="comment-input" style="width:100%" placeholder="https://...">
+                    <p style="font-size:11px; color:var(--amber); margin-top:4px;">※ 영상 링크 포함 시 500P 지급 대상이 됩니다.</p>
+                </div>
+                <div class="form-group">
+                    <label>사진 첨부 (최대 3장)</label>
+                    <input type="file" id="post-images" multiple accept="image/*" class="comment-input" style="width:100%; font-size:12px;" onchange="previewBoardImages()">
+                    <div id="post-image-preview" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
+                </div>
+                <div id="post-msg" style="font-size:13px; margin-bottom:16px;"></div>
+                <button class="btn-primary" style="width:100%" onclick="submitBoardPost()">등록하기</button>
+                <p style="font-size:11px; color:var(--text-dark); text-align:center; margin-top:12px;">하루 최대 2개까지 등록 가능하며, 홍보 글은 검토 후 포인트가 지급됩니다.</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+async function submitBoardPost() {
+    const title   = $('post-title').value.trim();
+    const content = $('post-content').value.trim();
+    const video   = $('post-video').value.trim();
+    const session = getSession();
+    const fileInput = $('post-images');
+
+    if (!title || !content) {
+        alert('제목과 내용을 입력해주세요.');
+        return;
+    }
+
+    const msg = $('post-msg');
+    msg.style.color = 'var(--cyan)';
+    msg.innerText = '게시글을 등록 중입니다...';
+
+    // 이미지 압축 후 base64 변환
+    let images = [];
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+        const files = Array.from(fileInput.files).slice(0, 3);
+        msg.innerText = `사진 압축 중... (${files.length}장)`;
+        try {
+            images = await Promise.all(files.map(f => compressImage(f)));
+        } catch(e) {
+            msg.style.color = 'var(--red)';
+            msg.innerText = '사진 처리 중 오류가 발생했습니다.';
+            return;
+        }
+        msg.innerText = '게시글을 등록 중입니다...';
+    }
+
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'submitBoardPost',
+                email: session.email,
+                name: session.name,
+                title,
+                content,
+                videoLink: video,
+                images
+            })
+        });
+        const result = await res.json();
+
+        if (result.status === 'success') {
+            alert('게시글이 등록되었습니다!');
+            document.getElementById('board-write-modal').remove();
+            fetchBoardPosts();
+        } else {
+            msg.style.color = 'var(--red)';
+            msg.innerText = result.message || '등록 실패';
+        }
+    } catch (err) {
+        msg.style.color = 'var(--red)';
+        msg.innerText = '서버 연결 오류. 잠시 후 다시 시도해주세요.';
+    }
+}
+
+async function submitBoardComment(postId) {
+    const input = $('comment-input');
+    const content = input.value;
+    const session = getSession();
+
+    if (!content) return;
+
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'submitBoardComment',
+                postId,
+                email: session.email,
+                name: session.name,
+                content
+            })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+            input.value = '';
+            fetchBoardComments(postId);
+        }
+    } catch (err) {
+        alert('댓글 등록 실패');
+    }
+}
+
+async function awardBoardPoints(postId) {
+    const amount = $('reward-amount').value;
+    const session = getSession();
+    
+    if (!confirm(`${amount}P를 지급하는 댓글을 작성하시겠습니까?`)) return;
+
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'awardBoardPoints',
+                postId,
+                adminEmail: session.email,
+                amount: Number(amount)
+            })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+            fetchBoardComments(postId);
+            alert('포인트 지급 및 댓글 작성이 완료되었습니다.');
+        }
+    } catch (err) {
+        alert('지급 실패');
+    }
+}

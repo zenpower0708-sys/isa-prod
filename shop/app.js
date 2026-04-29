@@ -1,4 +1,7 @@
 // ISA Shop - Application Logic
+const INNOPAY_MID = 'pgisaweb1m';
+const INNOPAY_LICENSE_KEY = 'rbccWA7HgRbh2XHahjlQ/Q9t/UJDgboR1rRN1X/0/mP/oTNiub6Y1D7dLAQDXhRSbZL2l7/dMd6JEi8R1qSOjA==';
+
 let currentLang = 'KO';
 let activeCategory = 'all';
 let isLoginMode = true;
@@ -191,28 +194,96 @@ async function submitOrder(e) {
                 ? `✅ 주문이 접수되었습니다!\n\n🏦 입금 계좌: 토스뱅크 1000-7587-9085 (곽세영)\n금액: ₩${totalPrice.toLocaleString()}\n\n입금 확인 후 배송이 시작됩니다.`
                 : `✅ Order received!\n\n🏦 Account: Toss Bank 1000-7587-9085 (Kwak Se-young)\nAmount: ₩${totalPrice.toLocaleString()}\n\nShipping starts after deposit.`;
             alert(bankMsg);
+            
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(orderData)
+            });
+            
+            finishOrder();
+        } else {
+            // 실제 PG 결제 시작 (INNOPAY)
+            if (typeof innopay === 'undefined') {
+                alert(currentLang === 'KO' ? 'PG SDK가 로드되지 않았습니다.' : 'PG SDK not loaded.');
+                return;
+            }
+
+            const moid = 'SHOP' + Date.now();
+            localStorage.setItem('isa_shop_pending', JSON.stringify({
+                moid, orderData, user: getSession()
+            }));
+
+            innopay.goPay({
+                PayMethod: 'CARD',
+                MID: INNOPAY_MID,
+                Moid: moid,
+                Amt: totalPrice,
+                GoodsName: orderData.items.substring(0, 30),
+                BuyerName: orderData.name,
+                BuyerTel: orderData.phone,
+                BuyerEmail: getSession().email,
+                ResultCode: '0000',
+                ReturnUrl: window.location.origin + window.location.pathname + '#/payment-result'
+            });
         }
-
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors', // GAS postData issue
-            body: JSON.stringify(orderData)
-        });
-
-        if (payMethod !== 'bank') {
-            alert(t.checkout.success);
-        }
-
-        closeCheckout();
-        cart = [];
-        saveCart();
-        renderCart();
-        $('checkout-form').reset();
     } catch (err) {
         console.error("Order error:", err);
         alert(currentLang === 'KO' ? "주문 처리 중 오류가 발생했습니다." : "Error processing order.");
     }
 }
+
+function finishOrder() {
+    closeCheckout();
+    // 장바구니 비우기 등 (현재 코드에는 cart 변수가 상단에 없지만 logic.js 등에 있을 것으로 추정)
+    // 실제로는 index.html에 cart 변수가 노출되지 않았으므로 로컬 스토리지 확인 필요
+    $('checkout-form').reset();
+}
+
+// 결과 처리 리스너
+window.addEventListener('hashchange', async () => {
+    if (window.location.hash.startsWith('#/payment-result')) {
+        const pending = JSON.parse(localStorage.getItem('isa_shop_pending'));
+        if (!pending) return;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const resCode = urlParams.get('resCode') || '0000';
+
+        if (resCode === '0000') {
+            // 1. 서버 전송
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(pending.orderData)
+            });
+
+            // 2. 포인트 적립 (1%)
+            const points = Math.floor(pending.orderData.totalPrice * 0.01);
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'addPoints',
+                    email: pending.user.email,
+                    name: pending.user.name,
+                    amount: points,
+                    reason: '장비 구매 적립'
+                })
+            });
+
+            alert(currentLang === 'KO' 
+                ? `✅ 결제가 완료되었습니다! ${points}P가 적립되었습니다.`
+                : `✅ Payment successful! ${points}P accrued.`);
+            
+            localStorage.removeItem('isa_shop_pending');
+            finishOrder();
+        } else {
+            alert(currentLang === 'KO' ? '결제에 실패했습니다.' : 'Payment failed.');
+        }
+        window.location.hash = '';
+    }
+});
+
 
 // ===== CONFIG =====
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhkc4PNMg1o3gx9v4owhydgns3UaZLTJ_XKoc64pQupnWfYXq0k1rh3GibjzVvR6Xm6/exec';

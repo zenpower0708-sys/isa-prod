@@ -44,6 +44,10 @@ function doGet(e) {
   if (action === 'adminGetAllPoints')    return adminGetAllPoints();
   if (action === 'getPendingPromoPosts') return getPendingPromoPosts();
 
+  // 게시판 기능
+  if (action === 'getBoardPosts')    return getBoardPosts();
+  if (action === 'getBoardComments') return getBoardComments(e.parameter.postId);
+
   return respond({ status: 'error', message: 'Unknown action' });
 }
 
@@ -70,6 +74,15 @@ function doPost(e) {
   if (action === 'submitPromoPost')  return submitPromoPost(data);
   if (action === 'approvePromoPost') return approvePromoPost(data);
   if (action === 'submitReview')     return submitReview(data);
+
+  // 게시판 기능
+  if (action === 'submitBoardPost')    return submitBoardPost(data);
+  if (action === 'submitBoardComment') return submitBoardComment(data);
+  if (action === 'awardBoardPoints')   return awardBoardPoints(data);
+
+  // 결제 기능
+  if (action === 'chargePoints')   return chargePoints(data);
+  if (action === 'recordCertPay')  return recordCertPay(data);
 
   return respond({ status: 'error', message: 'Unknown action' });
 }
@@ -609,6 +622,334 @@ function sendTelegram(message) {
 }
 
 // ──────────────────────────────────────────
+// 결제 후처리 기능
+// ──────────────────────────────────────────
+
+function chargePoints(data) {
+  var email  = data.email  || '';
+  var name   = data.name   || '';
+  var amount = Number(data.chargedPoints) || 0;
+  var tid    = data.tid    || '';
+  var price  = Number(data.price) || 0;
+
+  if (!email || amount <= 0) {
+    return respond({ status: 'error', message: '필수 정보가 누락되었습니다.' });
+  }
+
+  var newBalance = addPointRecord(email, name, amount, '포인트 충전 (결제금액: ' + price + '원, TID: ' + tid + ')', '완료');
+
+  sendTelegram([
+    '💳 *포인트 충전 완료*',
+    '이름: ' + name,
+    '충전: ' + amount + 'P (' + price + '원)',
+    '잔액: ' + newBalance + 'P',
+    'TID: ' + tid
+  ].join('\n'));
+
+  return respond({ status: 'success', newBalance: newBalance });
+}
+
+function recordCertPay(data) {
+  var email      = data.email      || '';
+  var name       = data.name       || '';
+  var level      = data.level      || '';
+  var discipline = data.discipline || '';
+  var amount     = Number(data.amount) || 0;
+  var tid        = data.tid        || '';
+  var isRetake   = data.isRetake   || false;
+
+  if (!email || !tid) {
+    return respond({ status: 'error', message: '결제 정보가 누락되었습니다.' });
+  }
+
+  var reason = isRetake
+    ? discipline + ' ' + level + '급 재응시료 (TID: ' + tid + ')'
+    : discipline + ' ' + level + '급 응시료 (TID: ' + tid + ')';
+
+  // 포인트내역에 결제 기록 (차감 없이 기록용)
+  var sheet = getSheet('포인트내역');
+  var now   = new Date().toLocaleString('ko-KR');
+  var current = getTotalPoints(email);
+  sheet.appendRow([email, now, reason, 0, current, '결제완료', name]);
+
+  sendTelegram([
+    '✅ *자격증 응시료 결제 완료*',
+    '이름: ' + name,
+    discipline + ' ' + level + '급' + (isRetake ? ' (재응시)' : ''),
+    '금액: ' + amount + '원',
+    'TID: ' + tid
+  ].join('\n'));
+
+  return respond({ status: 'success' });
+}
+
+// ──────────────────────────────────────────
+// 게시판 기능
+// ──────────────────────────────────────────
+
+var BOARD_ADMIN_EMAIL = 'zenpower0708@gmail.com';
+var BOARD_IMAGE_FOLDER = 'ISA 게시판 이미지';
+
+function getBoardPosts() {
+  var sheet = getSheet('게시판');
+  var data  = sheet.getDataRange().getValues();
+  var posts = [];
+
+  for (var i = 1; i < data.length; i++) {
+    if (!data[i][0]) continue;
+    posts.push({
+      id:           String(data[i][0]),
+      email:        data[i][1],
+      authorName:   data[i][2],
+      title:        data[i][3],
+      content:      data[i][4],
+      videoLink:    data[i][5] || '',
+      imageLinks:   data[i][6] || '',
+      date:         String(data[i][7]),
+      isPinned:     data[i][8] === true || data[i][8] === 'TRUE',
+      commentCount: data[i][9] || 0
+    });
+  }
+
+  // 고정글 우선, 나머지는 최신순
+  posts.sort(function(a, b) {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return 0;
+  });
+
+  return respond({ status: 'success', data: posts });
+}
+
+function submitBoardPost(data) {
+  if (!data.email || !data.name) {
+    return respond({ status: 'error', message: '로그인이 필요합니다.' });
+  }
+  if (!data.title || !data.content) {
+    return respond({ status: 'error', message: '제목과 내용을 입력해주세요.' });
+  }
+
+  var sheet   = getSheet('게시판');
+  var allData = sheet.getDataRange().getValues();
+  var today   = new Date().toLocaleDateString('ko-KR');
+  var todayCount = 0;
+
+  for (var i = 1; i < allData.length; i++) {
+    if (allData[i][1] === data.email && !allData[i][8]) {
+      var d = new Date(allData[i][7]).toLocaleDateString('ko-KR');
+      if (d === today) todayCount++;
+    }
+  }
+
+  if (todayCount >= 2) {
+    return respond({ status: 'error', message: '오늘 게시글 등록 한도(하루 2개)를 초과했습니다.' });
+  }
+
+  // 이미지 Drive 업로드
+  var imageLinks = '';
+  if (data.images && data.images.length > 0) {
+    var urls = [];
+    for (var j = 0; j < data.images.length && j < 3; j++) {
+      var img = data.images[j];
+      var url = uploadImageToDrive(img.base64, img.name, img.mimeType);
+      if (url) urls.push(url);
+    }
+    imageLinks = urls.join(',');
+  }
+
+  var postId = String(new Date().getTime());
+  var now    = new Date().toLocaleString('ko-KR');
+
+  sheet.appendRow([
+    postId,
+    data.email,
+    data.name,
+    data.title,
+    data.content,
+    data.videoLink || '',
+    imageLinks,
+    now,
+    false,
+    0
+  ]);
+
+  sendTelegram([
+    '📝 *새 게시글 등록*',
+    '이름: ' + data.name,
+    '제목: ' + data.title,
+    data.videoLink ? '🎥 영상 포함' : '',
+    imageLinks ? '📸 사진 포함' : ''
+  ].filter(Boolean).join('\n'));
+
+  return respond({ status: 'success', message: '게시글이 등록되었습니다.' });
+}
+
+function uploadImageToDrive(base64Data, fileName, mimeType) {
+  try {
+    var folders = DriveApp.getFoldersByName(BOARD_IMAGE_FOLDER);
+    var folder  = folders.hasNext() ? folders.next() : DriveApp.createFolder(BOARD_IMAGE_FOLDER);
+    var bytes   = Utilities.base64Decode(base64Data);
+    var blob    = Utilities.newBlob(bytes, mimeType || 'image/jpeg', fileName || 'image.jpg');
+    var file    = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return 'https://drive.google.com/uc?id=' + file.getId();
+  } catch(e) {
+    Logger.log('이미지 업로드 오류: ' + e.toString());
+    return null;
+  }
+}
+
+function getBoardComments(postId) {
+  if (!postId) return respond({ status: 'success', data: [] });
+
+  var sheet    = getSheet('게시판댓글');
+  var data     = sheet.getDataRange().getValues();
+  var comments = [];
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][1]) === String(postId)) {
+      comments.push({
+        id:           String(data[i][0]),
+        postId:       String(data[i][1]),
+        email:        data[i][2],
+        authorName:   data[i][3],
+        content:      data[i][4],
+        date:         String(data[i][5]),
+        isPointAward: data[i][6] === true || data[i][6] === 'TRUE',
+        awardAmount:  data[i][7] || 0
+      });
+    }
+  }
+
+  return respond({ status: 'success', data: comments });
+}
+
+function submitBoardComment(data) {
+  if (!data.email || !data.name || !data.content || !data.postId) {
+    return respond({ status: 'error', message: '필수 항목이 누락되었습니다.' });
+  }
+
+  var sheet     = getSheet('게시판댓글');
+  var commentId = String(new Date().getTime());
+  var now       = new Date().toLocaleString('ko-KR');
+
+  sheet.appendRow([commentId, String(data.postId), data.email, data.name, data.content, now, false, 0]);
+
+  // 게시판 댓글수 +1
+  var boardSheet = getSheet('게시판');
+  var boardData  = boardSheet.getDataRange().getValues();
+  for (var i = 1; i < boardData.length; i++) {
+    if (String(boardData[i][0]) === String(data.postId)) {
+      boardSheet.getRange(i + 1, 10).setValue(Number(boardData[i][9] || 0) + 1);
+      break;
+    }
+  }
+
+  return respond({ status: 'success', message: '댓글이 등록되었습니다.' });
+}
+
+function awardBoardPoints(data) {
+  if (data.adminEmail !== BOARD_ADMIN_EMAIL) {
+    return respond({ status: 'error', message: '관리자 권한이 필요합니다.' });
+  }
+
+  var amount = Number(data.amount);
+  if (!amount || amount < 100 || amount > 1000) {
+    return respond({ status: 'error', message: '포인트는 100~1000P 사이로 입력하세요.' });
+  }
+
+  // 게시글 작성자 조회
+  var boardSheet = getSheet('게시판');
+  var boardData  = boardSheet.getDataRange().getValues();
+  var authorEmail = null, authorName = null;
+
+  for (var i = 1; i < boardData.length; i++) {
+    if (String(boardData[i][0]) === String(data.postId)) {
+      authorEmail = boardData[i][1];
+      authorName  = boardData[i][2];
+      break;
+    }
+  }
+
+  if (!authorEmail) {
+    return respond({ status: 'error', message: '게시글을 찾을 수 없습니다.' });
+  }
+
+  // 포인트 지급
+  var newBalance = addPointRecord(authorEmail, authorName, amount, '게시판 우수 게시글 포인트', '완료');
+
+  // 포인트 지급 댓글 등록
+  var commentSheet = getSheet('게시판댓글');
+  var commentId    = String(new Date().getTime());
+  var now          = new Date().toLocaleString('ko-KR');
+
+  commentSheet.appendRow([
+    commentId, String(data.postId), BOARD_ADMIN_EMAIL, '관리자',
+    '🎁 ' + amount + 'P 포인트 지급 완료! 좋은 게시글 감사합니다 😊',
+    now, true, amount
+  ]);
+
+  // 댓글수 +1
+  for (var i = 1; i < boardData.length; i++) {
+    if (String(boardData[i][0]) === String(data.postId)) {
+      boardSheet.getRange(i + 1, 10).setValue(Number(boardData[i][9] || 0) + 1);
+      break;
+    }
+  }
+
+  sendTelegram([
+    '🎁 *게시판 포인트 지급*',
+    '회원: ' + authorName,
+    '지급: ' + amount + 'P',
+    '잔액: ' + newBalance + 'P'
+  ].join('\n'));
+
+  return respond({ status: 'success', message: amount + 'P 포인트가 지급되었습니다.' });
+}
+
+// ★ GAS 편집기에서 한 번 실행하면 고정 공지글이 생성됩니다
+function initBoardPinnedPost() {
+  var sheet = getSheet('게시판');
+  var data  = sheet.getDataRange().getValues();
+
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][8] === true || data[i][8] === 'TRUE') {
+      Logger.log('고정글이 이미 존재합니다.');
+      return;
+    }
+  }
+
+  var now = new Date().toLocaleString('ko-KR');
+  var content = '안녕하세요! 국제인공서핑협회(ISA) 커뮤니티 게시판입니다. 🏄\n\n'
+    + '【 게시판 이용 안내 】\n\n'
+    + '인공서핑에 관한 사진, 영상, 소식을 자유롭게 공유하는 공간입니다.\n\n'
+    + '✅ 올릴 수 있는 내용\n'
+    + '  • 인공서핑 체험 사진 및 후기\n'
+    + '  • 연습 영상 링크 (유튜브, 인스타, 틱톡, 페이스북 등)\n'
+    + '  • ISA 협회 홍보 게시글 링크\n'
+    + '  • 인공서핑 관련 정보 및 소식\n\n'
+    + '📸 사진: 게시글에 직접 첨부 (최대 3장)\n'
+    + '🎥 영상: 링크로만 등록 (유튜브, 인스타, 틱톡, 페이스북, 네이버 등)\n\n'
+    + '❌ 금지 사항\n'
+    + '  • 욕설, 비방, 광고성 게시물\n'
+    + '  • 인공서핑과 무관한 내용\n\n'
+    + '【 포인트 지급 안내 🎁 】\n\n'
+    + 'ISA 협회를 홍보하는 우수 게시글에 관리자가 직접 포인트를 지급합니다!\n\n'
+    + '💰 지급 금액: 100P ~ 1,000P (내용과 퀄리티에 따라 차등 지급)\n'
+    + '📅 하루 최대 2개 게시글까지 등록 가능\n\n'
+    + '🏆 포인트 많이 받는 팁\n'
+    + '  • 인스타·유튜브·틱톡 등 SNS에 ISA 홍보 게시글 올리고 링크 공유\n'
+    + '  • 체험 후기를 생생하게 작성\n'
+    + '  • 사진·영상 포함 시 우선 검토\n\n'
+    + '포인트는 관리자 검토 후 댓글로 지급 확인을 드립니다.\n'
+    + '열심히 활동해 주시면 많은 포인트 드릴게요! 😊\n\n'
+    + '— 국제인공서핑협회(ISA) 운영팀';
+
+  sheet.appendRow(['0001', BOARD_ADMIN_EMAIL, '관리자', '📌 게시판 이용 안내 및 포인트 지급 규정', content, '', '', now, true, 0]);
+  Logger.log('고정 공지글이 생성되었습니다.');
+}
+
+// ──────────────────────────────────────────
 // 공통 유틸 - 시트 가져오기 (없으면 자동 생성)
 // ──────────────────────────────────────────
 function getSheet(sheetName) {
@@ -626,6 +967,10 @@ function getSheet(sheetName) {
       sheet.appendRow(['이메일', '이름', '링크', '제출일시', '상태', '포인트지급', '플랫폼']);
     } else if (sheetName === '로그북') {
       sheet.appendRow(['이메일', '이름', '날짜', '장소', '시간', '증빙링크', '상태', '등록일시']);
+    } else if (sheetName === '게시판') {
+      sheet.appendRow(['ID', '이메일', '이름', '제목', '내용', '영상링크', '이미지링크', '작성일시', '고정여부', '댓글수']);
+    } else if (sheetName === '게시판댓글') {
+      sheet.appendRow(['ID', '게시글ID', '이메일', '이름', '내용', '작성일시', '포인트지급', '지급금액']);
     }
 
     var cols = sheet.getLastColumn();

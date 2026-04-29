@@ -134,7 +134,7 @@ const LANG = {
             footer: { contact: '연락처', legal: '법적 고지', privacy: '개인정보처리방침', terms: '이용약관', insTerms: '공제회 약관', rights: 'ISA. All rights reserved.' }
         },
         quick: { event: '이벤트', notice: '공지사항', appCheck: '접수확인', certCheck: '자격증조회', inputApp: '접수번호를 입력하세요', inputCert: '이름 (Name)', inputPhone: '연락처 (Phone)', checkBtn: '조회하기' },
-        nav: { cert: '자격증', shop: '장비스토어', insurance: '공제회', map: '인공서핑장현황', edu: '교육', book: '교재', instructor: '강사전용' },
+        nav: { cert: '자격증', shop: '장비스토어', insurance: '공제회', map: '인공서핑장현황', edu: '교육', book: '교재', instructor: '강사전용', board: '게시판' },
         hero: { tag: '미래의 서핑을 경험하라', title: '디지털 파도를 넘어', subtitle: '국제인공서핑협회 공식 플랫폼', cta: '자격증 신청하기', watch: '자격증 소개', waveHeight: '현재 파도 높이', waterTemp: '수온' },
         cert: {
             title: '자격증 센터', desc: '1급부터 4급까지, 당신의 실력을 증명하세요.',
@@ -190,7 +190,7 @@ const LANG = {
             footer: { contact: 'Contact', legal: 'Legal', privacy: 'Privacy Policy', terms: 'Terms of Service', insTerms: 'Insurance Terms', rights: 'ISA. All rights reserved.' }
         },
         quick: { event: 'Events', notice: 'Notices', appCheck: 'App. Check', certCheck: 'Cert. Check', inputApp: 'Enter Application No.', inputCert: 'Name', inputPhone: 'Phone', checkBtn: 'Check' },
-        nav: { cert: 'Certification', shop: 'Store', insurance: 'Insurance', map: 'Locations', edu: 'Education', book: 'Textbook', instructor: 'Instructor Only' },
+        nav: { cert: 'Certification', shop: 'Store', insurance: 'Insurance', map: 'Locations', edu: 'Education', book: 'Textbook', instructor: 'Instructor Only', board: 'Board' },
         hero: { tag: 'Experience the Future of Surfing', title: 'Beyond Digital Waves', subtitle: "Official Platform of the Int'l Artificial Indoor Surfing Association", cta: 'Apply for Cert', watch: 'Cert Intro', waveHeight: 'Wave Height', waterTemp: 'Water Temp' },
         cert: {
             title: 'Certification Center', desc: 'From Level 4 to Level 1, Prove your skills.',
