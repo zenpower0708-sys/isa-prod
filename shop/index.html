@@ -35,7 +35,7 @@
         
         <div class="hero-banner fade-in">
             <h2 class="game-font glow-text" id="hero-title">GEAR UP FOR THE WAVES</h2>
-            <p id="hero-desc">국제인공서핑협회 검증을 거친 최상의 장비와 제휴 할인 혜택을 만나보세요.</p>
+            <p id="hero-desc">한국인공서핑협회 검증을 거친 최상의 장비와 제휴 할인 혜택을 만나보세요.</p>
         </div>
 
         <!-- Mega Event Card -->
@@ -112,6 +112,28 @@
                         <option value="security">경비실에 맡겨주세요</option>
                         <option value="direct">직접 수령하겠습니다</option>
                     </select>
+                </div>
+
+                <div class="input-group">
+                    <label id="lbl-pay-method">결제 수단</label>
+                    <div style="display:flex; gap:10px; margin-top:8px;">
+                        <label style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; gap:8px; cursor:pointer; background:rgba(255,255,255,0.03); color:white; font-size:14px;">
+                            <input type="radio" name="pay-method" value="card" checked onclick="toggleBankInfo(false)" style="accent-color:var(--cyan);"> 💳 카드
+                        </label>
+                        <label style="flex:1; padding:12px; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; gap:8px; cursor:pointer; background:rgba(255,255,255,0.03); color:white; font-size:14px;">
+                            <input type="radio" name="pay-method" value="bank" onclick="toggleBankInfo(true)" style="accent-color:var(--cyan);"> 🏦 무통장
+                        </label>
+                    </div>
+                </div>
+
+                <div id="bank-info-box" style="display:none; margin-top:16px; padding:16px; background:rgba(6,182,212,0.1); border:1px solid var(--cyan); border-radius:10px; animation:fadeIn 0.3s ease;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                        <img src="https://static.toss.im/assets/homepage/safety/icn-safety-bank-toss.png" style="width:18px;" alt="Toss">
+                        <span style="color:white; font-size:14px; font-weight:700;">토스뱅크 입금 안내</span>
+                    </div>
+                    <p style="font-size:14px; color:var(--cyan); margin-bottom:4px; font-weight:800; letter-spacing:0.5px;">1000-7587-9085</p>
+                    <p style="font-size:12px; color:var(--text-dim);">예금주: 곽세영</p>
+                    <p style="font-size:11px; color:rgba(255,255,255,0.5); margin-top:8px; line-height:1.4;">* 주문자 성함으로 입금 부탁드립니다.<br>* 입금 확인 후 배송이 시작됩니다.</p>
                 </div>
 
                 <div style="margin-top:24px; text-align:left; font-size:12px; color:var(--text-dim);">

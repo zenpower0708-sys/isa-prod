@@ -11,8 +11,8 @@ const SITE_CONFIG = {
     regNumber: '2025-000001',
     phone: '02-554-2212',
     email: 'info@isa-surfing.org',
-    addressKR: '서울특별시 강남구 테헤란로 123',
-    address: '123 Teheran-ro, Gangnam-gu, Seoul',
+    addressKR: '서울시 강남구 남부순환로 2909',
+    address: '2909 Nambusunhwan-ro, Gangnam-gu, Seoul',
     storeUrl: 'https://isa-international-artificial-indoor-surfing-149618944785.us-west1.run.app'
 };
 
@@ -66,7 +66,7 @@ const NOTICES = {
         { date: '2026.04.10', title: '2026년 2분기 자격검정 일정 공고' },
         { date: '2026.03.25', title: '실기평가 업로드 시스템 개선 안내' },
         { date: '2026.03.15', title: '필기시험 재응시 제도 시행 안내' },
-        { date: '2026.02.28', title: '국제인공서핑협회 공식 인증 강사 목록 공개' }
+        { date: '2026.02.28', title: '한국인공서핑협회 공식 인증 강사 목록 공개' }
     ],
     EN: [
         { date: '2026.04.10', title: '2026 Q2 Certification Exam Schedule' },
@@ -81,40 +81,40 @@ const CERT_DATA = {
     KO: {
         levels: {
             items: [
-                { title: '4급 자격', role: '인공서핑 기초 이론과 안전 수칙을 이해하고, 기본 자세로 파도를 탈 수 있는 초급 수준.', target: '초보자 / 입문' },
-                { title: '3급 자격', role: '기본기를 넘어 턴과 간단한 기술을 구사할 수 있으며, 안전 관리 능력을 갖춘 중급 수준.', target: '일반 / 동호인' },
-                { title: '2급 자격', role: '고급 기술(에어리얼, 360 스핀 등)을 안정적으로 수행하며, 초급 지도가 가능한 상급 수준.', target: '상급 / 준선수' },
-                { title: '1급 자격', role: '모든 기술의 완벽한 숙련과 함께 전문 강사 및 심판 자격을 포함하는 최고 등급.', target: '전문가 / 강사' }
+                { title: '4급 자격', role: '기본 입수·균형·슬라럼을 구사하고, 1~2분 원테이크 영상으로 실기평가를 통과할 수 있는 입문 수준.', target: '일반' },
+                { title: '3급 자격', role: '지정 기술(알리·셔빗·원에이티 등)을 포함한 원테이크 영상 제출. 남성 3개 이상 / 여성 2개 이상 필요한 중급 수준.', target: '중급' },
+                { title: '2급 자격', role: '후방 입수 필수, 지정 고급 기술 영상 제출. 남성 4개 이상 / 여성 3개 이상 기술 구사 가능한 상급 수준.', target: '상급' },
+                { title: '1급 자격', role: '기술 영상 + 강습 영상 2개 제출. 전 종목 최고 기술 숙련, 전문 강사·심판 자격 포함 최고 등급.', target: '프로' }
             ]
         },
         curriculum: {
             title: '종합 교육 과정표',
             headers: ['등급', '필기시험', '실기평가', '실습시간', '발급비용'],
             rows: [
-                ['4급', '20문항/30분', '기본 자세 & 직진', '4시간 이상', '₩300,000'],
-                ['3급', '25문항/40분', '턴 & 기본 기술', '8시간 이상', '₩300,000'],
-                ['2급', '30문항/50분', '고급 기술 영상', '20시간 이상', '₩500,000'],
-                ['1급', '40문항/60분', '시범 & 면접', '50시간 이상', '₩500,000']
+                ['4급', '30문항/30분', '기본 입수·균형·슬라럼 (원테이크 1~2분)', '10시간 이상', '₩300,000'],
+                ['3급', '40문항/40분', '지정 기술 포함 원테이크 영상 (1~2분)', '20시간 이상', '₩300,000'],
+                ['2급', '50문항/50분', '후방 입수 필수 + 지정 기술 영상 (1~2분)', '30시간 이상', '₩500,000'],
+                ['1급', '60문항/60분', '기술 영상 + 강습 영상 2개 제출', '50시간 이상', '₩500,000']
             ]
         }
     },
     EN: {
         levels: {
             items: [
-                { title: 'Level 4', role: 'Beginner level understanding basic theory, safety rules, and can ride waves with basic posture.', target: 'Beginners' },
-                { title: 'Level 3', role: 'Intermediate level capable of turns and simple tricks with safety management ability.', target: 'General / Enthusiasts' },
-                { title: 'Level 2', role: 'Advanced level performing aerial, 360 spins and able to instruct beginners.', target: 'Advanced / Semi-pro' },
-                { title: 'Level 1', role: 'Expert level with mastery of all techniques, including professional instructor and judge qualifications.', target: 'Expert / Instructor' }
+                { title: 'Level 4', role: 'Beginner level: entry/balance/slalom skills. 1–2 min one-take video submission required.', target: 'General' },
+                { title: 'Level 3', role: 'Intermediate level: designated trick video required. Male 3+ / Female 2+ designated skills.', target: 'Intermediate' },
+                { title: 'Level 2', role: 'Advanced level: backward entry required + designated tricks. Male 4+ / Female 3+ skills.', target: 'Advanced' },
+                { title: 'Level 1', role: 'Expert level: 2 videos required (skill + coaching). Instructor & judge qualifications included.', target: 'Pro' }
             ]
         },
         curriculum: {
             title: 'Comprehensive Curriculum',
             headers: ['Level', 'Written Exam', 'Practical', 'Practice Hours', 'Fee'],
             rows: [
-                ['Level 4', '20Q / 30min', 'Basic Stance & Straight', '4+ hours', '₩300,000'],
-                ['Level 3', '25Q / 40min', 'Turns & Basic Tricks', '8+ hours', '₩300,000'],
-                ['Level 2', '30Q / 50min', 'Advanced Trick Video', '20+ hours', '₩500,000'],
-                ['Level 1', '40Q / 60min', 'Demo & Interview', '50+ hours', '₩500,000']
+                ['Level 4', '30Q / 30min', 'Entry · Balance · Slalom (1–2min one-take)', '10+ hours', '₩300,000'],
+                ['Level 3', '40Q / 40min', 'Designated Tricks One-take Video (1–2min)', '20+ hours', '₩300,000'],
+                ['Level 2', '50Q / 50min', 'Backward Entry + Designated Tricks (1–2min)', '30+ hours', '₩500,000'],
+                ['Level 1', '60Q / 60min', 'Skill Video + Coaching Video (2 submissions)', '50+ hours', '₩500,000']
             ]
         }
     }
@@ -124,7 +124,9 @@ const CERT_DATA = {
 const LANG = {
     KO: {
         common: {
-            appName: '국제인공서핑협회',
+            appName: '국제인공서핑협회', // 기본값
+            headerName: '국제인공서핑협회',
+            footerName: '한국인공서핑협회',
             govCulture: '문화체육관광부',
             govCoast: '해양경찰청',
             login: '로그인',
@@ -132,14 +134,14 @@ const LANG = {
             footer: { contact: '연락처', legal: '법적 고지', privacy: '개인정보처리방침', terms: '이용약관', insTerms: '공제회 약관', rights: 'ISA. All rights reserved.' }
         },
         quick: { event: '이벤트', notice: '공지사항', appCheck: '접수확인', certCheck: '자격증조회', inputApp: '접수번호를 입력하세요', inputCert: '이름 (Name)', inputPhone: '연락처 (Phone)', checkBtn: '조회하기' },
-        nav: { cert: '자격증', shop: '장비스토어', insurance: '공제회', map: '인공서핑장현황', edu: '교육' },
+        nav: { cert: '자격증', shop: '장비스토어', insurance: '공제회', map: '인공서핑장현황', edu: '교육', book: '교재', instructor: '강사전용' },
         hero: { tag: '미래의 서핑을 경험하라', title: '디지털 파도를 넘어', subtitle: '국제인공서핑협회 공식 플랫폼', cta: '자격증 신청하기', watch: '자격증 소개', waveHeight: '현재 파도 높이', waterTemp: '수온' },
         cert: {
             title: '자격증 센터', desc: '1급부터 4급까지, 당신의 실력을 증명하세요.',
             processTitle: '급 자격 심사 과정',
             step1: '실습 이수', step1Desc: '강사 확인 필요',
-            step2: '필기 시험', step2Desc: '20문항 / 30분',
-            step3: '실기 평가', step3Desc: '3분 1080p 영상 업로드',
+            step2: '필기 시험', step2Desc: '30문항 / 30분',
+            step3: '실기 평가', step3Desc: '1~2분 원테이크 영상 업로드 (1급: 기술+강습 영상 2개)',
             step4: '디지털 자격증 발급', step4Desc: 'PDF 자격증 발급 · 이메일 자동 발송',
             start: '시작하기', examFee: '응시료', total: '합계',
             creditCard: '신용카드 (해외 겸용)', payUnlock: '결제 및 시험 잠금 해제',
@@ -170,7 +172,7 @@ const LANG = {
             officialVideo: '공식 영상', aiVoicePreview: 'AI 보이스 프리뷰', playBtn: '재생하기'
         },
         login: {
-            title: '로그인', signupTitle: '회원가입', sub: '국제인공서핑협회 공식 플랫폼',
+            title: '로그인', signupTitle: '회원가입', sub: '한국인공서핑협회 공식 플랫폼',
             name: '이름', email: '이메일', password: '비밀번호',
             namePh: '이름을 입력하세요', submitLogin: '로그인', submitSignup: '가입하기',
             toggleToSignup: '계정이 없으신가요? 회원가입', toggleToLogin: '이미 계정이 있으신가요? 로그인'
@@ -179,6 +181,8 @@ const LANG = {
     EN: {
         common: {
             appName: 'ISA World',
+            headerName: 'ISA World',
+            footerName: 'ISA Korea',
             govCulture: 'Ministry of Culture',
             govCoast: 'Coast Guard',
             login: 'Login',
@@ -186,14 +190,14 @@ const LANG = {
             footer: { contact: 'Contact', legal: 'Legal', privacy: 'Privacy Policy', terms: 'Terms of Service', insTerms: 'Insurance Terms', rights: 'ISA. All rights reserved.' }
         },
         quick: { event: 'Events', notice: 'Notices', appCheck: 'App. Check', certCheck: 'Cert. Check', inputApp: 'Enter Application No.', inputCert: 'Name', inputPhone: 'Phone', checkBtn: 'Check' },
-        nav: { cert: 'Certification', shop: 'Store', insurance: 'Insurance', map: 'Locations', edu: 'Education' },
+        nav: { cert: 'Certification', shop: 'Store', insurance: 'Insurance', map: 'Locations', edu: 'Education', book: 'Textbook', instructor: 'Instructor Only' },
         hero: { tag: 'Experience the Future of Surfing', title: 'Beyond Digital Waves', subtitle: "Official Platform of the Int'l Artificial Indoor Surfing Association", cta: 'Apply for Cert', watch: 'Cert Intro', waveHeight: 'Wave Height', waterTemp: 'Water Temp' },
         cert: {
             title: 'Certification Center', desc: 'From Level 4 to Level 1, Prove your skills.',
             processTitle: 'Qualification Process',
             step1: 'Training', step1Desc: 'Instructor Check Required',
-            step2: 'Written Exam', step2Desc: '20 Questions / 30 Min',
-            step3: 'Practical', step3Desc: 'Upload 3min 1080p Video',
+            step2: 'Written Exam', step2Desc: '30 Questions / 30 Min',
+            step3: 'Practical', step3Desc: '1–2min one-take video (Level 1: 2 videos required)',
             step4: 'Digital Certificate', step4Desc: 'PDF Certificate · Auto Email Delivery',
             start: 'Start', examFee: 'Exam Fee', total: 'Total',
             creditCard: 'Credit Card', payUnlock: 'Pay & Unlock',
@@ -300,11 +304,11 @@ const DISCIPLINE_INFO = {
 const LEGAL_TEXTS = {
     privacy: `개인정보처리방침
 
-국제인공서핑협회(이하 '협회')는 이용자의 개인정보를 소중히 여기며, 개인정보 보호법 등 관계 법령을 준수합니다.
+한국인공서핑협회(이하 '협회')는 이용자의 개인정보를 소중히 여기며, 개인정보 보호법 등 관계 법령을 준수합니다.
 처리하고 있는 개인정보의 이용 목적은 이용 계약의 이행, 이용 편의 제공이며, 동의 없이 제3자에게 제공하지 않습니다.
 
 제1조 (개인정보의 처리 목적)
-국제인공서핑협회(이하 '협회')는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.
+한국인공서핑협회(이하 '협회')는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.
 1. 회원 가입 및 관리: 회원 가입 의사 확인, 회원제 서비스 제공에 따른 본인 식별·인증, 회원 자격 유지·관리, 서비스 부정 이용 방지, 각종 고지·통지, 고충처리 목적으로 개인정보를 처리합니다.
 2. 재화 또는 서비스 제공: 물품 배송, 서비스 제공, 계약서·청구서 발송, 콘텐츠 제공, 맞춤형 서비스 제공, 본인인증, 연령인증, 요금 결제·정산을 목적으로 개인정보를 처리합니다.
 3. 고충 처리: 민원인의 신원 확인, 민원사항 확인, 사실조사를 위한 연락·통지, 처리결과 통보 목적으로 개인정보를 처리합니다.
@@ -354,7 +358,7 @@ const LEGAL_TEXTS = {
     terms: `이용약관
 
 제1조 (목적)
-이 약관은 국제인공서핑협회(이하 '협회')가 운영하는 인공서핑 자격증 취득 및 관련 서비스(이하 '서비스')의 이용 조건 및 절차, 회원과 협회의 권리·의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+이 약관은 한국인공서핑협회(이하 '협회')가 운영하는 인공서핑 자격증 취득 및 관련 서비스(이하 '서비스')의 이용 조건 및 절차, 회원과 협회의 권리·의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
 
 제2조 (정의)
 1. "서비스"라 함은 단말기(PC, 모바일단말기 등)에 관계없이 회원이 이용할 수 있는 자격 신청, 취소, 조회 및 협회와 관련한 제반 서비스를 의미합니다.
@@ -423,7 +427,7 @@ const LEGAL_TEXTS = {
 제1장 총칙
 
 제1조 (목적)
-이 약관은 국제인공서핑협회(이하 "협회"라 한다)가 운영하는 인공서핑 자격 취득을 위한 실기 훈련 시 발생하는 회원(이하 "회원"이라 한다)의 상해 피해를 경제적으로 지원하여 회원의 활동 안전 및 복리 증진을 도모함을 목적으로 합니다.
+이 약관은 한국인공서핑협회(이하 "협회"라 한다)가 운영하는 인공서핑 자격 취득을 위한 실기 훈련 시 발생하는 회원(이하 "회원"이라 한다)의 상해 피해를 경제적으로 지원하여 회원의 활동 안전 및 복리 증진을 도모함을 목적으로 합니다.
 
 제2조 (정의)
 "실기 훈련"이라 함은 협회의 인공서핑 시설에서 해당 자격증 취득 시 필수 이수하여야 하는 소정의 훈련 시간을 말합니다.
@@ -489,5 +493,54 @@ const LEGAL_TEXTS = {
 제14조 (분쟁해결 및 소송 관할)
 이 약관의 해석 및 공제과정에서 한국법이 적용되며, 소송 시 협회 본사를 관할하는 법원을 제1심 법원으로 합니다.
 
-부칙: 이 약관은 2026년 5월 1일부터 시행합니다.`
+부칙: 이 약관은 2026년 5월 1일부터 시행합니다.`,
+
+    copyright: `저작권 및 지식재산권 고지
+
+© 2025 한국인공서핑협회 (ISA, International Artificial Indoor Surfing Association). All rights reserved.
+
+이 웹사이트(https://isa-web-portal.vercel.app) 및 관련 플랫폼의 모든 콘텐츠·디자인·소스코드·로고·영상·문서는 한국인공서핑협회(이하 '협회')에 귀속되는 저작물로서, 대한민국 저작권법 및 국제 저작권 협약에 의해 보호됩니다.
+
+제1조 (보호 대상)
+다음 각 호의 항목은 협회의 독점적 지식재산권 보호 대상입니다.
+• 웹사이트의 전체 및 부분적 디자인·레이아웃·UI
+• HTML, CSS, JavaScript 등 모든 소스코드
+• ISA 명칭, 로고, 엠블럼 및 관련 상표
+• 자격증 디자인·양식·발급 시스템
+• 급수별 시험 문제은행 및 채점 기준
+• 교육 자료, 안전 교육 콘텐츠, 기술 규정
+• 디지털 자격증 PDF 템플릿 및 QR코드 시스템
+• 협회가 제작하거나 협회에 귀속된 모든 영상·이미지·문서
+
+제2조 (금지 행위)
+협회의 사전 서면 동의 없이 다음 행위를 엄격히 금지합니다.
+1. 웹사이트 디자인·레이아웃·소스코드의 전부 또는 일부 복제·모방
+2. 자격증 시스템·시험 시스템·회원 시스템의 복제 또는 유사 서비스 운영
+3. ISA 명칭, 로고, 엠블럼을 무단으로 사용하거나 유사 명칭으로 혼동을 유발하는 행위
+4. 웹사이트 콘텐츠를 크롤링·스크래핑하여 상업적 목적으로 활용하는 행위
+5. 협회가 발급하는 자격증의 위조·변조·무단 복제
+6. 협회 시스템을 역설계(Reverse Engineering)하거나 소스코드를 무단으로 추출하는 행위
+7. 협회 플랫폼과 동일하거나 유사한 서비스를 제3자에게 제공하는 행위
+
+제3조 (저작권 침해 시 조치)
+저작권 침해 행위가 확인될 경우 협회는 다음과 같은 법적 조치를 취할 수 있습니다.
+1. 저작권법 제136조에 의거한 민·형사상 손해배상 청구
+2. 침해 콘텐츠 및 서비스에 대한 즉각적인 중지 요청
+3. 관련 플랫폼(웹 호스팅사, 검색엔진 등)에 대한 침해 신고 및 삭제 요청
+4. 필요 시 수사기관에 고발 조치
+
+제4조 (상표권)
+'ISA', '한국인공서핑협회', 'International Artificial Indoor Surfing Association' 및 관련 로고·엠블럼은 협회의 고유 상표입니다. 유사 명칭 사용 시 상표법에 따른 법적 책임을 질 수 있습니다.
+
+제5조 (링크 및 인용)
+• 협회 웹사이트의 공식 URL 링크는 비상업적 목적에 한해 허용됩니다.
+• 협회 콘텐츠 인용 시 반드시 출처(한국인공서핑협회, https://isa-web-portal.vercel.app)를 명시해야 합니다.
+• 상업적 목적의 링크·인용은 사전 서면 동의가 필요합니다.
+
+제6조 (문의)
+저작권 관련 문의 및 사용 허가 요청은 아래 연락처로 접수하시기 바랍니다.
+• 이메일: info@isa-surfing.org
+• 주소: 서울시 강남구 남부순환로 2909
+
+부칙: 본 저작권 고지는 2025년 1월 1일부터 효력을 가지며, 이전에 발생한 침해 행위에도 소급 적용될 수 있습니다.`
 };

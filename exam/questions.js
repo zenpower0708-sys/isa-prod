@@ -5,9 +5,15 @@
 // ============================================================
 
 const EXAM_CONFIG = {
-  questionsPerExam: 15,    // 시험 당 출제 문항 수
-  passingScore: 70,         // 합격 기준 (%)
-  timeLimitMinutes: 30,     // 시험 시간 (분)
+  questionsPerExam: 30,    // 기본값 (4급 기준) — 실제 출제는 levelConfig 참조
+  passingScore: 60,         // 합격 기준 (%) — 60점 이상
+  timeLimitMinutes: 30,     // 기본값 — 실제 시간은 levelConfig 참조
+  levelConfig: {
+    4: { questionsPerExam: 30, passingScore: 60, timeLimitMinutes: 30 },
+    3: { questionsPerExam: 40, passingScore: 60, timeLimitMinutes: 40 },
+    2: { questionsPerExam: 50, passingScore: 60, timeLimitMinutes: 50 },
+    1: { questionsPerExam: 60, passingScore: 60, timeLimitMinutes: 60 }
+  },
   disciplines: [
     { id: 'standing', name: 'Standing/Flow Board', nameKR: '스탠딩/플로우 보드', icon: '🏄' },
     { id: 'body',     name: 'Body/Boogie Board',   nameKR: '바디/부기 보드',    icon: '🏊' },
@@ -418,11 +424,6 @@ const QUESTIONS_STANDING_L1 = [
   { id:696, question:"지도자가 학습자의 '개인 정보'를 수집할 때 반드시 거쳐야 하는 절차는?", options:["정보 주체(학습자)의 사전 동의 획득","몰래 수집","인터넷에 검색","친구에게 물어보기"], answer:0 },
   { id:697, question:"고급 스포츠지도자로서 지녀야 할 '직업 윤리'의 핵심 가치는?", options:["전문성, 공정성, 책임감, 도덕성","수익성, 이기성, 편의성","허영심, 독단성, 무책임","차별, 폭력, 방임"], answer:0 }
 ];
-
-// ============================================================
-// 하위 호환을 위한 기존 변수명 유지
-// ============================================================
-const QUESTIONS_LEVEL4 = QUESTIONS_BODY_L4;
 
 // ============================================================
 // Wake Surfing - 3급 문제 (50문항) IDs: 700~749

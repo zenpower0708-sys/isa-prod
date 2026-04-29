@@ -165,29 +165,59 @@ function closeCheckout() {
 }
 
 // 주문 제출
-function submitOrder(e) {
+async function submitOrder(e) {
     e.preventDefault();
     const t = LANG[currentLang];
     
-    // 간단한 데이터 수집 시뮬레이션
+    const payMethod = document.querySelector('input[name="pay-method"]:checked')?.value || 'card';
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
     const orderData = {
+        action: 'submitOrder',
         name: $('order-name').value,
         phone: $('order-phone').value,
         zip: $('order-zip').value,
         address: $('order-addr').value,
         detail: $('order-detail').value,
-        request: $('order-request').value
+        request: $('order-request').value,
+        payMethod: payMethod,
+        totalPrice: totalPrice,
+        items: cart.map(item => `${item.name} (${item.quantity})`).join(', ')
     };
 
-    console.log("주문 접수 데이터:", orderData);
-    
-    // 성공 피드백
-    alert(t.checkout.success);
-    closeCheckout();
-    $('checkout-form').reset();
+    try {
+        if (payMethod === 'bank') {
+            const bankMsg = currentLang === 'KO' 
+                ? `✅ 주문이 접수되었습니다!\n\n🏦 입금 계좌: 토스뱅크 1000-7587-9085 (곽세영)\n금액: ₩${totalPrice.toLocaleString()}\n\n입금 확인 후 배송이 시작됩니다.`
+                : `✅ Order received!\n\n🏦 Account: Toss Bank 1000-7587-9085 (Kwak Se-young)\nAmount: ₩${totalPrice.toLocaleString()}\n\nShipping starts after deposit.`;
+            alert(bankMsg);
+        }
+
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // GAS postData issue
+            body: JSON.stringify(orderData)
+        });
+
+        if (payMethod !== 'bank') {
+            alert(t.checkout.success);
+        }
+
+        closeCheckout();
+        cart = [];
+        saveCart();
+        renderCart();
+        $('checkout-form').reset();
+    } catch (err) {
+        console.error("Order error:", err);
+        alert(currentLang === 'KO' ? "주문 처리 중 오류가 발생했습니다." : "Error processing order.");
+    }
 }
 
-// ===== 인증 및 세션 관리 =====
+// ===== CONFIG =====
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhkc4PNMg1o3gx9v4owhydgns3UaZLTJ_XKoc64pQupnWfYXq0k1rh3GibjzVvR6Xm6/exec';
+
+// ===== TRANSLATIONS =====
 function initAuth() {
     updateNavbarAuth(getSession());
 }

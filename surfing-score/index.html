@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surfing Score</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif; }
+  .gradient-bg { background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #0891b2 100%); }
+  .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.92); }
+  .wave-anim { animation: wave 3s ease-in-out infinite; }
+  @keyframes wave { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .pulse-ring { animation: pulseRing 1.5s ease-out infinite; }
+  @keyframes pulseRing { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .mode-card { transition: all 0.2s; }
+  .mode-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(14,165,233,0.3); }
+  .mode-card.selected { transform: scale(1.02); }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+  .lang-btn { transition: all 0.15s; }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- 언어 토글 (전역, 우상단) -->
+<div class="fixed top-3 right-3 z-50 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center p-1 text-xs font-bold">
+  <button onclick="setLang('ko')" id="langKo" class="lang-btn px-3 py-1 rounded-full">한국어</button>
+  <button onclick="setLang('en')" id="langEn" class="lang-btn px-3 py-1 rounded-full">EN</button>
+</div>
+
+<!-- ============================================== -->
+<!-- SCREEN 1: WELCOME -->
+<!-- ============================================== -->
+<div id="screen-welcome" class="screen active">
+  <div class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    <div class="glass rounded-3xl shadow-2xl max-w-3xl w-full p-8 md:p-12">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-3 wave-anim">🏄</div>
+        <h1 class="text-3xl md:text-4xl font-bold text-slate-800">Surfing Score</h1>
+        <p class="text-slate-600 mt-2" data-i18n="appSubtitle"></p>
+      </div>
+
+      <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-5 mb-5">
+        <h2 class="font-bold text-amber-900 mb-3 flex items-center gap-2">
+          <span class="text-xl">📋</span> <span data-i18n="rulesTitle"></span>
+        </h2>
+        <ul class="space-y-2 text-sm text-amber-900">
+          <li class="flex gap-2"><span>⏱️</span><span data-i18n="rule1"></span></li>
+          <li class="flex gap-2"><span>⬇️</span><span data-i18n="rule2"></span></li>
+          <li class="flex gap-2"><span>⬆️</span><span data-i18n="rule3"></span></li>
+          <li class="flex gap-2"><span>💦</span><span data-i18n="rule4"></span></li>
+          <li class="flex gap-2"><span>🚫</span><span data-i18n="rule5"></span></li>
+        </ul>
+      </div>
+
+      <div class="bg-sky-50 border-l-4 border-sky-400 rounded-r-lg p-5 mb-5">
+        <h2 class="font-bold text-sky-900 mb-3 flex items-center gap-2">
+          <span class="text-xl">📷</span> <span data-i18n="filmingTitle"></span>
+        </h2>
+        <ul class="space-y-2 text-sm text-sky-900">
+          <li class="flex gap-2"><span>📐</span><span data-i18n="film1"></span></li>
+          <li class="flex gap-2"><span>📏</span><span data-i18n="film2"></span></li>
+          <li class="flex gap-2"><span>👕</span><span data-i18n="film3"></span></li>
+          <li class="flex gap-2"><span>💡</span><span data-i18n="film4"></span></li>
+        </ul>
+      </div>
+
+      <div class="bg-rose-50 border-l-4 border-rose-400 rounded-r-lg p-5 mb-8">
+        <h2 class="font-bold text-rose-900 mb-3 flex items-center gap-2">
+          <span class="text-xl">⚠️</span> <span data-i18n="accuracyTitle"></span>
+        </h2>
+        <ul class="space-y-2 text-sm text-rose-900">
+          <li class="flex gap-2"><span>•</span><span data-i18n="acc1"></span></li>
+          <li class="flex gap-2"><span>•</span><span data-i18n="acc2"></span></li>
+          <li class="flex gap-2"><span>•</span><span data-i18n="acc3"></span></li>
+          <li class="flex gap-2"><span>•</span><span data-i18n="acc4"></span></li>
+        </ul>
+      </div>
+
+      <button onclick="goTo('screen-mode')" class="w-full bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-105">
+        <span data-i18n="agreeStart"></span> 🚀
+      </button>
+
+      <button onclick="goTo('screen-history')" class="w-full mt-3 bg-white border-2 border-slate-200 hover:border-sky-400 text-slate-700 font-medium py-3 rounded-xl transition">
+        📚 <span data-i18n="viewHistory"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- SCREEN 2: MODE -->
+<!-- ============================================== -->
+<div id="screen-mode" class="screen">
+  <div class="min-h-screen p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex items-center justify-between mb-8">
+        <button onclick="goTo('screen-welcome')" class="text-slate-600 hover:text-slate-900 font-medium">← <span data-i18n="back"></span></button>
+        <h2 class="text-2xl font-bold text-slate-800" data-i18n="modeSelectTitle"></h2>
+        <div class="w-12"></div>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="mode-card bg-white rounded-2xl p-6 shadow-md cursor-pointer border-2 border-transparent" data-mode="solo" onclick="selectMode('solo', 1)">
+          <div class="text-4xl mb-3">🏄</div>
+          <h3 class="font-bold text-lg text-slate-800" data-i18n="modeSolo"></h3>
+          <p class="text-sm text-slate-600 mt-1" data-i18n="modeSoloDesc"></p>
+          <div class="mt-3 text-xs text-sky-600 font-medium" data-i18n="needs1"></div>
+        </div>
+        <div class="mode-card bg-white rounded-2xl p-6 shadow-md cursor-pointer border-2 border-transparent" data-mode="duel2" onclick="selectMode('duel2', 2)">
+          <div class="text-4xl mb-3">⚔️</div>
+          <h3 class="font-bold text-lg text-slate-800" data-i18n="mode2"></h3>
+          <p class="text-sm text-slate-600 mt-1" data-i18n="mode2Desc"></p>
+          <div class="mt-3 text-xs text-sky-600 font-medium" data-i18n="needs2"></div>
+        </div>
+        <div class="mode-card bg-white rounded-2xl p-6 shadow-md cursor-pointer border-2 border-transparent" data-mode="duel3" onclick="selectMode('duel3', 3)">
+          <div class="text-4xl mb-3">🥉</div>
+          <h3 class="font-bold text-lg text-slate-800" data-i18n="mode3"></h3>
+          <p class="text-sm text-slate-600 mt-1" data-i18n="mode3Desc"></p>
+          <div class="mt-3 text-xs text-sky-600 font-medium" data-i18n="needs3"></div>
+        </div>
+        <div class="mode-card bg-white rounded-2xl p-6 shadow-md cursor-pointer border-2 border-transparent" data-mode="duel4" onclick="selectMode('duel4', 4)">
+          <div class="text-4xl mb-3">🏆</div>
+          <h3 class="font-bold text-lg text-slate-800" data-i18n="mode4"></h3>
+          <p class="text-sm text-slate-600 mt-1" data-i18n="mode4Desc"></p>
+          <div class="mt-3 text-xs text-sky-600 font-medium" data-i18n="needs4"></div>
+        </div>
+        <div class="mode-card bg-white rounded-2xl p-6 shadow-md cursor-pointer border-2 border-transparent md:col-span-2 lg:col-span-1" data-mode="team22" onclick="selectMode('team22', 4)">
+          <div class="text-4xl mb-3">🤝</div>
+          <h3 class="font-bold text-lg text-slate-800" data-i18n="modeTeam"></h3>
+          <p class="text-sm text-slate-600 mt-1" data-i18n="modeTeamDesc"></p>
+          <div class="mt-3 text-xs text-sky-600 font-medium" data-i18n="needsTeam"></div>
+        </div>
+      </div>
+
+      <button id="modeNextBtn" onclick="goTo('screen-setup')" disabled class="w-full mt-8 bg-sky-500 disabled:bg-slate-300 disabled:cursor-not-allowed hover:bg-sky-600 text-white font-bold py-4 rounded-xl shadow-lg transition">
+        <span data-i18n="next"></span> →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- SCREEN 3: SETUP -->
+<!-- ============================================== -->
+<div id="screen-setup" class="screen">
+  <div class="min-h-screen p-4 md:p-8">
+    <div class="max-w-2xl mx-auto">
+      <div class="flex items-center justify-between mb-8">
+        <button onclick="goTo('screen-mode')" class="text-slate-600 hover:text-slate-900 font-medium">← <span data-i18n="back"></span></button>
+        <h2 class="text-2xl font-bold text-slate-800" data-i18n="setupTitle"></h2>
+        <div class="w-12"></div>
+      </div>
+
+      <div id="setupContainer" class="bg-white rounded-2xl shadow-md p-6 space-y-4"></div>
+
+      <button onclick="confirmSetup()" class="w-full mt-6 bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 rounded-xl shadow-lg transition">
+        <span data-i18n="goToVideo"></span> →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- SCREEN 4: VIDEO INPUT -->
+<!-- ============================================== -->
+<div id="screen-video" class="screen">
+  <div class="min-h-screen p-4 md:p-8">
+    <div class="max-w-3xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <button onclick="goTo('screen-setup')" class="text-slate-600 hover:text-slate-900 font-medium">← <span data-i18n="back"></span></button>
+        <h2 class="text-2xl font-bold text-slate-800" data-i18n="videoTitle"></h2>
+        <div class="w-12"></div>
+      </div>
+
+      <div id="playerProgress" class="bg-white rounded-2xl shadow-md p-4 mb-4"></div>
+
+      <div class="bg-white rounded-2xl shadow-md p-6">
+        <h3 class="font-bold text-lg mb-1" id="currentPlayerLabel">-</h3>
+        <p class="text-sm text-slate-500 mb-4" data-i18n="videoSubtitle"></p>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <button onclick="setInputMode('upload')" id="btnUpload" class="border-2 border-sky-400 bg-sky-50 text-sky-700 font-medium py-3 rounded-xl">
+            📁 <span data-i18n="upload"></span>
+          </button>
+          <button onclick="setInputMode('record')" id="btnRecord" class="border-2 border-slate-200 hover:border-sky-400 text-slate-700 font-medium py-3 rounded-xl">
+            🎥 <span data-i18n="record"></span>
+          </button>
+        </div>
+
+        <div id="uploadArea" class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-sky-400 transition" onclick="document.getElementById('videoFileInput').click()">
+          <div class="text-5xl mb-3">📤</div>
+          <p class="font-medium text-slate-700" data-i18n="uploadHint"></p>
+          <p class="text-sm text-slate-500 mt-1" data-i18n="uploadFormats"></p>
+          <input type="file" id="videoFileInput" accept="video/*" class="hidden" onchange="handleFileUpload(event)">
+        </div>
+
+        <div id="recordArea" class="hidden">
+          <div class="bg-black rounded-xl overflow-hidden mb-3 relative" style="aspect-ratio: 16/9;">
+            <video id="cameraPreview" autoplay muted playsinline class="w-full h-full object-cover"></video>
+            <div id="recordingIndicator" class="hidden absolute top-3 left-3 flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+              <span class="w-2 h-2 bg-white rounded-full pulse-ring"></span>
+              <span id="recordTime">00:00</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button id="startRecordBtn" onclick="startRecording()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl">
+              ● <span data-i18n="startRec"></span>
+            </button>
+            <button id="stopRecordBtn" onclick="stopRecording()" disabled class="flex-1 bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl">
+              ■ <span data-i18n="stop"></span>
+            </button>
+          </div>
+        </div>
+
+        <div id="videoPreview" class="hidden mt-4">
+          <video id="previewPlayer" controls class="w-full rounded-xl bg-black"></video>
+          <div class="flex gap-2 mt-3">
+            <button onclick="retakeVideo()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-3 rounded-xl">
+              🔄 <span data-i18n="retake"></span>
+            </button>
+            <button onclick="analyzeCurrentVideo()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl">
+              ✓ <span data-i18n="useAnalyze"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- SCREEN 5: ANALYZE -->
+<!-- ============================================== -->
+<div id="screen-analyze" class="screen">
+  <div class="min-h-screen p-4 md:p-8 gradient-bg">
+    <div class="max-w-3xl mx-auto">
+      <div class="glass rounded-2xl shadow-2xl p-6 md:p-8">
+        <div class="text-center mb-6">
+          <div class="text-5xl mb-3 wave-anim">🔍</div>
+          <h2 class="text-2xl font-bold text-slate-800" data-i18n="analyzeTitle"></h2>
+          <p class="text-slate-600 mt-1" id="analyzePlayerName">-</p>
+        </div>
+
+        <div class="bg-black rounded-xl overflow-hidden mb-4 relative" style="aspect-ratio: 16/9;">
+          <video id="analyzeVideo" muted playsinline class="w-full h-full object-contain"></video>
+          <canvas id="analyzeCanvas" class="absolute inset-0 w-full h-full"></canvas>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-slate-700" data-i18n="progress"></span>
+            <span class="text-sm font-bold text-sky-600" id="progressPercent">0%</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+            <div id="progressBar" class="bg-gradient-to-r from-sky-400 to-cyan-500 h-full transition-all" style="width:0%"></div>
+          </div>
+          <p class="text-xs text-slate-500 mt-2" id="analyzeStatus" data-i18n="loadingModel"></p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-white rounded-xl p-3 text-center">
+            <div class="text-xs text-slate-500" data-i18n="ridingTime"></div>
+            <div class="text-xl font-bold text-slate-800"><span id="liveTime">0.0</span>s</div>
+          </div>
+          <div class="bg-white rounded-xl p-3 text-center">
+            <div class="text-xs text-slate-500">Wipe Out</div>
+            <div class="text-xl font-bold text-slate-800"><span id="liveWipeOut">0</span><span data-i18n="timesUnit"></span></div>
+          </div>
+          <div class="bg-white rounded-xl p-3 text-center">
+            <div class="text-xs text-slate-500" data-i18n="stability"></div>
+            <div class="text-xl font-bold text-slate-800"><span id="liveStability">-</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- SCREEN 6: REVIEW -->
+<!-- ============================================== -->
+<div id="screen-review" class="screen">
+  <div class="min-h-screen p-4 md:p-8">
+    <div class="max-w-3xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-slate-800" data-i18n="reviewTitle"></h2>
+        <span class="text-sm text-slate-500" id="reviewPlayerLabel">-</span>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-4">
+        <video id="reviewVideo" controls class="w-full rounded-xl bg-black mb-4"></video>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 text-sm text-amber-800" data-i18n="reviewHint"></div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium text-slate-700 block mb-1" data-i18n="ridingTimeLabel"></label>
+            <input type="number" id="editTime" step="0.1" min="0" class="w-full px-4 py-2 border-2 border-slate-200 rounded-lg focus:border-sky-400 focus:outline-none">
+            <p class="text-xs text-slate-500 mt-1" data-i18n="ridingTimeGoal"></p>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-slate-700 block mb-1" data-i18n="wipeOutLabel"></label>
+            <div class="flex gap-2">
+              <button onclick="setWipeOut(0)" data-wo="0" class="wo-btn flex-1 py-3 rounded-lg font-medium border-2"><span data-i18n="wo0"></span></button>
+              <button onclick="setWipeOut(1)" data-wo="1" class="wo-btn flex-1 py-3 rounded-lg font-medium border-2"><span data-i18n="wo1"></span></button>
+              <button onclick="setWipeOut(2)" data-wo="2" class="wo-btn flex-1 py-3 rounded-lg font-medium border-2"><span data-i18n="wo2"></span></button>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-slate-700 block mb-1" data-i18n="stabilityLabel"></label>
+            <input type="range" id="editStability" min="0" max="10" step="0.5" class="w-full accent-sky-500">
+            <div class="flex justify-between text-xs text-slate-500 mt-1">
+              <span data-i18n="shaky"></span>
+              <span id="stabilityDisplay">5</span>
+              <span data-i18n="veryStable"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-5">
+          <div class="text-sm text-sky-900 font-medium mb-2" data-i18n="expectedScore"></div>
+          <div class="text-4xl font-bold text-sky-600" id="livePreviewScore">100</div>
+          <div class="text-xs text-sky-700 mt-1" id="scoreBreakdown">-</div>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="saveAndContinue()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 rounded-xl shadow-lg transition" id="continueBtn">
+          <span data-i18n="saveContinue"></span> →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- SCREEN 7: RESULT -->
+<!-- ============================================== -->
+<div id="screen-result" class="screen">
+  <div class="min-h-screen gradient-bg p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="glass rounded-3xl shadow-2xl p-6 md:p-10">
+        <div class="text-center mb-8">
+          <div class="text-6xl mb-3">🏆</div>
+          <h2 class="text-3xl font-bold text-slate-800" data-i18n="finalResult"></h2>
+          <p class="text-slate-600 mt-2" id="resultModeLabel">-</p>
+        </div>
+
+        <div id="winnerBanner" class="bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-300 rounded-2xl p-6 mb-6 text-center hidden">
+          <div class="text-sm text-amber-900 font-medium">WINNER</div>
+          <div class="text-3xl font-bold text-amber-900 mt-1" id="winnerName">-</div>
+          <div class="text-sm text-amber-800 mt-1" id="winnerScore">-</div>
+        </div>
+
+        <div id="resultsList" class="space-y-3 mb-6"></div>
+
+        <div class="bg-white/70 rounded-xl p-4 mb-6">
+          <div class="text-sm text-slate-600 font-medium mb-2">📊 <span data-i18n="dataAccTitle"></span></div>
+          <p class="text-xs text-slate-700"><span data-i18n="dataAccPart1"></span> <span class="font-bold text-sky-600" id="totalRecords">0</span><span data-i18n="dataAccPart2"></span></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="resetAndGoHome()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-4 rounded-xl shadow border-2 border-slate-200">
+            🏠 <span data-i18n="home"></span>
+          </button>
+          <button onclick="goTo('screen-history')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 rounded-xl shadow-lg">
+            📚 <span data-i18n="viewRecords"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- SCREEN 8: HISTORY -->
+<!-- ============================================== -->
+<div id="screen-history" class="screen">
+  <div class="min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <button onclick="goTo('screen-welcome')" class="text-slate-600 hover:text-slate-900 font-medium">← <span data-i18n="home"></span></button>
+        <h2 class="text-2xl font-bold text-slate-800">📚 <span data-i18n="historyTitle"></span></h2>
+        <button onclick="clearHistory()" class="text-rose-500 hover:text-rose-700 text-sm font-medium" data-i18n="deleteAll"></button>
+      </div>
+
+      <div id="historyStats" class="grid grid-cols-3 gap-3 mb-6">
+        <div class="bg-white rounded-xl p-4 text-center shadow">
+          <div class="text-xs text-slate-500" data-i18n="totalGames"></div>
+          <div class="text-2xl font-bold text-sky-600" id="statGames">0</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center shadow">
+          <div class="text-xs text-slate-500" data-i18n="totalRides"></div>
+          <div class="text-2xl font-bold text-cyan-600" id="statRides">0</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center shadow">
+          <div class="text-xs text-slate-500" data-i18n="avgScore"></div>
+          <div class="text-2xl font-bold text-emerald-600" id="statAvg">-</div>
+        </div>
+      </div>
+
+      <div id="historyList" class="space-y-3"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// I18N
+// ============================================
+const I18N = {
+  ko: {
+    appSubtitle: '인공 서핑 기술 측정 & 대결 앱',
+    rulesTitle: '게임 규칙',
+    rule1: '<b>목표 시간 40초</b> — 40~45초 사이 라이딩이 만점 구간',
+    rule2: '40초 미만이면 부족 시간만큼 감점',
+    rule3: '45초 초과 시 초과 시간만큼 감점',
+    rule4: '<b>Wipe out 1회</b> — 감점 후 재진입 가능',
+    rule5: '<b>Wipe out 2회</b> — 실격 (0점)',
+    filmingTitle: '촬영 가이드',
+    film1: '카메라는 <b>정면 또는 측면 고정</b>으로 설치 (각도 일정)',
+    film2: '일정한 거리 유지 — 라이더 <b>전신이 화면에 들어오게</b>',
+    film3: '<b>밝은 색 옷</b> 권장 (파도와 색상 분리 위해)',
+    film4: '충분한 조명 환경에서 촬영',
+    accuracyTitle: '측정 정확도 안내',
+    acc1: '물보라 때문에 인물 인식 정확도가 흔들리는 구간이 있을 수 있습니다',
+    acc2: '단일 카메라 영상이라 깊이(z축) 측정에는 한계가 있습니다',
+    acc3: '"스타일" 같은 주관적 점수는 참고용으로 활용해주세요',
+    acc4: '자동 감지가 틀렸다면 결과 화면에서 직접 수정 가능합니다',
+    agreeStart: '동의하고 시작하기',
+    viewHistory: '지난 기록 보기',
+    back: '뒤로',
+    next: '다음',
+    home: '홈으로',
+    viewRecords: '기록 보기',
+    deleteAll: '전체 삭제',
+    modeSelectTitle: '모드 선택',
+    modeSolo: '1인 솔로', modeSoloDesc: '개인 기록 측정 모드', needs1: '영상 1개 필요',
+    mode2: '2인 대결', mode2Desc: '1:1 점수 비교 대결', needs2: '영상 2개 필요',
+    mode3: '3인 대결', mode3Desc: '3명 라이더 랭킹', needs3: '영상 3개 필요',
+    mode4: '4인 대결', mode4Desc: '4명 라이더 랭킹', needs4: '영상 4개 필요',
+    modeTeam: '2:2 팀전', modeTeamDesc: '2명씩 팀 합산 점수 대결', needsTeam: '영상 4개 필요 (팀당 2개)',
+    setupTitle: '참가자 설정',
+    teamA: 'A팀', teamB: 'B팀',
+    teamAPlayer: 'A팀 선수', teamBPlayer: 'B팀 선수',
+    playerNameLabel: '참가자 {n} 이름',
+    playerNamePlaceholder: '이름 입력',
+    goToVideo: '영상 입력하러 가기',
+    videoTitle: '영상 입력',
+    videoSubtitle: '영상을 업로드하거나 직접 촬영하세요',
+    upload: '영상 업로드', record: '직접 촬영',
+    uploadHint: '영상 파일을 클릭하여 선택', uploadFormats: 'MP4, WebM, MOV 지원',
+    startRec: '녹화 시작', stop: '정지',
+    retake: '다시', useAnalyze: '이 영상 사용 & 분석',
+    analyzeTitle: '영상 분석 중',
+    progress: '분석 진행률',
+    loadingModel: '포즈 감지 모델 로딩 중...',
+    loadingVideo: '영상 로딩 중...',
+    analyzingFrames: '프레임 분석 중... (영상 길이: {n}초)',
+    analyzeFailed: '분석 실패. 수동 입력으로 진행합니다.',
+    ridingTime: '라이딩 시간',
+    stability: '자세 안정',
+    timesUnit: '회',
+    reviewTitle: '분석 결과 확인',
+    reviewHint: '💡 AI가 자동으로 감지한 결과입니다. 잘못 감지된 항목이 있다면 직접 수정해주세요.',
+    ridingTimeLabel: '⏱️ 라이딩 시간 (초)',
+    ridingTimeGoal: '목표: 40~45초',
+    wipeOutLabel: '💦 Wipe Out 횟수',
+    wo0: '0회', wo1: '1회 (감점)', wo2: '2회 (실격)',
+    stabilityLabel: '🎯 자세 안정성 (0~10)',
+    shaky: '흔들림 큼', veryStable: '매우 안정',
+    expectedScore: '예상 점수',
+    saveContinue: '저장하고 계속',
+    finalResult: '최종 결과',
+    dataAccTitle: '데이터 누적 효과',
+    dataAccPart1: '현재 누적 기록:',
+    dataAccPart2: '개. 기록이 쌓이면 개인 평균 대비 분석, 트릭 자동 인식 등 더 정밀한 점수 산정이 가능해집니다.',
+    historyTitle: '지난 기록',
+    totalGames: '총 게임 수', totalRides: '총 라이딩 수', avgScore: '평균 점수',
+    noRecords: '아직 저장된 기록이 없습니다',
+    noRecordsHint: '게임을 플레이하면 여기에 자동 저장됩니다',
+    confirmDelete: '정말 모든 기록을 삭제하시겠습니까?',
+    cameraFail: '카메라 접근 실패: ',
+    rank: '위', win: '승', draw: '무승부',
+    teamWins: '{t}팀 승리!',
+    sumPts: '합계 {n}점',
+    score: '점',
+    disqualified: '실격',
+    breakdownBase: '기본 점수',
+    breakdownTimeShort: '시간 부족 ({n}초)',
+    breakdownTimeOver: '시간 초과 ({n}초)',
+    breakdownTimeOk: '시간 적정 (40~45초)',
+    breakdownWipeOut: 'Wipe Out 1회',
+    breakdownStability: '자세 안정성 ({n}/10)',
+    breakdownDQ: '실격 (Wipe Out 2회)',
+    historyVs: ' vs ',
+  },
+  en: {
+    appSubtitle: 'Stationary Surfing Skill Measurement & Battle App',
+    rulesTitle: 'Game Rules',
+    rule1: '<b>Target time 40 sec</b> — Perfect zone is 40~45 seconds',
+    rule2: 'Under 40 sec: deduct points by time short',
+    rule3: 'Over 45 sec: deduct points by time over',
+    rule4: '<b>1 Wipe Out</b> — Re-entry allowed after penalty',
+    rule5: '<b>2 Wipe Outs</b> — Disqualified (0 points)',
+    filmingTitle: 'Filming Guide',
+    film1: 'Mount camera at <b>fixed front or side angle</b>',
+    film2: 'Keep consistent distance — <b>Full body in frame</b>',
+    film3: '<b>Bright colored clothes</b> recommended (for contrast with water)',
+    film4: 'Film in well-lit environment',
+    accuracyTitle: 'Accuracy Notice',
+    acc1: 'Water spray may reduce pose detection accuracy in some sections',
+    acc2: 'Single camera has limitations measuring depth (z-axis)',
+    acc3: 'Subjective scores like "style" are for reference only',
+    acc4: 'You can manually edit results if auto-detection is wrong',
+    agreeStart: 'Agree & Start',
+    viewHistory: 'View Past Records',
+    back: 'Back',
+    next: 'Next',
+    home: 'Home',
+    viewRecords: 'View Records',
+    deleteAll: 'Delete All',
+    modeSelectTitle: 'Select Mode',
+    modeSolo: 'Solo', modeSoloDesc: 'Personal record mode', needs1: '1 video required',
+    mode2: '2-Player Duel', mode2Desc: '1-on-1 score battle', needs2: '2 videos required',
+    mode3: '3-Player Duel', mode3Desc: '3-rider ranking', needs3: '3 videos required',
+    mode4: '4-Player Duel', mode4Desc: '4-rider ranking', needs4: '4 videos required',
+    modeTeam: '2v2 Team Battle', modeTeamDesc: 'Team total score battle (2 per team)', needsTeam: '4 videos required (2 per team)',
+    setupTitle: 'Player Setup',
+    teamA: 'Team A', teamB: 'Team B',
+    teamAPlayer: 'Team A Player', teamBPlayer: 'Team B Player',
+    playerNameLabel: 'Player {n} Name',
+    playerNamePlaceholder: 'Enter name',
+    goToVideo: 'Go to Video Input',
+    videoTitle: 'Video Input',
+    videoSubtitle: 'Upload a video or record directly',
+    upload: 'Upload Video', record: 'Record',
+    uploadHint: 'Click to select video file', uploadFormats: 'Supports MP4, WebM, MOV',
+    startRec: 'Start Recording', stop: 'Stop',
+    retake: 'Retake', useAnalyze: 'Use & Analyze',
+    analyzeTitle: 'Analyzing Video',
+    progress: 'Analysis Progress',
+    loadingModel: 'Loading pose detection model...',
+    loadingVideo: 'Loading video...',
+    analyzingFrames: 'Analyzing frames... (Length: {n} sec)',
+    analyzeFailed: 'Analysis failed. Proceeding with manual input.',
+    ridingTime: 'Riding Time',
+    stability: 'Stability',
+    timesUnit: '',
+    reviewTitle: 'Review Analysis',
+    reviewHint: '💡 These are AI auto-detected results. Please correct any wrong items.',
+    ridingTimeLabel: '⏱️ Riding Time (seconds)',
+    ridingTimeGoal: 'Goal: 40~45 seconds',
+    wipeOutLabel: '💦 Wipe Out Count',
+    wo0: '0', wo1: '1 (Penalty)', wo2: '2 (DQ)',
+    stabilityLabel: '🎯 Stability (0~10)',
+    shaky: 'Shaky', veryStable: 'Very Stable',
+    expectedScore: 'Expected Score',
+    saveContinue: 'Save & Continue',
+    finalResult: 'Final Result',
+    dataAccTitle: 'Data Accumulation Effect',
+    dataAccPart1: 'Records so far:',
+    dataAccPart2: '. As records accumulate, more precise scoring becomes possible (personal average comparison, auto trick recognition, etc).',
+    historyTitle: 'Past Records',
+    totalGames: 'Total Games', totalRides: 'Total Rides', avgScore: 'Average Score',
+    noRecords: 'No records saved yet',
+    noRecordsHint: 'Games will be automatically saved here',
+    confirmDelete: 'Delete all records?',
+    cameraFail: 'Camera access failed: ',
+    rank: '', win: 'W', draw: 'Draw',
+    teamWins: 'Team {t} Wins!',
+    sumPts: 'Total {n} pts',
+    score: 'pts',
+    disqualified: 'DQ',
+    breakdownBase: 'Base Score',
+    breakdownTimeShort: 'Time Short ({n}s)',
+    breakdownTimeOver: 'Time Over ({n}s)',
+    breakdownTimeOk: 'Time Optimal (40~45s)',
+    breakdownWipeOut: 'Wipe Out x1',
+    breakdownStability: 'Stability ({n}/10)',
+    breakdownDQ: 'Disqualified (2 Wipe Outs)',
+    historyVs: ' vs ',
+  }
+};
+
+let CURRENT_LANG = localStorage.getItem('surfingScoreLang') || 'ko';
+
+function t(key, vars = {}) {
+  let str = (I18N[CURRENT_LANG] && I18N[CURRENT_LANG][key]) || (I18N.ko[key]) || key;
+  Object.entries(vars).forEach(([k, v]) => { str = str.replaceAll(`{${k}}`, v); });
+  return str;
+}
+
+function applyTranslations() {
+  document.documentElement.lang = CURRENT_LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.innerHTML = t(el.dataset.i18n);
+  });
+  // 언어 토글 active 상태
+  document.getElementById('langKo').className = 'lang-btn px-3 py-1 rounded-full ' + (CURRENT_LANG === 'ko' ? 'bg-sky-500 text-white' : 'text-slate-600 hover:bg-slate-100');
+  document.getElementById('langEn').className = 'lang-btn px-3 py-1 rounded-full ' + (CURRENT_LANG === 'en' ? 'bg-sky-500 text-white' : 'text-slate-600 hover:bg-slate-100');
+  // 동적 화면 다시 그리기
+  if (document.getElementById('screen-setup').classList.contains('active')) buildSetup();
+  if (document.getElementById('screen-video').classList.contains('active') && STATE.players.length > 0) setupVideoScreen();
+  if (document.getElementById('screen-review').classList.contains('active')) updateLivePreview();
+  if (document.getElementById('screen-history').classList.contains('active')) renderHistory();
+  if (document.getElementById('screen-result').classList.contains('active') && STATE.players.length > 0) showFinalResult();
+}
+
+function setLang(lang) {
+  CURRENT_LANG = lang;
+  localStorage.setItem('surfingScoreLang', lang);
+  applyTranslations();
+}
+
+// ============================================
+// 글로벌 상태
+// ============================================
+const STATE = {
+  mode: null, playerCount: 0, players: [], currentPlayerIdx: 0,
+  inputMode: 'upload', mediaStream: null, mediaRecorder: null,
+  recordedChunks: [], recordTimer: null, recordStartTime: 0,
+  pose: null, currentBlob: null, currentBlobUrl: null, analysisResult: null
+};
+
+const SCREENS = ['screen-welcome','screen-mode','screen-setup','screen-video','screen-analyze','screen-review','screen-result','screen-history'];
+const MODE_KEY = { solo: 'modeSolo', duel2: 'mode2', duel3: 'mode3', duel4: 'mode4', team22: 'modeTeam' };
+
+function goTo(id) {
+  SCREENS.forEach(s => document.getElementById(s).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'screen-history') renderHistory();
+  window.scrollTo(0,0);
+}
+
+// ============================================
+// 모드 선택
+// ============================================
+function selectMode(mode, count) {
+  STATE.mode = mode; STATE.playerCount = count;
+  document.querySelectorAll('.mode-card').forEach(c => {
+    c.classList.remove('selected','ring-4','ring-sky-500','border-sky-500');
+    c.classList.add('border-transparent');
+  });
+  const sel = document.querySelector(`[data-mode="${mode}"]`);
+  sel.classList.remove('border-transparent');
+  sel.classList.add('selected','ring-4','ring-sky-500','border-sky-500');
+  document.getElementById('modeNextBtn').disabled = false;
+}
+
+// ============================================
+// 플레이어 설정
+// ============================================
+function buildSetup() {
+  const container = document.getElementById('setupContainer');
+  container.innerHTML = '';
+
+  if (STATE.mode === 'team22') {
+    container.innerHTML = `
+      <div class="bg-rose-50 rounded-xl p-4">
+        <h4 class="font-bold text-rose-700 mb-3">🔴 ${t('teamA')}</h4>
+        <div class="space-y-2">
+          <input type="text" id="player_0" value="${(STATE.players[0]||{}).name||''}" placeholder="${t('teamAPlayer')} 1" class="w-full px-4 py-3 border-2 border-rose-200 rounded-lg focus:border-rose-400 focus:outline-none">
+          <input type="text" id="player_1" value="${(STATE.players[1]||{}).name||''}" placeholder="${t('teamAPlayer')} 2" class="w-full px-4 py-3 border-2 border-rose-200 rounded-lg focus:border-rose-400 focus:outline-none">
+        </div>
+      </div>
+      <div class="bg-blue-50 rounded-xl p-4">
+        <h4 class="font-bold text-blue-700 mb-3">🔵 ${t('teamB')}</h4>
+        <div class="space-y-2">
+          <input type="text" id="player_2" value="${(STATE.players[2]||{}).name||''}" placeholder="${t('teamBPlayer')} 1" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:border-blue-400 focus:outline-none">
+          <input type="text" id="player_3" value="${(STATE.players[3]||{}).name||''}" placeholder="${t('teamBPlayer')} 2" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:border-blue-400 focus:outline-none">
+        </div>
+      </div>
+    `;
+  } else {
+    for (let i = 0; i < STATE.playerCount; i++) {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <label class="text-sm font-medium text-slate-700 block mb-1">${t('playerNameLabel', { n: i+1 })}</label>
+        <input type="text" id="player_${i}" value="${(STATE.players[i]||{}).name||''}" placeholder="${t('playerNamePlaceholder')}" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-sky-400 focus:outline-none">
+      `;
+      container.appendChild(div);
+    }
+  }
+}
+
+function confirmSetup() {
+  const newPlayers = [];
+  for (let i = 0; i < STATE.playerCount; i++) {
+    const name = document.getElementById(`player_${i}`).value.trim() || t('playerNameLabel', { n: i+1 });
+    let team = null;
+    if (STATE.mode === 'team22') team = i < 2 ? 'A' : 'B';
+    newPlayers.push({ name, team, blob: null, blobUrl: null, results: null });
+  }
+  STATE.players = newPlayers;
+  STATE.currentPlayerIdx = 0;
+  goTo('screen-video');
+  setupVideoScreen();
+}
+
+// ============================================
+// 영상 입력
+// ============================================
+function setupVideoScreen() {
+  const p = STATE.players[STATE.currentPlayerIdx];
+  if (!p) return;
+  const teamLabel = p.team ? ` (${p.team === 'A' ? t('teamA') : t('teamB')})` : '';
+  document.getElementById('currentPlayerLabel').textContent = `${p.name}${teamLabel}`;
+
+  const prog = document.getElementById('playerProgress');
+  let html = '<div class="flex items-center gap-2 flex-wrap">';
+  STATE.players.forEach((pl, i) => {
+    const done = !!pl.blob;
+    const current = i === STATE.currentPlayerIdx;
+    const cls = done ? 'bg-emerald-500 text-white' : (current ? 'bg-sky-500 text-white ring-4 ring-sky-200' : 'bg-slate-200 text-slate-500');
+    const tag = pl.team ? `${pl.team}.` : '';
+    html += `<div class="px-3 py-2 rounded-lg text-xs font-medium ${cls}">${done ? '✓ ' : ''}${tag}${pl.name}</div>`;
+  });
+  html += '</div>';
+  prog.innerHTML = html;
+
+  if (!STATE.currentBlob) {
+    document.getElementById('uploadArea').classList.remove('hidden');
+    document.getElementById('recordArea').classList.add('hidden');
+    document.getElementById('videoPreview').classList.add('hidden');
+    setInputMode('upload');
+  }
+}
+
+function setInputMode(mode) {
+  STATE.inputMode = mode;
+  document.getElementById('btnUpload').className = mode === 'upload'
+    ? 'border-2 border-sky-400 bg-sky-50 text-sky-700 font-medium py-3 rounded-xl'
+    : 'border-2 border-slate-200 hover:border-sky-400 text-slate-700 font-medium py-3 rounded-xl';
+  document.getElementById('btnRecord').className = mode === 'record'
+    ? 'border-2 border-sky-400 bg-sky-50 text-sky-700 font-medium py-3 rounded-xl'
+    : 'border-2 border-slate-200 hover:border-sky-400 text-slate-700 font-medium py-3 rounded-xl';
+  document.getElementById('uploadArea').classList.toggle('hidden', mode !== 'upload');
+  document.getElementById('recordArea').classList.toggle('hidden', mode !== 'record');
+  if (mode === 'record') startCamera();
+  else stopCamera();
+}
+
+async function startCamera() {
+  try {
+    if (STATE.mediaStream) return;
+    STATE.mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+    document.getElementById('cameraPreview').srcObject = STATE.mediaStream;
+  } catch (e) {
+    alert(t('cameraFail') + e.message);
+  }
+}
+
+function stopCamera() {
+  if (STATE.mediaStream) {
+    STATE.mediaStream.getTracks().forEach(tr => tr.stop());
+    STATE.mediaStream = null;
+  }
+}
+
+function startRecording() {
+  if (!STATE.mediaStream) return;
+  STATE.recordedChunks = [];
+  STATE.mediaRecorder = new MediaRecorder(STATE.mediaStream, { mimeType: 'video/webm' });
+  STATE.mediaRecorder.ondataavailable = e => { if (e.data.size > 0) STATE.recordedChunks.push(e.data); };
+  STATE.mediaRecorder.onstop = () => {
+    const blob = new Blob(STATE.recordedChunks, { type: 'video/webm' });
+    handleVideoBlob(blob);
+  };
+  STATE.mediaRecorder.start();
+  STATE.recordStartTime = Date.now();
+  document.getElementById('recordingIndicator').classList.remove('hidden');
+  document.getElementById('startRecordBtn').disabled = true;
+  document.getElementById('startRecordBtn').className = 'flex-1 bg-slate-300 cursor-not-allowed text-white font-bold py-3 rounded-xl';
+  document.getElementById('stopRecordBtn').disabled = false;
+  document.getElementById('stopRecordBtn').className = 'flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl';
+  STATE.recordTimer = setInterval(() => {
+    const sec = Math.floor((Date.now() - STATE.recordStartTime) / 1000);
+    const m = String(Math.floor(sec/60)).padStart(2,'0');
+    const s = String(sec%60).padStart(2,'0');
+    document.getElementById('recordTime').textContent = `${m}:${s}`;
+  }, 200);
+}
+
+function stopRecording() {
+  if (STATE.mediaRecorder && STATE.mediaRecorder.state !== 'inactive') STATE.mediaRecorder.stop();
+  clearInterval(STATE.recordTimer);
+  document.getElementById('recordingIndicator').classList.add('hidden');
+}
+
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (file) handleVideoBlob(file);
+}
+
+function handleVideoBlob(blob) {
+  STATE.currentBlob = blob;
+  if (STATE.currentBlobUrl) URL.revokeObjectURL(STATE.currentBlobUrl);
+  STATE.currentBlobUrl = URL.createObjectURL(blob);
+  document.getElementById('previewPlayer').src = STATE.currentBlobUrl;
+  document.getElementById('uploadArea').classList.add('hidden');
+  document.getElementById('recordArea').classList.add('hidden');
+  document.getElementById('videoPreview').classList.remove('hidden');
+}
+
+function retakeVideo() {
+  STATE.currentBlob = null;
+  if (STATE.currentBlobUrl) { URL.revokeObjectURL(STATE.currentBlobUrl); STATE.currentBlobUrl = null; }
+  document.getElementById('videoPreview').classList.add('hidden');
+  setInputMode(STATE.inputMode);
+}
+
+// ============================================
+// 영상 분석
+// ============================================
+async function analyzeCurrentVideo() {
+  stopCamera();
+  goTo('screen-analyze');
+  const player = STATE.players[STATE.currentPlayerIdx];
+  document.getElementById('analyzePlayerName').textContent = player.name;
+  document.getElementById('progressPercent').textContent = '0%';
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('analyzeStatus').textContent = t('loadingModel');
+
+  try {
+    const result = await runPoseAnalysis(STATE.currentBlobUrl);
+    STATE.analysisResult = result;
+    setTimeout(() => { goTo('screen-review'); setupReviewScreen(); }, 500);
+  } catch (e) {
+    console.error(e);
+    document.getElementById('analyzeStatus').textContent = t('analyzeFailed');
+    STATE.analysisResult = { duration: 30, wipeOuts: 0, stability: 5, autoDetected: false };
+    setTimeout(() => { goTo('screen-review'); setupReviewScreen(); }, 1500);
+  }
+}
+
+async function runPoseAnalysis(videoUrl) {
+  return new Promise((resolve, reject) => {
+    const video = document.getElementById('analyzeVideo');
+    const canvas = document.getElementById('analyzeCanvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!STATE.pose) {
+      STATE.pose = new Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
+      STATE.pose.setOptions({
+        modelComplexity: 1, smoothLandmarks: true, enableSegmentation: false,
+        minDetectionConfidence: 0.5, minTrackingConfidence: 0.5
+      });
+    }
+
+    document.getElementById('analyzeStatus').textContent = t('loadingVideo');
+    video.src = videoUrl;
+    video.muted = true;
+
+    video.onloadedmetadata = async () => {
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 360;
+      const duration = video.duration;
+      document.getElementById('analyzeStatus').textContent = t('analyzingFrames', { n: duration.toFixed(1) });
+
+      const FPS = 8;
+      const frameCount = Math.min(Math.floor(duration * FPS), 800);
+      const interval = duration / frameCount;
+      const poses = [];
+
+      STATE.pose.onResults((results) => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (results.poseLandmarks) {
+          drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00ff88', lineWidth: 2 });
+          drawLandmarks(ctx, results.poseLandmarks, { color: '#ff0066', lineWidth: 1, radius: 3 });
+        }
+        const lm = results.poseLandmarks;
+        if (lm) {
+          const lh = lm[23], rh = lm[24], ls = lm[11], rs = lm[12];
+          const hipY = (lh.y + rh.y) / 2;
+          const hipX = (lh.x + rh.x) / 2;
+          const shoulderY = (ls.y + rs.y) / 2;
+          const torsoVertical = Math.abs(hipY - shoulderY);
+          poses.push({ t: video.currentTime, hipY, hipX, shoulderY, torsoVertical, detected: true });
+        } else {
+          poses.push({ t: video.currentTime, detected: false });
+        }
+      });
+
+      let frameIdx = 0;
+      const processNextFrame = async () => {
+        if (frameIdx >= frameCount) {
+          resolve(computeMetrics(poses, duration));
+          return;
+        }
+        video.currentTime = frameIdx * interval;
+        await new Promise(r => video.onseeked = r);
+        try { await STATE.pose.send({ image: video }); } catch (e) {}
+        frameIdx++;
+        const pct = Math.floor((frameIdx / frameCount) * 100);
+        document.getElementById('progressPercent').textContent = pct + '%';
+        document.getElementById('progressBar').style.width = pct + '%';
+        const livePart = computeMetrics(poses, video.currentTime || 0.1);
+        document.getElementById('liveTime').textContent = livePart.duration.toFixed(1);
+        document.getElementById('liveWipeOut').textContent = livePart.wipeOuts;
+        document.getElementById('liveStability').textContent = livePart.stability.toFixed(1);
+        requestAnimationFrame(processNextFrame);
+      };
+      processNextFrame();
+    };
+
+    video.onerror = () => reject(new Error('Video load failed'));
+  });
+}
+
+function computeMetrics(poses, totalDuration) {
+  const detectedPoses = poses.filter(p => p.detected);
+  if (detectedPoses.length === 0) return { duration: 0, wipeOuts: 0, stability: 0, autoDetected: false };
+
+  let startT = null, endT = null;
+  for (const p of detectedPoses) {
+    if (p.torsoVertical > 0.15) {
+      if (startT === null) startT = p.t;
+      endT = p.t;
+    }
+  }
+  if (startT === null) { startT = detectedPoses[0].t; endT = detectedPoses[detectedPoses.length-1].t; }
+
+  let wipeOuts = 0, wasUp = false, lastUpT = -1;
+  for (const p of poses) {
+    if (p.detected && p.torsoVertical > 0.15) {
+      if (!wasUp && lastUpT > 0 && (p.t - lastUpT) > 0.8) wipeOuts++;
+      wasUp = true; lastUpT = p.t;
+    } else if (p.detected && p.torsoVertical < 0.08 && wasUp) {
+      wipeOuts++; wasUp = false;
+    } else if (!p.detected) { wasUp = false; }
+  }
+  wipeOuts = Math.min(wipeOuts, 2);
+
+  const upPoses = detectedPoses.filter(p => p.torsoVertical > 0.15);
+  let stability = 5;
+  if (upPoses.length > 5) {
+    const xs = upPoses.map(p => p.hipX);
+    const mean = xs.reduce((a,b) => a+b, 0) / xs.length;
+    const variance = xs.reduce((a,b) => a + (b-mean)**2, 0) / xs.length;
+    const std = Math.sqrt(variance);
+    stability = Math.max(0, Math.min(10, 10 - (std - 0.02) * 75));
+  }
+
+  const duration = Math.max(0, endT - startT);
+  return { duration, wipeOuts, stability, autoDetected: true };
+}
+
+// ============================================
+// 결과 검토
+// ============================================
+function setupReviewScreen() {
+  const player = STATE.players[STATE.currentPlayerIdx];
+  document.getElementById('reviewPlayerLabel').textContent = player.name + (player.team ? ` (${player.team === 'A' ? t('teamA') : t('teamB')})` : '');
+  document.getElementById('reviewVideo').src = STATE.currentBlobUrl;
+
+  const r = STATE.analysisResult;
+  document.getElementById('editTime').value = r.duration.toFixed(1);
+  document.getElementById('editStability').value = r.stability.toFixed(1);
+  document.getElementById('stabilityDisplay').textContent = r.stability.toFixed(1);
+  setWipeOut(r.wipeOuts);
+
+  document.getElementById('editTime').oninput = updateLivePreview;
+  document.getElementById('editStability').oninput = (e) => {
+    document.getElementById('stabilityDisplay').textContent = parseFloat(e.target.value).toFixed(1);
+    updateLivePreview();
+  };
+  updateLivePreview();
+}
+
+function setWipeOut(n) {
+  STATE._wipeOuts = n;
+  document.querySelectorAll('.wo-btn').forEach(b => {
+    const v = parseInt(b.dataset.wo);
+    if (v === n) {
+      const colors = ['border-emerald-500 bg-emerald-50 text-emerald-700', 'border-amber-500 bg-amber-50 text-amber-700', 'border-rose-500 bg-rose-50 text-rose-700'];
+      b.className = `wo-btn flex-1 py-3 rounded-lg font-medium border-2 ${colors[v]}`;
+    } else {
+      b.className = 'wo-btn flex-1 py-3 rounded-lg font-medium border-2 border-slate-200 text-slate-500 hover:border-slate-400';
+    }
+  });
+  updateLivePreview();
+}
+
+function calculateScore(timeSec, wipeOuts, stability) {
+  if (wipeOuts >= 2) return { total: 0, disqualified: true, breakdown: [{ label: t('breakdownDQ'), value: 0 }] };
+  let score = 100;
+  const breakdown = [{ label: t('breakdownBase'), value: 100 }];
+  if (timeSec < 40) {
+    const p = (40 - timeSec) * 2;
+    score -= p;
+    breakdown.push({ label: t('breakdownTimeShort', { n: timeSec.toFixed(1) }), value: -p });
+  } else if (timeSec > 45) {
+    const p = (timeSec - 45) * 1;
+    score -= p;
+    breakdown.push({ label: t('breakdownTimeOver', { n: timeSec.toFixed(1) }), value: -p });
+  } else {
+    breakdown.push({ label: t('breakdownTimeOk'), value: 0 });
+  }
+  if (wipeOuts === 1) {
+    score -= 15;
+    breakdown.push({ label: t('breakdownWipeOut'), value: -15 });
+  }
+  score += stability;
+  breakdown.push({ label: t('breakdownStability', { n: stability.toFixed(1) }), value: +stability });
+  return { total: Math.max(0, Math.round(score * 10) / 10), disqualified: false, breakdown };
+}
+
+function updateLivePreview() {
+  const tm = parseFloat(document.getElementById('editTime').value) || 0;
+  const wo = STATE._wipeOuts || 0;
+  const s = parseFloat(document.getElementById('editStability').value) || 0;
+  const result = calculateScore(tm, wo, s);
+  document.getElementById('livePreviewScore').textContent = result.total;
+  document.getElementById('scoreBreakdown').innerHTML = result.breakdown.map(b =>
+    `<div>${b.label}: <span class="${b.value < 0 ? 'text-rose-600' : (b.value > 0 ? 'text-emerald-600' : 'text-slate-600')}">${b.value > 0 ? '+' : ''}${b.value}</span></div>`
+  ).join('');
+}
+
+async function saveAndContinue() {
+  const tm = parseFloat(document.getElementById('editTime').value) || 0;
+  const wo = STATE._wipeOuts || 0;
+  const s = parseFloat(document.getElementById('editStability').value) || 0;
+  const result = calculateScore(tm, wo, s);
+
+  STATE.players[STATE.currentPlayerIdx].results = {
+    duration: tm, wipeOuts: wo, stability: s,
+    score: result.total, disqualified: result.disqualified, breakdown: result.breakdown
+  };
+  STATE.players[STATE.currentPlayerIdx].blob = STATE.currentBlob;
+
+  STATE.currentPlayerIdx++;
+  if (STATE.currentPlayerIdx < STATE.playerCount) {
+    STATE.currentBlob = null;
+    if (STATE.currentBlobUrl) { URL.revokeObjectURL(STATE.currentBlobUrl); STATE.currentBlobUrl = null; }
+    goTo('screen-video');
+    setupVideoScreen();
+  } else {
+    await saveGameToHistory();
+    showFinalResult();
+  }
+}
+
+// ============================================
+// 최종 결과
+// ============================================
+function showFinalResult() {
+  goTo('screen-result');
+  document.getElementById('resultModeLabel').textContent = t(MODE_KEY[STATE.mode]);
+
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '';
+
+  if (STATE.mode === 'team22') {
+    const teamA = STATE.players.filter(p => p.team === 'A');
+    const teamB = STATE.players.filter(p => p.team === 'B');
+    const sumA = teamA.reduce((a,p) => a + p.results.score, 0);
+    const sumB = teamB.reduce((a,p) => a + p.results.score, 0);
+    const winnerTeam = sumA > sumB ? 'A' : (sumB > sumA ? 'B' : null);
+
+    if (winnerTeam) {
+      document.getElementById('winnerBanner').classList.remove('hidden');
+      document.getElementById('winnerName').textContent = t('teamWins', { t: winnerTeam });
+      document.getElementById('winnerScore').textContent = t('sumPts', { n: (winnerTeam === 'A' ? sumA : sumB).toFixed(1) });
+    } else {
+      document.getElementById('winnerBanner').classList.add('hidden');
+    }
+
+    [['A', teamA, sumA, 'rose'], ['B', teamB, sumB, 'blue']].forEach(([tt, members, sum, color]) => {
+      const block = document.createElement('div');
+      block.className = `bg-${color}-50 border-2 border-${color}-200 rounded-xl p-4`;
+      block.innerHTML = `
+        <div class="flex justify-between items-center mb-3">
+          <div class="font-bold text-${color}-700 text-lg">${tt === 'A' ? t('teamA') : t('teamB')}</div>
+          <div class="text-2xl font-bold text-${color}-700">${sum.toFixed(1)} ${t('score')}</div>
+        </div>
+        ${members.map(p => `
+          <div class="bg-white rounded-lg p-3 mb-2 last:mb-0">
+            <div class="flex justify-between items-center">
+              <div class="font-medium">${p.name}</div>
+              <div class="font-bold text-slate-700">${p.results.score} ${t('score')}${p.results.disqualified ? ' ('+t('disqualified')+')' : ''}</div>
+            </div>
+            <div class="text-xs text-slate-500 mt-1">${t('ridingTime')} ${p.results.duration.toFixed(1)}s · WO ${p.results.wipeOuts}${t('timesUnit')} · ${t('stability')} ${p.results.stability.toFixed(1)}</div>
+          </div>
+        `).join('')}
+      `;
+      list.appendChild(block);
+    });
+  } else {
+    const sorted = [...STATE.players].sort((a,b) => b.results.score - a.results.score);
+    if (STATE.mode !== 'solo' && sorted.length > 0 && !sorted[0].results.disqualified) {
+      document.getElementById('winnerBanner').classList.remove('hidden');
+      document.getElementById('winnerName').textContent = `🏆 ${sorted[0].name}`;
+      document.getElementById('winnerScore').textContent = `${sorted[0].results.score} ${t('score')}`;
+    } else {
+      document.getElementById('winnerBanner').classList.add('hidden');
+    }
+
+    sorted.forEach((p, i) => {
+      const rank = i + 1;
+      const medals = ['🥇','🥈','🥉','4️⃣'];
+      const div = document.createElement('div');
+      div.className = `bg-white rounded-xl p-4 shadow ${rank === 1 && !p.results.disqualified ? 'ring-2 ring-amber-400' : ''}`;
+      div.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl">${medals[i] || (rank+t('rank'))}</div>
+            <div>
+              <div class="font-bold text-lg">${p.name}</div>
+              <div class="text-xs text-slate-500">${rank}${t('rank')||(rank===1?'st':rank===2?'nd':rank===3?'rd':'th')}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-3xl font-bold ${p.results.disqualified ? 'text-rose-500' : 'text-sky-600'}">${p.results.score}</div>
+            <div class="text-xs text-slate-500">${p.results.disqualified ? t('disqualified') : t('score')}</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center text-xs mt-2 pt-2 border-t">
+          <div><span class="text-slate-500">${t('ridingTime')}</span> <b>${p.results.duration.toFixed(1)}s</b></div>
+          <div><span class="text-slate-500">Wipe Out</span> <b>${p.results.wipeOuts}${t('timesUnit')}</b></div>
+          <div><span class="text-slate-500">${t('stability')}</span> <b>${p.results.stability.toFixed(1)}</b></div>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  loadHistoryStats().then(stats => {
+    document.getElementById('totalRecords').textContent = stats.totalRides;
+  });
+}
+
+function resetAndGoHome() {
+  STATE.players.forEach(p => { if (p.blobUrl) URL.revokeObjectURL(p.blobUrl); });
+  if (STATE.currentBlobUrl) URL.revokeObjectURL(STATE.currentBlobUrl);
+  STATE.players = []; STATE.currentPlayerIdx = 0; STATE.mode = null;
+  STATE.currentBlob = null; STATE.currentBlobUrl = null;
+  document.getElementById('modeNextBtn').disabled = true;
+  document.querySelectorAll('.mode-card').forEach(c => {
+    c.classList.remove('selected','ring-4','ring-sky-500','border-sky-500');
+    c.classList.add('border-transparent');
+  });
+  goTo('screen-welcome');
+}
+
+// ============================================
+// IndexedDB
+// ============================================
+const DB_NAME = 'SurfingScoreDB';
+const DB_VERSION = 1;
+const STORE = 'games';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        const store = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+        store.createIndex('date', 'date');
+        store.createIndex('mode', 'mode');
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveGameToHistory() {
+  const db = await openDB();
+  const tx = db.transaction(STORE, 'readwrite');
+  const store = tx.objectStore(STORE);
+  const game = {
+    date: new Date().toISOString(),
+    mode: STATE.mode,
+    players: STATE.players.map(p => ({ name: p.name, team: p.team, results: p.results }))
+  };
+  return new Promise((resolve, reject) => {
+    const req = store.add(game);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function loadHistory() {
+  const db = await openDB();
+  const tx = db.transaction(STORE, 'readonly');
+  const store = tx.objectStore(STORE);
+  return new Promise((resolve, reject) => {
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result.sort((a,b) => b.date.localeCompare(a.date)));
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function loadHistoryStats() {
+  const games = await loadHistory();
+  const totalRides = games.reduce((a,g) => a + g.players.length, 0);
+  const allScores = games.flatMap(g => g.players.filter(p => !p.results.disqualified).map(p => p.results.score));
+  const avg = allScores.length > 0 ? (allScores.reduce((a,b) => a+b, 0) / allScores.length).toFixed(1) : '-';
+  return { totalGames: games.length, totalRides, avg };
+}
+
+async function renderHistory() {
+  const games = await loadHistory();
+  const stats = await loadHistoryStats();
+  document.getElementById('statGames').textContent = stats.totalGames;
+  document.getElementById('statRides').textContent = stats.totalRides;
+  document.getElementById('statAvg').textContent = stats.avg;
+
+  const list = document.getElementById('historyList');
+  if (games.length === 0) {
+    list.innerHTML = `
+      <div class="bg-white rounded-xl p-8 text-center shadow">
+        <div class="text-5xl mb-3">📭</div>
+        <p class="text-slate-500">${t('noRecords')}</p>
+        <p class="text-xs text-slate-400 mt-1">${t('noRecordsHint')}</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = games.map(g => {
+    const date = new Date(g.date);
+    const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+
+    let summary;
+    if (g.mode === 'team22') {
+      const sumA = g.players.filter(p => p.team === 'A').reduce((a,p) => a + p.results.score, 0);
+      const sumB = g.players.filter(p => p.team === 'B').reduce((a,p) => a + p.results.score, 0);
+      const winner = sumA > sumB ? t('teamA') : (sumB > sumA ? t('teamB') : t('draw'));
+      summary = `<div class="text-sm text-slate-700"><b>${t('teamA')} ${sumA.toFixed(1)}</b>${t('historyVs')}<b>${t('teamB')} ${sumB.toFixed(1)}</b> · ${t('win')}: ${winner}</div>`;
+    } else {
+      const sorted = [...g.players].sort((a,b) => b.results.score - a.results.score);
+      summary = `<div class="text-sm text-slate-700">` + sorted.map((p,i) =>
+        `<span class="${i===0 ? 'font-bold text-sky-600' : ''}">${i+1}. ${p.name} ${p.results.score}${t('score')}</span>`
+      ).join(' · ') + `</div>`;
+    }
+
+    return `
+      <div class="bg-white rounded-xl p-4 shadow">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <span class="bg-sky-100 text-sky-700 text-xs font-medium px-2 py-1 rounded">${t(MODE_KEY[g.mode] || g.mode)}</span>
+          </div>
+          <div class="text-xs text-slate-500">${dateStr}</div>
+        </div>
+        ${summary}
+      </div>
+    `;
+  }).join('');
+}
+
+async function clearHistory() {
+  if (!confirm(t('confirmDelete'))) return;
+  const db = await openDB();
+  const tx = db.transaction(STORE, 'readwrite');
+  tx.objectStore(STORE).clear();
+  setTimeout(renderHistory, 100);
+}
+
+// ============================================
+// 초기화
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+  applyTranslations();
+  const observer = new MutationObserver(() => {
+    if (document.getElementById('screen-setup').classList.contains('active')) buildSetup();
+  });
+  observer.observe(document.getElementById('screen-setup'), { attributes: true, attributeFilter: ['class'] });
+});
+</script>
+
+</body>
+</html>

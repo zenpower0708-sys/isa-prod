@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISA 디지털 합격 자격증 - Wave Surfing</title>
+<link rel="apple-touch-icon" href="../images/cert-icon.png">
+<link rel="icon" type="image/png" href="../images/cert-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Outfit:wght@200;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --diamond-primary: #5ac8f0; --diamond-bg: #03081a; --diamond-glow: rgba(90,200,240,0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #020406;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', 'Outfit', sans-serif;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  .cert-container {
+    perspective: 1500px; width: 100%; max-width: 860px;
+  }
+
+  .cert-card {
+    width: 100%;
+    aspect-ratio: 1.6 / 1;
+    border-radius: 20px; border: 1.5px solid;
+    position: relative; overflow: hidden;
+    padding: 40px;
+    transition: transform 0.15s ease-out;
+    background-size: cover;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.8);
+    background: linear-gradient(135deg, #03081a 0%, #010308 100%); 
+    border-color: rgba(90,200,240,0.4);
+  }
+
+  .hologram {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.02) 45%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 55%, transparent 60%);
+    background-size: 200% 200%; transition: 0.1s; z-index: 10;
+  }
+  .noise {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.04;
+    background-image: url('https://www.transparenttextures.com/patterns/pinstripe.png'); pointer-events: none;
+  }
+  .glow-orb {
+    position: absolute; width: 450px; height: 450px; border-radius: 50%; filter: blur(100px); 
+    pointer-events: none; z-index: 1; opacity: 0.45;
+    background: radial-gradient(circle, var(--diamond-primary), transparent 70%); top: -150px; right: -80px;
+  }
+
+  .wave-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 260px; opacity: 0.4; z-index: 2; pointer-events: none; }
+
+  .top-right-group {
+    position: absolute; top: 32px; right: 40px;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 14px;
+    z-index: 15;
+  }
+  
+  .badge-top {
+    font-family: 'Outfit'; font-weight: 900; font-size: 19px; letter-spacing: 5px;
+    text-transform: uppercase; color: #b0f0ff; text-shadow: 0 0 15px rgba(90,200,240,0.6);
+  }
+
+  .qr-wrap { 
+    width: 68px; height: 68px; background: #fff; padding: 6px; border-radius: 10px; 
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+  }
+  .qr-wrap img { width: 100%; height: 100%; object-fit: contain; }
+
+  .cert-body {
+    position: relative; z-index: 5; display: flex; gap: 40px; height: 100%;
+  }
+
+  .left-col { width: 170px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  
+  .brand-wrap { text-align: center; }
+  .brand-logo { 
+    width: 90px; height: 90px; object-fit: contain; margin-bottom: 10px;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+  }
+  .brand-name { font-size: 9.5px; font-weight: 700; color: #fff; opacity: 0.8; line-height: 1.4; letter-spacing: 0.5px; }
+  
+  .photo-frame {
+    width: 140px; height: 175px; border-radius: 10px; background: rgba(255,255,255,0.03);
+    border: 1.5px solid var(--diamond-primary); display: flex; align-items: center; justify-content: center;
+    overflow: hidden; backdrop-filter: blur(5px);
+    box-shadow: 0 0 20px rgba(90,200,240,0.2);
+  }
+  .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+  .issue-box { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; margin-top: auto; }
+  .issue-box b { display: block; font-family: 'Outfit'; font-size: 11px; color: #fff; margin-top: 4px; letter-spacing: 1px; }
+
+  .right-col { flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 5px; }
+  
+  .header-section { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; }
+  .official-tag { font-family: 'Outfit'; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+  .cert-main-title { font-size: 32px; font-weight: 900; color: #fff; letter-spacing: -1px; line-height: 1.1; }
+  .cert-sub-title { font-family: 'Outfit'; font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 3px; }
+
+  .user-section { margin: 5px 0; }
+  .label { font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .name-display { font-size: 46px; font-weight: 900; color: #fff; line-height: 1; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .glass-box {
+    background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 18px;
+    border: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(8px);
+  }
+  .value { font-size: 16px; font-weight: 700; color: #fff; }
+
+  .tier-section {
+    background: rgba(0,0,0,0.15); border-radius: 12px; padding: 15px 20px;
+    border: 1px solid rgba(255,255,255,0.05); margin: 5px 0;
+  }
+  .tier-label { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .tier-track { display: flex; align-items: center; gap: 0; position: relative; justify-content: space-between; padding: 0 10px; }
+  .tier-item { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 2; }
+  .tier-badge {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .tier-badge svg { width: 30px; height: 30px; }
+  .tier-name { font-family: 'Outfit'; font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+  .tier-connector { flex: 1; height: 2px; background: rgba(255,255,255,0.05); margin: 0 -5px; margin-top: -24px; position: relative; z-index: 1; }
+
+  .tier-item.active .tier-badge { filter: saturate(1.2) brightness(1.1); transform: scale(1.1); box-shadow: 0 0 25px var(--diamond-glow); }
+  .tier-item.active .tier-name { color: #fff; }
+
+  .footer-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-bottom: 5px; }
+  .cert-no-box { 
+    display: flex; align-items: center; gap: 12px; 
+    font-family: 'Outfit'; font-size: 13px; color: rgba(255,255,255,0.6); letter-spacing: 0.5px;
+  }
+  .cert-no-box .label { margin-bottom: 0; font-size: 11px; opacity: 0.7; }
+  .cert-no-box b { color: #fff; font-size: 14px; letter-spacing: 1px; }
+
+  .back-btn {
+    margin-bottom: 20px; padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; color: #fff; cursor: pointer; text-decoration: none; font-size: 14px; transition: 0.3s;
+    display: inline-block;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+  @media (max-width: 800px) {
+    body { padding: 10px; }
+    .cert-card { height: auto; aspect-ratio: auto; padding: 40px 24px; }
+    .cert-body { flex-direction: column; gap: 30px; height: auto; display: flex; }
+    .left-col { width: 100%; order: 3; display: flex; flex-direction: column; align-items: center; }
+    .right-col { width: 100%; order: 2; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    
+    .top-right-group { 
+      position: relative; top: 0; right: 0; margin-bottom: 20px; 
+      align-items: center; order: 1; display: flex; width: 100%;
+    }
+    
+    .badge-top { font-size: 18px; }
+    .qr-wrap { width: 80px; height: 80px; }
+    
+    .header-section { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+    .cert-main-title { font-size: 28px; }
+    
+    .user-section { margin: 15px 0; }
+    .name-display { font-size: 42px; }
+    
+    .info-grid { grid-template-columns: 1fr; gap: 12px; }
+    .glass-box { padding: 12px; }
+    
+    .photo-frame { width: 130px; height: 160px; margin: 0 auto; }
+    .issue-box { margin-top: 20px; }
+    
+    .footer-row { flex-direction: column; gap: 25px; align-items: center; text-align: center; margin-top: 30px; }
+    .cert-no-box { flex-direction: column; align-items: center; gap: 5px; }
+  }
+</style>
+</head>
+<body>
+  <a href="index.html" class="back-btn">← 목록으로 돌아가기</a>
+  <div class="cert-container">
+    <div class="cert-card diamond" id="card">
+      <div class="hologram" id="hologram"></div>
+      <div class="noise"></div>
+      <div class="glow-orb"></div>
+      <canvas class="wave-canvas" id="waveCanvas"></canvas>
+      
+      <div class="top-right-group">
+        <div class="badge-top">DIAMOND</div>
+        <div class="qr-wrap">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ISA-2026-500004" alt="QR">
+        </div>
+      </div>
+
+      <div class="cert-body">
+        <div class="left-col">
+          <div class="brand-wrap">
+            <img class="brand-logo" src="https://isa-web-portal.vercel.app/images/isa-emblem.png" alt="ISA">
+            <div class="brand-name">INTL. ARTIFICIAL SURFING ASSOC.<br>국제인공서핑협회</div>
+          </div>
+          <div class="photo-frame">
+            <img src="../images/세영증명사진.jpg" alt="Profile">
+          </div>
+          <div class="issue-box">
+            ISSUED ON / 발급일
+            <b>2026. 05. 01</b>
+          </div>
+        </div>
+
+        <div class="right-col">
+          <div class="header-section">
+            <div class="official-tag">OFFICIAL CERTIFICATION</div>
+            <div class="cert-main-title">합격 자격증</div>
+            <div class="cert-sub-title">Certificate of Technical Qualification</div>
+          </div>
+
+          <div class="user-section">
+            <div class="label">NAME / 성명</div>
+            <div class="name-display">곽세영</div>
+          </div>
+
+          <div class="info-grid">
+            <div class="glass-box">
+              <div class="label">LEVEL / 등급</div>
+              <div class="value">1급 (Professional)</div>
+            </div>
+            <div class="glass-box">
+              <div class="label">DISCIPLINE / 종목</div>
+              <div class="value">Wave Surfing</div>
+            </div>
+          </div>
+
+          <div class="tier-section">
+            <div class="tier-label">티어 / TIER</div>
+            <div class="tier-track">
+              <div class="tier-item">
+                <div class="tier-badge"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="url(#b-fill)" stroke="#c4784a" stroke-width="1"/><text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,220,180,0.9)">B</text><defs><radialGradient id="b-fill" cx="35%" cy="30%"><stop offset="0%" stop-color="#d4895a"/><stop offset="100%" stop-color="#7a3d1e"/></radialGradient></defs></svg></div>
+                <span class="tier-name">Bronze</span>
+              </div>
+              <div class="tier-connector"></div>
+              <div class="tier-item">
+                <div class="tier-badge"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="url(#s-fill)" stroke="#c0c0c0" stroke-width="1"/><text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,255,255,0.9)">S</text><defs><radialGradient id="s-fill" cx="35%" cy="30%"><stop offset="0%" stop-color="#d8d8d8"/><stop offset="100%" stop-color="#808080"/></radialGradient></defs></svg></div>
+                <span class="tier-name">Silver</span>
+              </div>
+              <div class="tier-connector"></div>
+              <div class="tier-item">
+                <div class="tier-badge"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="url(#g-fill)" stroke="#d4a83a" stroke-width="1"/><text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,250,200,0.95)">G</text><defs><radialGradient id="g-fill" cx="35%" cy="30%"><stop offset="0%" stop-color="#f5d060"/><stop offset="100%" stop-color="#a07010"/></radialGradient></defs></svg></div>
+                <span class="tier-name">Gold</span>
+              </div>
+              <div class="tier-connector"></div>
+              <div class="tier-item active">
+                <div class="tier-badge"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="url(#d-fill)" stroke="#7dd4f8" stroke-width="1"/><polygon points="14,5 20,11 14,22 8,11" fill="rgba(200,240,255,0.85)" stroke="rgba(150,220,255,0.6)" stroke-width="0.5"/><defs><radialGradient id="d-fill" cx="35%" cy="30%"><stop offset="0%" stop-color="#b8eaff"/><stop offset="100%" stop-color="#1a5a8a"/></radialGradient></defs></svg></div>
+                <span class="tier-name">Diamond</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-row">
+            <div class="cert-no-box">
+              <div>
+                <div class="label">자격증 번호 / CERT No.</div>
+                <b>ISA-2026-500004</b>
+              </div>
+            </div>
+            <div style="display: flex; gap: 24px; align-items: center;">
+              <img src="https://isa-web-portal.vercel.app/images/mcst_logo_new.jpg" alt="MCST" style="height: 40px;">
+              <img src="https://isa-web-portal.vercel.app/images/kcg_logo_new.jpg" alt="KCG" style="height: 40px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+  const canvas = document.getElementById('waveCanvas');
+  const ctx = canvas.getContext('2d');
+  let time = 0;
+  const configs = [ { a:35, f:0.01, s:0.025, y:0.4, c:'rgba(90,200,240,0.45)' }, { a:20, f:0.015, s:0.035, y:0.55, c:'rgba(60,180,255,0.3)' } ];
+  function draw() {
+    if (!canvas.offsetWidth) return;
+    canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    configs.forEach(conf => {
+      ctx.beginPath();
+      for(let x=0; x<=canvas.width; x+=2) {
+        const y = canvas.height * conf.y + Math.sin(x * conf.f + time * conf.s) * conf.a;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height);
+      ctx.fillStyle = conf.c; ctx.fill();
+    });
+    time += 0.5; requestAnimationFrame(draw);
+  }
+  draw();
+  const card = document.getElementById('card');
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rX = (0.5 - y) * 10; const rY = (x - 0.5) * 10;
+    card.style.transform = `rotateX(${rX}deg) rotateY(${rY}deg) scale(1.01)`;
+  });
+  card.addEventListener('mouseleave', () => { card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)'; });
+</script>
+</body>
+</html>

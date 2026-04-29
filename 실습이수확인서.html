@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>실습 이수 확인서 - 국제인공서핑협회 (ISA)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    font-size: 11pt;
+    color: #1a1a2e;
+    background: #f0f4f8;
+    padding: 20px;
+  }
+
+  .page {
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 18mm 18mm 15mm 18mm;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #0ea5e9;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-box {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 13pt; letter-spacing: -1px;
+  }
+  .org-name { font-size: 9pt; color: #64748b; }
+  .org-name strong { display: block; font-size: 12pt; color: #0f172a; font-weight: 700; }
+  .doc-no { font-size: 8.5pt; color: #94a3b8; text-align: right; }
+  .doc-no span { display: block; font-size: 9pt; color: #64748b; }
+
+  /* ── 제목 ── */
+  .title-wrap {
+    text-align: center;
+    margin: 16px 0 18px;
+  }
+  .title-wrap h1 {
+    font-size: 19pt;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: 6px;
+  }
+  .title-wrap p {
+    font-size: 9pt;
+    color: #64748b;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* ── 섹션 공통 ── */
+  .section { margin-bottom: 14px; }
+  .section-title {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #0284c7;
+    background: #f0f9ff;
+    border-left: 3px solid #0ea5e9;
+    padding: 4px 8px;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  /* ── 입력 테이블 ── */
+  table { width: 100%; border-collapse: collapse; }
+  table td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 9px;
+    font-size: 10.5pt;
+    vertical-align: middle;
+  }
+  .label {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 9.5pt;
+    width: 28%;
+    white-space: nowrap;
+  }
+  .value { color: #1e293b; min-height: 26px; }
+  .value.wide { width: 72%; }
+  .required {
+    color: #ef4444;
+    font-size: 8pt;
+    margin-left: 2px;
+  }
+
+  /* ── 강사 구분 체크박스 ── */
+  .check-row {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    padding: 6px 10px;
+    background: #fafafa;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5pt;
+  }
+  .checkbox {
+    width: 14px; height: 14px;
+    border: 1.5px solid #94a3b8;
+    display: inline-block;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── 이수시간 기준표 ── */
+  .hour-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  .hour-table th {
+    background: #0ea5e9;
+    color: white;
+    font-size: 9.5pt;
+    font-weight: 600;
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #0284c7;
+  }
+  .hour-table td {
+    text-align: center;
+    border: 1px solid #cbd5e1;
+    padding: 5px 8px;
+    font-size: 10pt;
+  }
+  .hour-table tr:nth-child(even) td { background: #f8fafc; }
+  .badge {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 8.5pt;
+    font-weight: 600;
+  }
+  .b4 { background: #dcfce7; color: #166534; }
+  .b3 { background: #dbeafe; color: #1e40af; }
+  .b2 { background: #fef9c3; color: #854d0e; }
+  .b1 { background: #fce7f3; color: #9d174d; }
+
+  /* ── 인정 서류 안내 ── */
+  .docs-box {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 9.5pt;
+    color: #78350f;
+  }
+  .docs-box .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .docs-box .row:last-child { margin-bottom: 0; }
+  .dot { color: #f59e0b; font-weight: 700; flex-shrink: 0; }
+  .warn-box {
+    background: #fff1f2;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 9pt;
+    color: #991b1b;
+    margin-top: 8px;
+  }
+
+  /* ── 서명란 ── */
+  .sign-section {
+    margin-top: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 14px 16px;
+    background: #fafafa;
+  }
+  .sign-date {
+    font-size: 10.5pt;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sign-line { display: inline-block; width: 40px; border-bottom: 1.5px solid #475569; margin: 0 3px; }
+  .sign-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+  }
+  .sign-box {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 10px 12px;
+    background: white;
+  }
+  .sign-box .s-label {
+    font-size: 8.5pt;
+    color: #64748b;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .sign-box .s-name { font-size: 10pt; color: #1e293b; }
+  .sign-area {
+    height: 36px;
+    border-bottom: 1.5px solid #94a3b8;
+    margin-top: 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-bottom: 2px;
+    font-size: 8.5pt;
+    color: #94a3b8;
+  }
+
+  /* ── 제출처 ── */
+  .submit-to {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 9pt;
+    color: #64748b;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 10px;
+  }
+  .submit-to strong { color: #0284c7; }
+
+  /* ── 푸터 ── */
+  .footer {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 8pt;
+    color: #94a3b8;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 8px;
+  }
+
+  /* ── 인쇄 안내 (화면에서만 표시) ── */
+  .print-guide {
+    background: #0ea5e9;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 10pt;
+    border-radius: 8px;
+    margin: 0 auto 16px;
+    width: 210mm;
+    max-width: 100%;
+  }
+
+  /* ── 인쇄 스타일 ── */
+  @media print {
+    body { background: white; padding: 0; }
+    .page { box-shadow: none; margin: 0; padding: 15mm 16mm 12mm 16mm; }
+    .print-guide { display: none; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="print-guide">
+  📄 PDF로 저장하려면: <strong>Ctrl+P</strong> → 대상: <strong>PDF로 저장</strong> → 인쇄 버튼 클릭
+</div>
+
+<div class="page">
+
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">ISA</div>
+      <div class="org-name">
+        <span>International Surfing Association</span>
+        <strong>국제인공서핑협회</strong>
+      </div>
+    </div>
+    <div class="doc-no">
+      <span>문서번호</span>
+      ISA-CERT-____-______
+    </div>
+  </div>
+
+  <!-- 제목 -->
+  <div class="title-wrap">
+    <h1>실 습  이 수  확 인 서</h1>
+    <p>Practical Training Completion Certificate</p>
+  </div>
+
+  <!-- 1. 신청자 정보 -->
+  <div class="section">
+    <div class="section-title">① 신청자 정보</div>
+    <table>
+      <tr>
+        <td class="label">성명<span class="required">*</span></td>
+        <td class="value"></td>
+        <td class="label">생년월일<span class="required">*</span></td>
+        <td class="value"></td>
+      </tr>
+      <tr>
+        <td class="label">연락처<span class="required">*</span></td>
+        <td class="value"></td>
+        <td class="label">신청 급수<span class="required">*</span></td>
+        <td class="value">□ 4급(일반)　□ 3급(중급)　□ 2급(상급)　□ 1급(프로)</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 2. 실습 내용 -->
+  <div class="section">
+    <div class="section-title">② 실습 이수 내용</div>
+    <table>
+      <tr>
+        <td class="label">교육 기간<span class="required">*</span></td>
+        <td class="value wide">____년 ____월 ____일　~　____년 ____월 ____일</td>
+      </tr>
+      <tr>
+        <td class="label">총 이수 시간<span class="required">*</span></td>
+        <td class="value wide">________ 시간</td>
+      </tr>
+      <tr>
+        <td class="label">교육 장소<span class="required">*</span></td>
+        <td class="value wide"></td>
+      </tr>
+      <tr>
+        <td class="label">교육 시설명</td>
+        <td class="value wide"></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 3. 강사 구분 -->
+  <div class="section">
+    <div class="section-title">③ 강사 구분 및 정보</div>
+    <div class="check-row">
+      <div class="check-item"><div class="checkbox"></div> ISA 공인 강사 (자격증 번호 기재 필수)</div>
+      <div class="check-item"><div class="checkbox"></div> 비공인 강사 (연락처 기재 및 서명 필수)</div>
+    </div>
+    <table>
+      <tr>
+        <td class="label">강사 성명<span class="required">*</span></td>
+        <td class="value"></td>
+        <td class="label">강사 연락처<span class="required">*</span></td>
+        <td class="value"></td>
+      </tr>
+      <tr>
+        <td class="label">ISA 자격증 번호</td>
+        <td class="value" colspan="3">（공인 강사만 기재）</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 4. 급수별 최소 이수 시간 -->
+  <div class="section">
+    <div class="section-title">④ 급수별 최소 이수 시간 기준</div>
+    <table class="hour-table">
+      <tr>
+        <th>급수</th>
+        <th>등급명</th>
+        <th>최소 이수 시간</th>
+        <th>비고</th>
+      </tr>
+      <tr>
+        <td><span class="badge b4">4급</span></td>
+        <td>일반 (General)</td>
+        <td><strong>10시간 이상</strong></td>
+        <td>기초 입문 과정</td>
+      </tr>
+      <tr>
+        <td><span class="badge b3">3급</span></td>
+        <td>중급 (Intermediate)</td>
+        <td><strong>20시간 이상</strong></td>
+        <td>기본 기술 숙련</td>
+      </tr>
+      <tr>
+        <td><span class="badge b2">2급</span></td>
+        <td>상급 (Advanced)</td>
+        <td><strong>30시간 이상</strong></td>
+        <td>심화 기술 과정</td>
+      </tr>
+      <tr>
+        <td><span class="badge b1">1급</span></td>
+        <td>프로 (Pro)</td>
+        <td><strong>50시간 이상</strong></td>
+        <td>전문가·강사 수준</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 5. 인정 서류 안내 -->
+  <div class="section">
+    <div class="section-title">⑤ 인정 서류 기준 안내</div>
+    <div class="docs-box">
+      <div class="row"><span class="dot">●</span><span>공인 강습장 또는 ISA 공인 강사가 발급한 <strong>수료증</strong> (교육 날짜·시간 명기 필수)</span></div>
+      <div class="row"><span class="dot">●</span><span>ISA <strong>공식 양식</strong>의 실습 확인서 (강사 서명 필수)</span></div>
+      <div class="row"><span class="dot">●</span><span>캠프·클리닉 <strong>참가 확인서</strong> (주최 기관 직인 또는 강사 서명 포함)</span></div>
+      <div class="row"><span class="dot">●</span><span>자체 훈련 일지 (<strong>강사 서명 + 연락처 기재 필수</strong>，일자별 시간 상세 기록)</span></div>
+    </div>
+    <div class="warn-box">
+      ⚠️ 비공인 강습의 경우 강사 성명·연락처를 반드시 기재하여야 하며, 허위 기재 시 자격 취소 및 법적 책임이 따를 수 있습니다.
+    </div>
+  </div>
+
+  <!-- 서명란 -->
+  <div class="sign-section">
+    <div class="sign-date">
+      위 내용이 사실임을 확인합니다.&nbsp;&nbsp;&nbsp;
+      확인일：<span class="sign-line"></span>년&nbsp;<span class="sign-line"></span>월&nbsp;<span class="sign-line"></span>일
+    </div>
+    <div class="sign-row">
+      <div class="sign-box">
+        <div class="s-label">신청자 서명</div>
+        <div class="s-name">성명：</div>
+        <div class="sign-area">（서명 또는 인）</div>
+      </div>
+      <div class="sign-box">
+        <div class="s-label">강사 서명 <span style="color:#ef4444">*필수</span></div>
+        <div class="s-name">강사명：</div>
+        <div class="sign-area">（서명 또는 인）</div>
+      </div>
+      <div class="sign-box">
+        <div class="s-label">심사위원회 확인 (ISA 내부용)</div>
+        <div class="s-name">확인자：</div>
+        <div class="sign-area">（직인）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 제출처 -->
+  <div class="submit-to">
+    본 확인서는 <strong>국제인공서핑협회 자격 심사위원회</strong>에 제출하시기 바랍니다.<br>
+    문의：<strong>isa-web-portal.vercel.app</strong>
+  </div>
+
+  <!-- 푸터 -->
+  <div class="footer">
+    © 2025 국제인공서핑협회 (ISA) · International Surfing Association · 본 양식의 무단 복제 및 변조를 금합니다.
+  </div>
+
+</div>
+</body>
+</html>

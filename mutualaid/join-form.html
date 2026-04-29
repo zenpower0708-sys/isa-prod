@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공제회 가입 신청서 - 한국인공서핑협회 공제회</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    font-size: 10.5pt; color: #1a1a2e; background: #f0f4f8; padding: 20px;
+  }
+  .page {
+    background: #fff;
+    width: 210mm; height: 297mm;
+    margin: 0 auto;
+    padding: 14mm 15mm 12mm 15mm;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid #06b6d4; padding-bottom: 8px; margin-bottom: 10px;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .logo-box {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #06b6d4, #2563eb);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 11pt;
+  }
+  .org-name span { display: block; font-size: 8pt; color: #64748b; }
+  .org-name strong { font-size: 11pt; color: #0f172a; }
+  .doc-no { text-align: right; font-size: 8pt; color: #94a3b8; }
+  .doc-no span { display: block; font-size: 8.5pt; color: #64748b; }
+
+  /* ── 제목 ── */
+  .title-wrap { text-align: center; margin: 10px 0 12px; }
+  .title-wrap h1 { font-size: 17pt; font-weight: 700; color: #0f172a; letter-spacing: 5px; }
+  .title-wrap p { font-size: 8.5pt; color: #64748b; margin-top: 2px; }
+
+  /* ── 안내 박스 ── */
+  .info-top {
+    background: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 7px;
+    padding: 8px 12px; margin-bottom: 12px;
+  }
+  .info-top .it-title { color: #0369a1; font-weight: 700; font-size: 9.5pt; margin-bottom: 4px; }
+  .info-top ul { padding-left: 14px; }
+  .info-top li { font-size: 8.5pt; color: #0c4a6e; line-height: 1.65; }
+
+  /* 화면 페이지 간격 */
+  @media screen { .page + .page { margin-top: 24px; } }
+
+  /* 인쇄 */
+  @media print {
+    body { background: white; padding: 0; }
+    .page {
+      box-shadow: none; margin: 0;
+      padding: 12mm 14mm 10mm 14mm;
+      page-break-after: always;
+      overflow: visible;
+    }
+    @page { size: A4; margin: 0; }
+  }
+
+  /* ── 섹션 ── */
+  .section { margin-bottom: 12px; }
+  .section-title {
+    font-size: 9pt; font-weight: 700; color: #0284c7;
+    background: #f0f9ff; border-left: 3px solid #0ea5e9;
+    padding: 3px 8px; margin-bottom: 6px;
+  }
+
+  /* ── 테이블 ── */
+  table { width: 100%; border-collapse: collapse; }
+  td { border: 1px solid #cbd5e1; padding: 6px 8px; font-size: 9.5pt; vertical-align: middle; }
+  .lbl {
+    background: #f8fafc; color: #475569; font-weight: 600;
+    font-size: 8.5pt; width: 26%; white-space: nowrap;
+  }
+  .val { color: #1e293b; min-height: 24px; }
+
+  .footer-sig { margin-top: 40px; text-align: center; }
+  .footer-sig p { font-size: 11pt; margin-bottom: 10px; }
+  .footer-sig .date { margin-bottom: 30px; letter-spacing: 2px; }
+  .footer-sig .name-box { font-size: 13pt; font-weight: 700; margin-top: 20px; }
+  .footer-sig .stamp { display: inline-block; width: 60px; height: 60px; border: 1px solid #cbd5e1; vertical-align: middle; margin-left: 10px; color: #94a3b8; line-height: 60px; font-size: 8pt; }
+
+  .bottom-org { margin-top: 50px; text-align: center; border-top: 2px solid #0ea5e9; padding-top: 20px; }
+  .bottom-org strong { font-size: 14pt; color: #0f172a; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">ISA</div>
+      <div class="org-name">
+        <span>한국인공서핑협회</span>
+        <strong>공제회 (Mutual Aid)</strong>
+      </div>
+    </div>
+    <div class="doc-no">
+      <span>문서번호: ISA-MA-JOIN-2026</span>
+    </div>
+  </div>
+
+  <div class="title-wrap">
+    <h1>공제회 가입 신청서</h1>
+    <p>Mutual Aid Membership Application Form</p>
+  </div>
+
+  <div class="info-top">
+    <div class="it-title">📋 가입 및 결제 안내</div>
+    <ul>
+      <li>본 신청서는 한국인공서핑협회 안전 공제회 가입을 위한 정식 서류입니다.</li>
+      <li><strong>결제 안내:</strong> 현재 공제회비는 <strong>무통장 입금</strong>으로만 수납 가능합니다.</li>
+      <li><strong>입금 계좌:</strong> 토스뱅크 1000-7587-9085 (예금주: 곽세영)</li>
+      <li>입금 시 반드시 <strong>신청인 성함</strong>으로 입금해 주시기 바랍니다.</li>
+      <li>가입 완료는 공제회비 입금 확인 후 최종 승인됩니다.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">1. 신청인(가입자) 정보</div>
+    <table>
+      <tr>
+        <td class="lbl">성명 (실명)</td>
+        <td class="val"></td>
+        <td class="lbl">생년월일</td>
+        <td class="val"></td>
+      </tr>
+      <tr>
+        <td class="lbl">연락처</td>
+        <td class="val"></td>
+        <td class="lbl">성별</td>
+        <td class="val">□ 남 □ 여</td>
+      </tr>
+      <tr>
+        <td class="lbl">주소</td>
+        <td colspan="3" class="val"></td>
+      </tr>
+      <tr>
+        <td class="lbl">이메일</td>
+        <td colspan="3" class="val"></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">2. 가입 플랜 선택</div>
+    <table>
+      <tr>
+        <td class="lbl">선택 플랜</td>
+        <td colspan="3" class="val">
+          □ Daily (1일) - 5,000원<br>
+          □ Monthly (30일) - 30,000원<br>
+          □ Seasonal (90일) - 80,000원
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">가입 희망일</td>
+        <td colspan="3" class="val">2026년 ______월 ______일 부터</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3. 건강 상태 고지</div>
+    <table>
+      <tr>
+        <td class="lbl">질환 유무</td>
+        <td colspan="3" class="val">
+          최근 6개월 이내 치료받은 질환이 있습니까? □ 아니오 □ 예 (질환명: ________________)
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">4. 개인정보 수집 및 이용 동의</div>
+    <div style="font-size: 8.5pt; color: #475569; padding: 10px; border: 1px solid #cbd5e1; line-height: 1.5; margin-bottom: 5px;">
+      - 수집항목: 성명, 생년월일, 연락처, 주소, 이메일, 건강정보 등<br>
+      - 수집목적: 공제회 가입 처리, 공제금 지급 심사, 안내 업무<br>
+      - 보유기간: 공제 계약 종료 후 5년까지 (법령에 따름)
+    </div>
+    <div style="text-align: right; font-size: 9.5pt;">위 내용에 동의합니다. ( □ 동의함 )</div>
+  </div>
+
+  <div class="footer-sig">
+    <p>본인은 한국인공서핑협회 공제회 규약을 준수할 것을 서약하며,</p>
+    <p>위와 같이 공제회 가입을 신청합니다.</p>
+    <div class="date">2026년 ______월 ______일</div>
+    <div class="name-box">
+      신청인 : ____________________ (서명/인)
+      <div class="stamp">인</div>
+    </div>
+  </div>
+
+  <div class="bottom-org">
+    <p style="font-size: 8pt; color: #64748b; margin-bottom: 5px;">서울시 강남구 남부순환로 2909</p>
+    <strong>한국인공서핑협회 공제 심사위원회 귀중</strong>
+  </div>
+</div>
+
+</body>
+</html>

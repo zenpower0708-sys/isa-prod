@@ -46,14 +46,16 @@ const S = {
   name:'', phone:'', birth:'', gender:'M', email:'',
   address:'', emergencyName:'', emergencyPhone:'',
   hasCondition:'no', conditionDetail:'', hasOtherInsurance:'no',
-  payMethod:'card', certNumber:'', certDate:'',
+  payMethod:'bank', certNumber:'', certDate:'',
   claimCertNumber:'', claimName:'', claimPhone:'',
   claimVerified:false, claimRecord:null,
   accidentDate:'', accidentTime:'', accidentLocation:'',
   accidentDesc:'', injuryPart:'', hospitalName:'',
   treatmentDate:'', treatmentDesc:'',
   totalMedical:0, nationalIns:0, selfPay:0,
-  claimFiles:{diagnosis:null,receipt:null,detail:null,proof:null,id:null},
+  claimFiles:{diagnosis:null,receipt:null,detail:null,facilityConfirm:null,accidentPhoto:null,id:null},
+  sportType:'', entryMethod:'', facilityOperatorName:'', facilityOperatorPhone:'',
+  witnessName:'', witnessPhone:'', witnessRole:'',
   claimAgree:false, claimNumber:'',
   loading:false
 };
@@ -162,6 +164,7 @@ function plansHTML(){
       <div class="shield">🛡️</div>
       <h2>ISA 안전 공제회</h2>
       <p>인공서핑 실습 중 발생하는 부상에 대한 실비 치료비를 보상합니다.</p>
+      <p style="font-size: 13px; color: var(--cyan-400); margin-top: 8px; font-weight: 700;">※ 아래 플랜 선택 후 온라인 가입 양식을 작성해 주세요.</p>
     </div>
     <div class="plans-grid">${PLANS.map(p=>`
       <div class="plan-card ${p.popular?'popular':''}" data-action="choose-plan" data-id="${p.id}">
@@ -173,7 +176,22 @@ function plansHTML(){
         <button class="plan-btn ${p.popular?'plan-btn-primary':'plan-btn-default'}">가입하기</button>
       </div>`).join('')}
     </div>
-    <div style="text-align:center;margin-top:40px;padding-top:40px;border-top:1px solid var(--border);">
+    <div style="margin-top:40px;padding:20px;background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.25);border-radius:14px;">
+      <div style="font-weight:800;font-size:15px;color:var(--cyan-400);margin-bottom:6px;">📎 첨부 서류 양식 다운로드</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">공제금 청구 시 필요한 인쇄용 청구서 양식입니다. 미리 작성 후 온라인 접수 시 첨부하세요.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="/mutualaid/join-form.html" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;background:var(--cyan-600);color:white;border:1px solid var(--cyan-500);">
+          📄 공제회 가입 신청서 (인쇄용)
+        </a>
+        <a href="/mutualaid/claim-form.html" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;background:rgba(6,182,212,0.18);color:var(--cyan-400);border:1px solid rgba(6,182,212,0.4);">
+          📄 공제금 청구서 (한국어)
+        </a>
+        <a href="/mutualaid/claim-form-en.html" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);">
+          📄 Claim Form (English)
+        </a>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:32px;padding-top:32px;border-top:1px solid var(--border);">
       <h3 style="font-size:22px;font-weight:800;margin-bottom:10px;">이미 가입하셨나요?</h3>
       <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;">실습 중 부상을 당하셨다면 공제금을 청구하세요.</p>
       <button class="btn btn-secondary btn-lg" data-action="go-claim" style="gap:10px;">📋 공제금 청구하기</button>
@@ -265,15 +283,48 @@ function paymentHTML(){
       <div class="summary-row"><span class="label">보상 한도</span><span class="value">${plan?plan.coverage:''}</span></div>
       <div class="summary-total"><span class="label">결제 금액</span><span class="amount">₩${plan?plan.price.toLocaleString():''}</span></div>
     </div>
-    <div class="form-card"><div class="form-card-title">💳 결제 수단</div>
-      <div class="payment-grid">
-        ${['card','easy','bank','paypal'].map(m=>{
-          const d={card:{i:'💳',n:'신용카드',d:'국내/해외'},easy:{i:'📱',n:'간편결제',d:'토스/카카오'},bank:{i:'🏦',n:'계좌이체',d:'실시간'},paypal:{i:'🌐',n:'PayPal',d:'해외'}}[m];
-          return `<div class="payment-option ${S.payMethod===m?'selected':''}" data-action="pay-method" data-method="${m}">
-            <div class="pay-icon">${d.i}</div><div class="pay-name">${d.n}</div><div class="pay-desc">${d.d}</div></div>`;
-        }).join('')}
+    <div class="form-card">
+      <div class="form-card-title">🏦 결제 수단</div>
+      <div style="padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px;">
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+          현재 공제회비 결제는 <strong>무통장 입금</strong>만 가능합니다.
+        </p>
       </div>
-      <div class="security-note">🔒 <span>PortOne / PG사 보안 결제</span></div>
+      
+      <div class="payment-grid">
+        <div class="payment-option selected" style="cursor: default; border-color: var(--cyan-400); background: rgba(6,182,212,0.15);">
+          <div class="pay-icon">🏦</div>
+          <div class="pay-name">무통장 입금</div>
+          <div class="pay-desc" style="color: var(--cyan-400);">토스뱅크 전용</div>
+        </div>
+      </div>
+
+      ${S.payMethod === 'bank' ? `
+      <div style="margin-top:20px; padding:18px; background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.4); border-radius:12px; animation:fadeIn 0.3s ease;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <div style="width:32px; height:32px; background:white; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <img src="https://static.toss.im/assets/homepage/safety/icn-safety-bank-toss.png" style="width:20px;" alt="Toss">
+          </div>
+          <span style="color:white; font-weight:700; font-size:15px;">토스뱅크 입금 안내</span>
+        </div>
+        <div style="background:rgba(0,0,0,0.2); padding:14px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span style="color:var(--text-muted); font-size:13px;">은행명</span>
+            <span style="color:white; font-size:13px; font-weight:600;">토스뱅크</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span style="color:var(--text-muted); font-size:13px;">계좌번호</span>
+            <span style="color:var(--cyan-400); font-size:14px; font-weight:800; letter-spacing:0.5px;">1000-7587-9085</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-muted); font-size:13px;">예금주</span>
+            <span style="color:white; font-size:13px; font-weight:600;">곽세영</span>
+          </div>
+        </div>
+        <p style="margin-top:12px; font-size:12px; color:var(--red-400); line-height:1.5;">* 신청자 성함으로 입금해 주셔야 빠른 확인이 가능합니다.<br>* 입금 확인 후 공제 증권이 최종 승인됩니다.</p>
+      </div>` : ''}
+      
+      <div class="security-note">🔒 <span>보안 결제 시스템 적용 중</span></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-secondary" data-action="go" data-to="info">← 이전</button>
@@ -321,6 +372,42 @@ function claimStartHTML(){
       <h2>공제금 청구</h2>
       <p>공제 증권 번호 또는 가입 정보로 본인 확인 후 청구합니다.</p>
     </div>
+    <div style="background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.3);border-radius:12px;padding:16px 20px;margin-bottom:16px;">
+      <div style="font-weight:800;font-size:14px;color:var(--cyan-400);margin-bottom:10px;">📎 청구서 양식 다운로드</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">온라인 접수 전 인쇄용 청구서를 미리 작성하실 수 있습니다.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="/mutualaid/claim-form.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;background:rgba(6,182,212,0.15);color:var(--cyan-400);border:1px solid rgba(6,182,212,0.35);">
+          📄 청구서 (한국어)
+        </a>
+        <a href="/mutualaid/claim-form-en.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);">
+          📄 Claim Form (EN)
+        </a>
+      </div>
+    </div>
+    <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+      <div style="font-weight:800;font-size:15px;color:var(--red-400);margin-bottom:12px;">⚠️ 청구 전 필수 확인 사항</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text-secondary);">
+          <span style="color:var(--red-400);font-weight:700;flex-shrink:0;">①</span>
+          <span>사고 발생 후 <strong style="color:white;">72시간(3일) 이내</strong>에 반드시 접수해야 합니다.</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text-secondary);">
+          <span style="color:var(--red-400);font-weight:700;flex-shrink:0;">②</span>
+          <span>사고 당일 또는 <strong style="color:white;">익일(다음 날) 이내</strong> 의료기관 방문 진단서가 필요합니다.</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text-secondary);">
+          <span style="color:var(--red-400);font-weight:700;flex-shrink:0;">③</span>
+          <span><strong style="color:white;">서핑장 운영자 확인서</strong>가 반드시 필요합니다. (사고 당일 입장 기록 증빙)</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text-secondary);">
+          <span style="color:var(--red-400);font-weight:700;flex-shrink:0;">④</span>
+          <span><strong style="color:white;">사고 현장 및 부상 부위 사진</strong>을 사고 당일 촬영하여 첨부해야 합니다.</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px 12px;background:rgba(239,68,68,0.1);border-radius:8px;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;">
+        허위 청구 시 공제금 환수 및 <strong style="color:var(--red-400);">자격 취소·형사 고발</strong> 조치될 수 있습니다. 서핑장 이용 사실은 운영자 확인 및 CCTV 기록으로 교차 검증됩니다.
+      </div>
+    </div>
     <div class="form-card">
       <div class="form-card-title">🔍 가입 정보 확인</div>
       <div class="form-group"><label class="form-label">공제 증권 번호</label>
@@ -361,12 +448,54 @@ function claimFormHTML(){
           <input type="date" class="form-input" data-field="accidentDate" value="${S.accidentDate}"></div>
         <div class="form-group"><label class="form-label">사고 발생 시각</label>
           <input type="time" class="form-input" data-field="accidentTime" value="${S.accidentTime}"></div></div>
-      <div class="form-group"><label class="form-label">사고 장소<span class="required">*</span></label>
+      <div class="form-group"><label class="form-label">사고 장소 (서핑장명)<span class="required">*</span></label>
         <input type="text" class="form-input" data-field="accidentLocation" value="${S.accidentLocation}" placeholder="예: ISA HQ 서울웨이브"></div>
+      <div class="form-group">
+        <label class="form-label">당일 입장 방법<span class="required">*</span></label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;margin-top:6px;">
+          ${['QR 코드 체크인','RFID 팔찌','수기 명부 기재','회원권 스캔','기타'].map(m=>`
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+              <input type="radio" name="entryMethod" data-field="entryMethod" value="${m}" ${S.entryMethod===m?'checked':''} style="accent-color:var(--red-400);">
+              ${m}
+            </label>`).join('')}
+        </div>
+        <div class="form-hint">서핑장 입장 기록은 사고 당일 이용 여부 확인에 사용됩니다.</div>
+      </div>
       <div class="form-group"><label class="form-label">사고 경위<span class="required">*</span></label>
         <textarea class="form-input" data-field="accidentDesc" rows="4" placeholder="사고 상황을 상세히 기술해주세요">${S.accidentDesc}</textarea></div>
+      <div class="form-group">
+        <label class="form-label">이용 종목<span class="required">*</span></label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;margin-top:6px;">
+          ${['S/F','B/B','Wake','Wave','기타'].map(m=>`
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+              <input type="radio" name="sportType" data-field="sportType" value="${m}" ${S.sportType===m?'checked':''} style="accent-color:var(--red-400);">
+              ${m}
+            </label>`).join('')}
+        </div>
+      </div>
       <div class="form-group"><label class="form-label">부상 부위<span class="required">*</span></label>
         <input type="text" class="form-input" data-field="injuryPart" value="${S.injuryPart}" placeholder="예: 왼쪽 손목"></div>
+    </div>
+    <div class="form-card">
+      <div class="form-card-title">🏄 서핑장 이용 확인 <span style="font-size:12px;color:var(--red-400);font-weight:600;">— 허위 청구 방지 필수 항목</span></div>
+      <div style="padding:10px 14px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+        서핑장 운영자 정보를 입력하면 협회에서 직접 사실 여부를 확인합니다. 운영자 서명이 있는 확인서를 다음 단계에서 첨부해주세요.
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">서핑장 운영자/담당자명<span class="required">*</span></label>
+          <input type="text" class="form-input" data-field="facilityOperatorName" value="${S.facilityOperatorName}" placeholder="담당자 이름"></div>
+        <div class="form-group"><label class="form-label">담당자 연락처<span class="required">*</span></label>
+          <input type="tel" class="form-input" data-field="facilityOperatorPhone" value="${S.facilityOperatorPhone}" placeholder="010-0000-0000"></div>
+      </div>
+    </div>
+    <div class="form-card">
+      <div class="form-card-title">👁️ 목격자 / 동반 강사 정보 <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(있는 경우)</span></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">목격자/강사 성명</label>
+          <input type="text" class="form-input" data-field="witnessName" value="${S.witnessName}" placeholder="이름"></div>
+        <div class="form-group"><label class="form-label">연락처</label>
+          <input type="tel" class="form-input" data-field="witnessPhone" value="${S.witnessPhone}" placeholder="010-0000-0000"></div>
+      </div>
     </div>
     <div class="form-card"><div class="form-card-title">🏥 치료 정보</div>
       <div class="form-group"><label class="form-label">병원명<span class="required">*</span></label>
@@ -395,14 +524,18 @@ function claimFormHTML(){
 
 function claimUploadHTML(){
   const files=[
-    {key:'diagnosis',label:'진단서',desc:'병원 발급'},
-    {key:'receipt',label:'진료비 계산서',desc:'영수증'},
-    {key:'detail',label:'진료비 세부 내역서',desc:'급여/비급여'},
-    {key:'proof',label:'사고 입증 서류',desc:'실습일지/강사확인서'},
-    {key:'id',label:'신분증 사본',desc:'주민등록증 등'},
+    {key:'diagnosis',   label:'진단서',              desc:'병원 발급 · 사고 당일 또는 익일 이내 초진 기록 포함'},
+    {key:'receipt',     label:'진료비 영수증 / 세부 내역서', desc:'급여·비급여 구분 내역 포함'},
+    {key:'facilityConfirm', label:'서핑장 이용 확인서', desc:'사고 당일 입장 기록 · QR/수기 캡처 또는 운영자 서명 확인서 ★ 핵심 서류'},
+    {key:'accidentPhoto',   label:'사고 현장·부상 사진', desc:'사고 당일 촬영 · 부상 부위 + 현장 각 1장 이상 (타임스탬프 포함 권장)'},
+    {key:'id',          label:'신분증 사본',           desc:'주민등록증, 운전면허증 등'},
+    {key:'detail',      label:'목격자/강사 확인서',    desc:'있는 경우 첨부 · 서명 + 연락처 포함'},
   ];
   return `<div class="screen active">
     <div class="section-title"><div class="bar"></div>서류 첨부</div>
+    <div style="padding:12px 16px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25);border-radius:10px;margin-bottom:16px;font-size:13px;color:var(--text-muted);line-height:1.7;">
+      📎 아래 서류를 모두 첨부해주세요. <strong style="color:var(--red-400);">서핑장 이용 확인서</strong>와 <strong style="color:var(--red-400);">사고 현장·부상 사진</strong>은 핵심 심사 서류로, 미첨부 시 청구가 반려될 수 있습니다.
+    </div>
     ${files.map(f=>`
       <div class="form-card" style="margin-bottom:14px;padding:20px 24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -499,9 +632,12 @@ function handleAction(e){
     case 'verify-claim': verifyClaim(); break;
     case 'go-claim-upload':
       if(!S.accidentDate){alert('사고 발생일을 입력해주세요.');return;}
-      if(!S.accidentLocation.trim()){alert('사고 장소를 입력해주세요.');return;}
+      if(!S.accidentLocation.trim()){alert('사고 장소(서핑장명)를 입력해주세요.');return;}
+      if(!S.entryMethod){alert('당일 입장 방법을 선택해주세요.');return;}
       if(!S.accidentDesc.trim()){alert('사고 경위를 입력해주세요.');return;}
       if(!S.injuryPart.trim()){alert('부상 부위를 입력해주세요.');return;}
+      if(!S.facilityOperatorName.trim()){alert('서핑장 운영자/담당자명을 입력해주세요.');return;}
+      if(!S.facilityOperatorPhone.trim()){alert('서핑장 담당자 연락처를 입력해주세요.');return;}
       if(!S.hospitalName.trim()){alert('병원명을 입력해주세요.');return;}
       if(!S.selfPay){alert('본인 부담금을 입력해주세요.');return;}
       S.screen='claim-upload'; render(); window.scrollTo(0,0); break;
@@ -595,7 +731,7 @@ async function submitClaim(){
 }
 
 function resetState(){
-  Object.assign(S,{screen:'plans',selectedPlan:null,agreeTerms:false,agreePrivacy:false,agreeAll:false,termsOpen:false,privacyOpen:false,name:'',phone:'',birth:'',gender:'M',email:'',address:'',emergencyName:'',emergencyPhone:'',hasCondition:'no',conditionDetail:'',hasOtherInsurance:'no',payMethod:'card',certNumber:'',certDate:'',claimCertNumber:'',claimName:'',claimPhone:'',claimVerified:false,claimRecord:null,accidentDate:'',accidentTime:'',accidentLocation:'',accidentDesc:'',injuryPart:'',hospitalName:'',treatmentDate:'',treatmentDesc:'',totalMedical:0,nationalIns:0,selfPay:0,claimFiles:{diagnosis:null,receipt:null,detail:null,proof:null,id:null},claimAgree:false,claimNumber:'',loading:false});
+  Object.assign(S,{screen:'plans',selectedPlan:null,agreeTerms:false,agreePrivacy:false,agreeAll:false,termsOpen:false,privacyOpen:false,name:'',phone:'',birth:'',gender:'M',email:'',address:'',emergencyName:'',emergencyPhone:'',hasCondition:'no',conditionDetail:'',hasOtherInsurance:'no',payMethod:'bank',certNumber:'',certDate:'',claimCertNumber:'',claimName:'',claimPhone:'',claimVerified:false,claimRecord:null,accidentDate:'',accidentTime:'',accidentLocation:'',accidentDesc:'',injuryPart:'',hospitalName:'',treatmentDate:'',treatmentDesc:'',totalMedical:0,nationalIns:0,selfPay:0,claimFiles:{diagnosis:null,receipt:null,detail:null,proof:null,id:null},claimAgree:false,claimNumber:'',loading:false});
 }
 
 render();

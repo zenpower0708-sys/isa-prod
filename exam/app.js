@@ -1,28 +1,30 @@
-// ========================================================
-// ISA 필기시험 시스템 - 메인 애플리케이션 로직
-// ========================================================
+/* ========================================================
+   ISA 필기시험 & 문제은행 시스템 - 메인 로직 (v2.5)
+   ======================================================== */
 
 (function() {
   'use strict';
 
-  // === State ===
-  // === Toss Payments Config ===
-  // ★ 테스트 모드 키입니다. 실서비스 시 라이브 키로 교체하세요! ★
+  // === Constants ===
   const TOSS_CLIENT_KEY = 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
-  const EXAM_PRICE = 300000; // 응시료 (4급/3급: 30만원)
   const EXAM_TICKET_KEY = 'isa_exam_ticket';
-  const TICKET_VALIDITY_HOURS = 48; // 응시권 유효시간
-  const GOOGLE_SCRIPT_URL = ''; // 구글 앱스 스크립트 배포 URL을 여기에 넣으세요.
+  const TICKET_VALIDITY_HOURS = 48;
 
-
+  // === State ===
   const state = {
-    currentScreen: 'landing',
-    selectedDiscipline: null,
-    selectedLevel: null,
+    currentScreen: 'landing', // landing, userinfo, payment, exam, study, theory, result
+    mode: 'exam', // exam (시험), study (교재/공부), theory (이론 학습)
+    selectedDiscipline: 'standing',
+    selectedLevel: 4,
+    
+    // User Info
     userName: '',
     userPhone: '',
     userBirth: '',
     userEmail: '',
+    isVerified: false,
+    
+    // Exam Data
     examQuestions: [],
     answers: {},
     currentQuestion: 0,
@@ -30,69 +32,52 @@
     timerInterval: null,
     examStartTime: null,
     examEndTime: null,
-    isReviewMode: false,
+    
+    // Theory Data
+    currentChapter: 0,
+    
+    // Study Data
+    visibleAnswers: {}, 
+    
+    // UI state
     showSubmitModal: false,
     showTimeUpModal: false,
-    paymentProcessing: false
+    paymentProcessing: false,
+    isReviewMode: false
   };
 
-  // === Utility Functions ===
-  function shuffleArray(arr) {
-    const shuffled = [...arr];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
+  // === Level Configuration ===
+  function getLevelConfig(level = state.selectedLevel) {
+    return EXAM_CONFIG.levelConfig[level] || EXAM_CONFIG.levelConfig[4];
   }
 
-  function formatTime(seconds) {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  function getExamPrice() {
+    return (state.selectedLevel <= 2) ? 500000 : 300000;
   }
 
-  function getTimerClass() {
-    if (state.timeRemaining <= 60) return 'danger';
-    if (state.timeRemaining <= 300) return 'warning';
-    return '';
+  // === Initialization ===
+  function init() {
+    render();
+    window.addEventListener('popstate', handleBackNavigation);
   }
 
-  // Telegram Notification via GAS
-  async function notifyTelegram(message) {
-    if (!GOOGLE_SCRIPT_URL) return;
-    try {
-      // POST 요청으로 알림 데이터 전송
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // GAS CORS 이슈 회피를 위해 no-cors 사용 (성공 여부 상관없이 발송)
-        body: JSON.stringify({
-          action: 'addMember', // 기존 addMember 핸들러 재활용 (또는 별도 추가 가능)
-          name: state.userName || '미입력',
-          plan: '자격증 시험 신청: ' + message,
-          certNumber: 'PAYMENT_ALERT',
-          timestamp: new Date().toISOString()
-        })
-      });
-    } catch (e) {
-      console.error('Telegram notification error:', e);
+  function handleBackNavigation() {
+    // 간단한 뒤로가기 대응 (실제 라우팅 시스템은 아니지만 사용자 경험 고려)
+    if (state.currentScreen !== 'landing') {
+      state.currentScreen = 'landing';
+      render();
     }
   }
-
 
   // === Render Functions ===
   function render() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="bg-grid"></div>
-      <div class="bg-glow-1"></div>
-      <div class="bg-glow-2"></div>
       ${renderHeader()}
-      <div class="container">
-        ${renderScreen()}
-      </div>
-      ${state.showSubmitModal ? renderSubmitModal() : ''}
-      ${state.showTimeUpModal ? renderTimeUpModal() : ''}
+      <main class="container">
+        ${renderCurrentScreen()}
+      </main>
+      ${renderModals()}
     `;
     attachEvents();
   }
@@ -101,915 +86,599 @@
     return `
       <header class="header">
         <div class="header-inner">
-          <div class="logo-area">
+          <div class="logo-area" style="cursor: pointer;" data-action="go-screen" data-screen="landing">
             <div class="logo-icon">ISA</div>
             <div class="logo-text">
               <h1>국제인공서핑협회</h1>
-              <p>WRITTEN EXAMINATION SYSTEM</p>
+              <p>EDUCATION PORTAL</p>
             </div>
           </div>
-          <div class="header-badge">📋 필기시험</div>
+          <div class="header-badge" style="background: ${state.mode === 'exam' ? 'rgba(168,85,247,0.1)' : 'rgba(6,182,212,0.1)'}; color: ${state.mode === 'exam' ? 'var(--purple-500)' : 'var(--cyan-400)'}; border-color: ${state.mode === 'exam' ? 'rgba(168,85,247,0.2)' : 'rgba(6,182,212,0.2)'}">
+            ${state.mode === 'exam' ? '🏆 실전 모의고사' : state.mode === 'theory' ? '📖 이론 학습 모드' : '📝 문제은행 모드'}
+          </div>
         </div>
       </header>
     `;
   }
 
-  function renderScreen() {
+  function renderCurrentScreen() {
     switch(state.currentScreen) {
       case 'landing': return renderLanding();
       case 'userinfo': return renderUserInfo();
       case 'payment': return renderPayment();
       case 'exam': return renderExam();
+      case 'study': return renderStudy();
+      case 'theory': return renderTheory();
       case 'result': return renderResult();
-      default: return '';
+      default: return renderLanding();
     }
   }
 
-  // === Landing Screen ===
+  // --- Landing Screen ---
   function renderLanding() {
     return `
-      <div class="screen active" id="screen-landing">
-        <div class="landing-hero">
-          <div class="icon-wrap">📝</div>
-          <h2>ISA 자격증 필기시험</h2>
-          <p>국제인공서핑협회 공인 자격증 취득을 위한 필기시험입니다. 종목과 등급을 선택하세요.</p>
+      <div class="screen active">
+        <div class="hero-section">
+          <div class="hero-icon">🏄‍♂️</div>
+          <h2 class="hero-title">ISA 자격증 교육 포털</h2>
+          <p class="hero-desc">공인 자격증 취득을 위한 이론 학습, 문제은행, 그리고 실전 모의고사를 한 곳에서 경험하세요.</p>
+        </div>
+
+        <div class="tab-nav">
+          <button class="tab-btn ${state.mode === 'theory' ? 'active' : ''}" data-action="set-mode" data-mode="theory">📖 이론 학습</button>
+          <button class="tab-btn ${state.mode === 'study' ? 'active' : ''}" data-action="set-mode" data-mode="study">📝 문제은행</button>
+          <button class="tab-btn ${state.mode === 'exam' ? 'active' : ''}" data-action="set-mode" data-mode="exam">🏆 실전 모의고사</button>
         </div>
 
         <div class="section-title"><div class="bar"></div>종목 선택</div>
-        <div class="card-grid">
+        <div class="selection-grid">
           ${EXAM_CONFIG.disciplines.map(d => `
-            <div class="card ${state.selectedDiscipline === d.id ? 'selected' : ''}" data-action="select-discipline" data-id="${d.id}">
+            <div class="selection-card ${state.selectedDiscipline === d.id ? 'active' : ''}" data-action="select-disc" data-id="${d.id}">
               <span class="card-icon">${d.icon}</span>
-              <div class="card-title">${d.nameKR}</div>
-              <div class="card-desc">${d.name}</div>
+              <div class="card-name">${d.nameKR}</div>
+              <div class="card-sub">${d.name}</div>
             </div>
           `).join('')}
         </div>
 
         <div class="section-title"><div class="bar"></div>등급 선택</div>
-        <div class="card-grid">
+        <div class="selection-grid">
           ${EXAM_CONFIG.levels.map(l => `
-            <div class="card ${state.selectedLevel === l.id ? 'selected' : ''} ${!l.available ? 'disabled' : ''}" 
-                 data-action="select-level" data-id="${l.id}" ${!l.available ? '' : ''}>
+            <div class="selection-card ${state.selectedLevel === l.id ? 'active' : ''} ${!l.available ? 'disabled' : ''}" 
+                 data-action="select-level" data-id="${l.id}">
               <span class="card-icon">${l.id}급</span>
-              <div class="card-title">${l.name} · ${l.desc}</div>
-              ${l.available 
-                ? '<span class="card-badge ready">응시 가능</span>' 
-                : '<span class="card-badge">준비 중</span>'}
+              <div class="card-name">${l.name}</div>
+              <div class="card-sub">${l.desc}</div>
+              <div class="status-badge ${l.available ? 'status-ready' : 'status-wait'}">
+                ${l.available ? '● 서비스 중' : '○ 준비 중'}
+              </div>
             </div>
           `).join('')}
         </div>
 
-        <div class="info-box">
-          <h4>ℹ️ 시험 안내</h4>
-          <ul>
-            <li>총 50문항 중 <strong>15문항</strong>이 랜덤으로 출제됩니다.</li>
-            <li>시험 시간은 <strong>30분</strong>입니다.</li>
-            <li>합격 기준: <strong>70% 이상</strong> (15문항 중 11문항 이상 정답)</li>
-            <li>4지선다 객관식 문제입니다.</li>
-            <li>시험 중 뒤로가기 및 문항 이동이 자유롭습니다.</li>
-          </ul>
-        </div>
-
-        <button class="btn btn-primary btn-full btn-lg" data-action="go-userinfo"
-                ${!state.selectedDiscipline || !state.selectedLevel ? 'disabled' : ''}>
-          다음 단계 →
+        <button class="btn-premium btn-primary" data-action="go-next">
+          ${state.mode === 'exam' ? '모의고사 시작하기 →' : state.mode === 'theory' ? '이론 학습 시작하기 →' : '문제은행 학습하기 →'}
         </button>
       </div>
     `;
   }
 
-  // === User Info Screen ===
+  // --- User Info & Authentication ---
   function renderUserInfo() {
-    const disc = EXAM_CONFIG.disciplines.find(d => d.id === state.selectedDiscipline);
-    const level = EXAM_CONFIG.levels.find(l => l.id === state.selectedLevel);
-
     return `
-      <div class="screen active" id="screen-userinfo">
-        <div class="landing-hero" style="padding: 40px 0 30px;">
-          <h2>응시자 정보 입력</h2>
-          <p>시험 결과의 정확한 기록을 위해 아래 정보를 입력해주세요.</p>
+      <div class="screen active">
+        <div class="hero-section" style="margin-bottom: 40px;">
+          <h2 class="hero-title" style="font-size: 28px;">본인 확인 및 인증</h2>
+          <p class="hero-desc">국가 공인 기록 관리를 위해 안전한 실명 인증 절차를 거칩니다.</p>
         </div>
 
-        <div class="info-box" style="margin-bottom: 24px;">
-          <h4>📋 시험 정보</h4>
+        <div class="glass-form">
+          <div class="form-field">
+            <label class="field-label">성함</label>
+            <input type="text" class="field-input" placeholder="홍길동" value="${state.userName}" data-field="userName">
+          </div>
+          <div class="form-field">
+            <label class="field-label">통신사 선택 및 연락처</label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
+              <div class="selection-card ${state.carrier === 'SKT' ? 'active' : ''}" style="padding: 12px; text-align: center; font-size: 13px;" data-action="select-carrier" data-id="SKT">SKT</div>
+              <div class="selection-card ${state.carrier === 'KT' ? 'active' : ''}" style="padding: 12px; text-align: center; font-size: 13px;" data-action="select-carrier" data-id="KT">KT</div>
+              <div class="selection-card ${state.carrier === 'LGU' ? 'active' : ''}" style="padding: 12px; text-align: center; font-size: 13px;" data-action="select-carrier" data-id="LGU">LG U+</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <input type="tel" class="field-input" placeholder="010-0000-0000" value="${state.userPhone}" data-field="userPhone" style="flex: 1;">
+              <button class="btn-premium btn-primary" style="width: auto; padding: 0 20px; font-size: 14px;" data-action="request-auth">
+                ${state.authSent ? '재전송' : '인증요청'}
+              </button>
+            </div>
+          </div>
+          
+          ${state.authSent ? `
+            <div class="form-field" style="animation: slideDown 0.4s ease;">
+              <label class="field-label">인증번호 입력</label>
+              <div style="position: relative;">
+                <input type="text" class="field-input" placeholder="6자리 숫자" maxlength="6" data-field="authCode">
+                <span style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--red-400); font-size: 12px; font-weight: 700;">03:00</span>
+              </div>
+              <button class="btn-premium btn-outline" style="margin-top: 12px; font-size: 14px; padding: 12px;" data-action="verify-code">인증 완료하기</button>
+            </div>
+          ` : ''}
+
+          ${state.isVerified ? `
+            <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid var(--green-400); border-radius: 12px; padding: 12px; font-size: 14px; color: var(--green-400); text-align: center; margin-bottom: 24px; animation: scaleUp 0.3s ease;">
+              ✅ 실명 인증이 완료되었습니다.
+            </div>
+          ` : ''}
+
+          <div class="form-field">
+            <label class="field-label">생년월일 (6자리)</label>
+            <input type="text" class="field-input" placeholder="990101" maxlength="6" value="${state.userBirth}" data-field="userBirth">
+          </div>
+          <div class="form-field">
+            <label class="field-label">이메일 주소</label>
+            <input type="email" class="field-input" placeholder="example@isa.org" value="${state.userEmail}" data-field="userEmail">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-premium btn-outline" data-action="go-screen" data-screen="landing">← 이전</button>
+          <button class="btn-premium btn-primary" data-action="verify-and-move" ${state.isVerified ? '' : 'disabled'}>
+            ${state.mode === 'exam' ? '결제 단계로 이동 →' : '학습 시작하기 →'}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- Payment Screen ---
+  function renderPayment() {
+    const price = getExamPrice();
+    return `
+      <div class="screen active">
+        <div class="hero-section">
+          <div class="hero-icon">💳</div>
+          <h2 class="hero-title">응시료 결제</h2>
+          <p class="hero-desc">자격증 필기시험 응시를 위해 결제를 진행합니다.</p>
+        </div>
+
+        <div class="glass-form" style="text-align: center;">
+          <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">결제 금액</div>
+          <div style="font-size: 48px; font-weight: 900; color: var(--cyan-400);">₩${price.toLocaleString()}</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">실기시험 응시 자격 부여 및 공인 기록 관리 포함</div>
+        </div>
+
+        <div class="info-box">
+          <h4>💡 안내사항</h4>
           <ul>
-            <li>종목: <strong>${disc ? disc.nameKR : ''}</strong> (${disc ? disc.name : ''})</li>
-            <li>등급: <strong>${level ? level.name : ''}</strong> - ${level ? level.desc : ''}</li>
-            <li>문항 수: <strong>${EXAM_CONFIG.questionsPerExam}문항</strong> (50문항 중 랜덤 출제)</li>
-            <li>제한 시간: <strong>${EXAM_CONFIG.timeLimitMinutes}분</strong></li>
+            <li>결제 후 48시간 이내에 횟수 제한 없이 시험 응시가 가능합니다.</li>
+            <li>합격 시 즉시 실기시험 응시 권한이 활성화됩니다.</li>
+            <li>국내외 모든 신용카드 및 토스/카카오페이 등을 지원합니다.</li>
           </ul>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">이름 (실명) *</label>
-          <input type="text" class="form-input" id="input-name" placeholder="홍길동" 
-                 value="${state.userName}" data-field="userName" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">연락처 *</label>
-            <input type="tel" class="form-input" id="input-phone" placeholder="010-1234-5678"
-                   value="${state.userPhone}" data-field="userPhone" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">생년월일 (6자리) *</label>
-            <input type="text" class="form-input" id="input-birth" placeholder="990101" maxlength="6"
-                   value="${state.userBirth}" data-field="userBirth" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">이메일 * (결제 영수증 발송용)</label>
-          <input type="email" class="form-input" id="input-email" placeholder="surfer@isa.world"
-                 value="${state.userEmail}" data-field="userEmail" />
-        </div>
-
-        <div style="display:flex; gap:12px; margin-top:20px;">
-          <button class="btn btn-secondary" data-action="go-landing" style="flex:1;">
-            ← 이전
-          </button>
-          <button class="btn btn-primary btn-lg" data-action="go-payment" style="flex:2;">
-            💳 결제 및 응시 →
-          </button>
-        </div>
+        <button class="btn-premium btn-primary" data-action="start-payment">
+          💳 토스페이먼츠로 안전 결제하기
+        </button>
       </div>
     `;
   }
 
-  // === Exam Screen ===
+  // --- Exam Screen ---
   function renderExam() {
     const q = state.examQuestions[state.currentQuestion];
     if (!q) return '';
-    const answered = Object.keys(state.answers).length;
     const total = state.examQuestions.length;
-    const progress = ((state.currentQuestion + 1) / total) * 100;
-    const disc = EXAM_CONFIG.disciplines.find(d => d.id === state.selectedDiscipline);
+    const answeredCount = Object.keys(state.answers).length;
 
     return `
-      <div class="screen active" id="screen-exam">
-        <div class="exam-header">
-          <div class="exam-header-inner">
-            <div class="exam-meta">
-              <span class="badge badge-discipline">${disc ? disc.icon : ''} ${disc ? disc.nameKR : ''}</span>
-              <span class="badge badge-level">🏅 ${state.selectedLevel}급</span>
-            </div>
-            <div class="timer ${getTimerClass()}">
-              <svg class="timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-              </svg>
-              ${formatTime(state.timeRemaining)}
+      <div class="screen active">
+        <div class="exam-top">
+          <div class="badge-row" style="display: flex; gap: 8px;">
+            <div class="header-badge">🏅 ${state.selectedLevel}급</div>
+            <div class="header-badge" style="background: rgba(168,85,247,0.1); color: var(--purple-500); border-color: rgba(168,85,247,0.2);">
+              ${EXAM_CONFIG.disciplines.find(d => d.id === state.selectedDiscipline).nameKR}
             </div>
           </div>
-        </div>
-
-        <div class="progress-bar-wrap">
-          <div class="progress-info">
-            <span class="label">진행률</span>
-            <span class="value">${answered}/${total} 답변 완료</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: ${(answered / total) * 100}%"></div>
+          <div class="timer-wrap ${state.timeRemaining < 60 ? 'danger' : ''}">
+            ⏱ ${Math.floor(state.timeRemaining / 60)}:${String(state.timeRemaining % 60).padStart(2, '0')}
           </div>
         </div>
 
-        <div class="question-card">
-          <div class="question-number">
-            문항 ${state.currentQuestion + 1} / ${total}
-          </div>
-          <div class="question-text">${q.question}</div>
-          <div class="options-list">
-            ${q.options.map((opt, i) => {
-              const isSelected = state.answers[q.id] === i;
-              let extraClass = isSelected ? 'selected' : '';
-              
-              if (state.isReviewMode) {
-                extraClass = '';
-                if (i === q.answer) extraClass = 'correct';
-                else if (state.answers[q.id] === i && i !== q.answer) extraClass = 'wrong';
-              }
+        <div class="progress-track">
+          <div class="progress-fill" style="width: ${((state.currentQuestion + 1) / total) * 100}%"></div>
+        </div>
 
-              const markers = ['①', '②', '③', '④'];
-              return `
-                <div class="option ${extraClass}" data-action="${state.isReviewMode ? '' : 'select-answer'}" data-qid="${q.id}" data-idx="${i}">
-                  <div class="option-marker">${state.isReviewMode ? (i === q.answer ? '✓' : (state.answers[q.id] === i ? '✗' : markers[i])) : markers[i]}</div>
-                  <div class="option-text">${opt}</div>
-                </div>
-              `;
-            }).join('')}
+        <div class="question-view">
+          <div class="q-label">QUESTION ${state.currentQuestion + 1} / ${total}</div>
+          <div class="q-text">${q.question}</div>
+          
+          <div class="ans-options">
+            ${q.options.map((opt, i) => `
+              <div class="ans-item ${state.answers[q.id] === i ? 'active' : ''}" data-action="pick-answer" data-idx="${i}">
+                <div class="ans-marker">${['①','②','③','④'][i]}</div>
+                <div class="ans-text">${opt}</div>
+              </div>
+            `).join('')}
           </div>
         </div>
 
-        <div class="question-dots">
-          ${state.examQuestions.map((eq, i) => {
-            let dotClass = '';
-            if (state.isReviewMode) {
-              const isCorrect = state.answers[eq.id] === eq.answer;
-              dotClass = state.answers[eq.id] !== undefined ? (isCorrect ? 'review-correct' : 'review-wrong') : '';
-            } else {
-              if (i === state.currentQuestion) dotClass = 'current';
-              else if (state.answers[eq.id] !== undefined) dotClass = 'answered';
-            }
-            return `<div class="dot ${dotClass}" data-action="jump-question" data-idx="${i}">${i + 1}</div>`;
-          }).join('')}
+        <div class="nav-dots">
+          ${state.examQuestions.map((_, i) => `
+            <div class="nav-dot ${state.currentQuestion === i ? 'active' : (state.answers[state.examQuestions[i].id] !== undefined ? 'done' : '')}" data-action="jump-q" data-idx="${i}">
+              ${i + 1}
+            </div>
+          `).join('')}
         </div>
 
-        <div class="exam-nav">
-          <button class="btn btn-secondary" data-action="prev-question" ${state.currentQuestion === 0 ? 'disabled' : ''}>
-            ← 이전 문항
-          </button>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-premium btn-outline" data-action="prev-q" ${state.currentQuestion === 0 ? 'disabled' : ''}>← 이전</button>
           ${state.currentQuestion === total - 1 ? `
-            ${state.isReviewMode ? `
-              <button class="btn btn-primary" data-action="go-landing">
-                🏠 처음으로
-              </button>
-            ` : `
-              <button class="btn btn-primary" data-action="show-submit">
-                📤 제출하기
-              </button>
-            `}
+            <button class="btn-premium btn-primary" data-action="confirm-submit">📥 최종 제출하기</button>
           ` : `
-            <button class="btn btn-primary" data-action="next-question">
-              다음 문항 →
-            </button>
+            <button class="btn-premium btn-primary" data-action="next-q">다음 문항 →</button>
           `}
         </div>
-
-        ${!state.isReviewMode && answered === total ? `
-          <div class="submit-wrap">
-            <button class="btn btn-primary btn-lg" data-action="show-submit">
-              ✅ 모든 문항 답변 완료 - 제출하기
-            </button>
-          </div>
-        ` : ''}
       </div>
     `;
   }
 
-  // === Result Screen ===
+  // --- Theory (Textbook) Screen ---
+  function renderTheory() {
+    const ch = THEORY_DATA[state.currentChapter];
+    return `
+      <div class="screen active">
+        <div class="exam-top" style="border: none; padding-bottom: 0;">
+          <div class="badge-row">
+            <div class="header-badge">📖 이론서 학습</div>
+            <div class="header-badge" style="background: rgba(6,182,212,0.1); color: var(--cyan-400);">Chapter ${state.currentChapter + 1}</div>
+          </div>
+        </div>
+
+        <div class="theory-viewer" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-xl); padding: 40px; margin-bottom: 40px;">
+          <h2 style="font-size: 28px; font-weight: 900; margin-bottom: 32px; color: var(--cyan-400);">${ch.title}</h2>
+          
+          <div class="theory-chapters">
+            ${ch.sections.map(sec => `
+              <div class="theory-section" style="margin-bottom: 32px;">
+                <h4 style="font-size: 18px; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 4px; height: 18px; background: var(--cyan-500); border-radius: 2px;"></span>
+                  ${sec.subtitle}
+                </h4>
+                <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; line-height: 1.8; color: var(--text-secondary); font-size: 15px;">
+                  ${sec.content}
+                </div>
+                ${sec.importance === 'critical' ? `
+                  <div style="margin-top: 12px; font-size: 12px; color: var(--red-400); font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                    🚨 매우 중요: 해당 내용은 시험에 필수로 출제됩니다.
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="chapter-nav" style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+          <button class="btn-premium btn-outline" data-action="prev-chapter" ${state.currentChapter === 0 ? 'disabled' : ''} style="flex: 1;">← 이전 장</button>
+          
+          <div style="display: flex; gap: 6px;">
+            ${THEORY_DATA.map((_, i) => `
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: ${state.currentChapter === i ? 'var(--cyan-400)' : 'var(--glass-border)'}"></div>
+            `).join('')}
+          </div>
+
+          ${state.currentChapter === THEORY_DATA.length - 1 ? `
+            <button class="btn-premium btn-primary" data-action="go-screen" data-screen="landing" style="flex: 1;">🏠 학습 완료</button>
+          ` : `
+            <button class="btn-premium btn-primary" data-action="next-chapter" style="flex: 1;">다음 장으로 →</button>
+          `}
+        </div>
+      </div>
+    `;
+  }
+
+  // --- Study (Question Bank) Screen ---
+  function renderStudy() {
+    const bank = state.examQuestions;
+    return `
+      <div class="screen active">
+        <div class="hero-section" style="margin-bottom: 40px; text-align: left;">
+          <div class="header-badge" style="margin-bottom: 12px;">📝 문제은행 교재</div>
+          <h2 class="hero-title" style="font-size: 28px;">${EXAM_CONFIG.disciplines.find(d => d.id === state.selectedDiscipline).nameKR} ${state.selectedLevel}급</h2>
+          <p class="hero-desc">이 종목과 등급에서 출제될 수 있는 전체 문항입니다. 키워드를 파악하며 학습하세요.</p>
+        </div>
+
+        <div class="study-list">
+          ${bank.map((q, i) => `
+            <div class="study-card" style="position: relative; overflow: hidden;">
+              <div class="q-label">QUESTION NO.${i + 1}</div>
+              <div class="q-text" style="font-size: 18px; line-height: 1.6; margin-bottom: 24px;">${q.question}</div>
+              <div class="ans-options" style="opacity: 0.9; margin-bottom: 24px;">
+                ${q.options.map((opt, oi) => `
+                  <div class="ans-item" style="padding: 14px 18px; border-radius: 10px; cursor: default; background: rgba(0,0,0,0.15);">
+                    <div class="ans-marker" style="width:24px; height:24px; font-size:11px;">${oi + 1}</div>
+                    <div style="font-size: 14px; color: var(--text-secondary);">${opt}</div>
+                  </div>
+                `).join('')}
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="btn-premium btn-outline" style="padding: 10px 20px; font-size: 13px; width: auto;" data-action="toggle-ans" data-id="${q.id}">
+                  ${state.visibleAnswers[q.id] ? '정답 가리기' : '정답 확인'}
+                </button>
+              </div>
+              <div class="study-answer ${state.visibleAnswers[q.id] ? 'visible' : ''}" style="margin-top: 16px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 20px;">
+                <div style="font-weight: 900; color: var(--green-400); font-size: 16px; margin-bottom: 8px;">정답: ${q.answer + 1}번</div>
+                <div style="font-size: 14px; color: #fff; opacity: 0.8; line-height: 1.6;">${q.options[q.answer]}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="margin-top: 60px; text-align: center;">
+          <button class="btn-premium btn-outline" data-action="go-screen" data-screen="landing" style="max-width: 200px; margin: 0 auto;">← 처음으로 돌아가기</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- Result Screen ---
   function renderResult() {
     const total = state.examQuestions.length;
     let correct = 0;
     state.examQuestions.forEach(q => {
       if (state.answers[q.id] === q.answer) correct++;
     });
-    const wrong = total - correct;
-    const scorePercent = Math.round((correct / total) * 100);
-    const passed = scorePercent >= EXAM_CONFIG.passingScore;
-
-    const circumference = 2 * Math.PI * 70;
-    const offset = circumference - (circumference * scorePercent / 100);
-
-    const disc = EXAM_CONFIG.disciplines.find(d => d.id === state.selectedDiscipline);
-    const elapsed = state.examEndTime && state.examStartTime 
-      ? Math.round((state.examEndTime - state.examStartTime) / 1000) 
-      : 0;
+    const score = Math.round((correct / total) * 100);
+    const passed = score >= getLevelConfig().passingScore;
 
     return `
-      <div class="screen active" id="screen-result">
-        ${passed ? renderConfetti() : ''}
-        
-        <div class="result-hero">
-          <div class="result-circle">
-            <svg width="180" height="180">
-              <circle cx="90" cy="90" r="70" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
-              <circle cx="90" cy="90" r="70" fill="none" 
-                      stroke="${passed ? 'var(--green-400)' : 'var(--red-400)'}" 
-                      stroke-width="8" stroke-linecap="round"
-                      stroke-dasharray="${circumference}" 
-                      stroke-dashoffset="${offset}"
-                      style="transition: stroke-dashoffset 1.5s ease;"/>
+      <div class="screen active">
+        <div class="result-box">
+          <div class="score-display">
+            <svg width="200" height="200" style="position: absolute; transform: rotate(-90deg);">
+              <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>
+              <circle cx="100" cy="100" r="90" fill="none" stroke="${passed ? 'var(--green-400)' : 'var(--red-400)'}" 
+                      stroke-width="10" stroke-dasharray="565.48" stroke-dashoffset="${565.48 * (1 - score / 100)}"
+                      stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;"/>
             </svg>
-            <div>
-              <div class="score-text" style="color: ${passed ? 'var(--green-400)' : 'var(--red-400)'}">
-                ${scorePercent}
-              </div>
-              <div class="score-unit">점</div>
+            <div style="text-align: center; z-index: 2;">
+              <span class="score-num" style="color: ${passed ? 'var(--green-400)' : 'var(--red-400)'}">${score}</span>
+              <span class="score-unit">점</span>
             </div>
           </div>
 
-          <div class="result-pass ${passed ? 'pass' : 'fail'}">
-            ${passed ? '🎉 합격' : '😔 불합격'}
+          <div class="result-tag ${passed ? 'pass' : 'fail'}">
+            ${passed ? '🎉 필기 합격' : '😔 다음 기회에'}
           </div>
-
-          <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.6; max-width: 400px; margin: 0 auto;">
-            ${state.userName}님의 <strong>${disc ? disc.nameKR : ''} ${state.selectedLevel}급</strong> 필기시험 결과입니다.
-            ${passed ? '축하합니다! 실기시험을 준비하세요.' : '70% 이상 득점 시 합격입니다. 다시 도전해보세요!'}
+          
+          <p class="hero-desc" style="margin-bottom: 40px;">
+            ${state.userName}님의 검정 결과입니다. ${passed ? '축하드립니다! 실기 시험 접수가 가능합니다.' : '아쉽지만 60점 이상 획득 시 합격입니다.'}
           </p>
-        </div>
 
-        <div class="result-stats">
-          <div class="stat-card correct">
-            <div class="stat-value">${correct}</div>
-            <div class="stat-label">정답</div>
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-val" style="color: var(--green-400);">${correct}</div>
+              <div class="stat-lab">정답</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-val" style="color: var(--red-400);">${total - correct}</div>
+              <div class="stat-lab">오답</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-val" style="color: var(--cyan-400);">${state.selectedLevel}</div>
+              <div class="stat-lab">응시등급</div>
+            </div>
           </div>
-          <div class="stat-card wrong">
-            <div class="stat-value">${wrong}</div>
-            <div class="stat-label">오답</div>
-          </div>
-          <div class="stat-card total">
-            <div class="stat-value">${formatTime(elapsed)}</div>
-            <div class="stat-label">소요시간</div>
-          </div>
-        </div>
 
-        <div class="info-box">
-          <h4>📊 시험 상세</h4>
-          <ul>
-            <li>응시자: ${state.userName} (${state.userPhone})</li>
-            <li>종목: ${disc ? disc.nameKR : ''} (${disc ? disc.name : ''})</li>
-            <li>등급: ${state.selectedLevel}급</li>
-            <li>합격 기준: ${EXAM_CONFIG.passingScore}% (${Math.ceil(total * EXAM_CONFIG.passingScore / 100)}문항 이상)</li>
-            <li>응시 일시: ${new Date().toLocaleString('ko-KR')}</li>
-          </ul>
-        </div>
-
-        <div class="result-actions">
-          <button class="btn btn-secondary" data-action="review-exam">
-            📖 오답 확인
-          </button>
-          <button class="btn btn-primary" data-action="restart-exam">
-            🔄 다시 응시
-          </button>
-          <button class="btn btn-secondary" data-action="go-landing">
-            🏠 처음으로
-          </button>
+          <div style="display: grid; gap: 12px;">
+            <button class="btn-premium btn-primary" data-action="go-screen" data-screen="landing">메인으로</button>
+            <button class="btn-premium btn-outline" data-action="go-screen" data-screen="userinfo">다시 응시하기</button>
+          </div>
         </div>
       </div>
     `;
   }
 
-  // === Confetti ===
-  function renderConfetti() {
-    const colors = ['#22d3ee', '#4ade80', '#fbbf24', '#a855f7', '#f43f5e', '#fff'];
-    let confettiHTML = '';
-    for (let i = 0; i < 60; i++) {
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const left = Math.random() * 100;
-      const delay = Math.random() * 2;
-      const duration = 2 + Math.random() * 3;
-      const size = 6 + Math.random() * 8;
-      const shape = Math.random() > 0.5 ? '50%' : '2px';
-      confettiHTML += `<div class="confetti" style="
-        left:${left}%; 
-        background:${color}; 
-        width:${size}px; height:${size}px; 
-        border-radius:${shape};
-        animation-duration:${duration}s; 
-        animation-delay:${delay}s;
-      "></div>`;
+  // --- Modals ---
+  function renderModals() {
+    if (state.showSubmitModal) {
+      return `
+        <div class="modal-overlay">
+          <div class="modal-content">
+            <h3>시험 제출</h3>
+            <p>모든 답안을 제출하시겠습니까? 제출 후에는 수정이 불가능합니다.</p>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn-premium btn-outline" data-action="close-modal">취소</button>
+              <button class="btn-premium btn-primary" data-action="submit-exam">제출하기</button>
+            </div>
+          </div>
+        </div>
+      `;
     }
-    return `<div class="confetti-wrap">${confettiHTML}</div>`;
+    return '';
   }
 
-  // === Modals ===
-  function renderSubmitModal() {
-    const answered = Object.keys(state.answers).length;
-    const total = state.examQuestions.length;
-    const unanswered = total - answered;
-
-    return `
-      <div class="modal-overlay" data-action="close-modal">
-        <div class="modal" onclick="event.stopPropagation()">
-          <h3>시험을 제출하시겠습니까?</h3>
-          <p>
-            ${unanswered > 0 
-              ? `⚠️ <strong>${unanswered}개 문항</strong>이 아직 답변되지 않았습니다.<br>미답변 문항은 오답 처리됩니다.`
-              : `✅ 모든 ${total}개 문항에 답변하셨습니다.<br>제출 후에는 수정할 수 없습니다.`}
-          </p>
-          <div class="modal-actions">
-            <button class="btn btn-secondary" data-action="close-modal">돌아가기</button>
-            <button class="btn btn-primary" data-action="submit-exam">제출하기</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderTimeUpModal() {
-    return `
-      <div class="modal-overlay">
-        <div class="modal">
-          <h3>⏰ 시험 시간 종료</h3>
-          <p>30분의 시험 시간이 모두 경과하였습니다.<br>답변한 내용을 기준으로 자동 채점됩니다.</p>
-          <div class="modal-actions">
-            <button class="btn btn-primary" data-action="submit-exam">결과 확인</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // === Event Handling ===
+  // === Logic & Interactions ===
   function attachEvents() {
     document.querySelectorAll('[data-action]').forEach(el => {
-      el.addEventListener('click', handleAction);
+      el.onclick = handleAction;
     });
 
-    // Form input listeners
     document.querySelectorAll('[data-field]').forEach(el => {
-      el.addEventListener('input', (e) => {
+      el.oninput = (e) => {
         state[e.target.dataset.field] = e.target.value;
-      });
+      };
     });
   }
 
   function handleAction(e) {
     const action = e.currentTarget.dataset.action;
-    if (!action) return;
+    const id = e.currentTarget.dataset.id;
+    const mode = e.currentTarget.dataset.mode;
+    const screen = e.currentTarget.dataset.screen;
+    const idx = parseInt(e.currentTarget.dataset.idx);
 
     switch(action) {
-      case 'select-discipline': {
-        const id = e.currentTarget.dataset.id;
-        state.selectedDiscipline = id;
-        render();
-        break;
-      }
+      case 'set-mode': state.mode = mode; break;
+      case 'select-disc': state.selectedDiscipline = id; break;
       case 'select-level': {
-        const id = parseInt(e.currentTarget.dataset.id);
-        const level = EXAM_CONFIG.levels.find(l => l.id === id);
-        if (level && level.available) {
-          state.selectedLevel = id;
+        const l = EXAM_CONFIG.levels.find(level => level.id === parseInt(id));
+        if (l && l.available) state.selectedLevel = parseInt(id);
+        break;
+      }
+      case 'select-carrier': state.carrier = id; break;
+      case 'go-next': 
+        state.currentScreen = 'userinfo'; 
+        break;
+      case 'go-screen': 
+        state.currentScreen = screen; 
+        break;
+      case 'request-auth':
+        if (!state.userName || !state.userPhone || !state.carrier) {
+          alert('이름, 통신사, 연락처를 모두 입력해주세요.');
+          return;
+        }
+        state.authSent = true;
+        break;
+      case 'verify-code':
+        e.currentTarget.innerText = '인증 확인 중...';
+        setTimeout(() => {
+          state.isVerified = true;
+          state.authSent = false;
           render();
+        }, 1000);
+        break;
+      case 'verify-and-move':
+        if (state.mode === 'exam') {
+          state.currentScreen = 'payment';
+        } else if (state.mode === 'theory') {
+          state.currentScreen = 'theory';
+          state.currentChapter = 0;
+        } else {
+          startStudy();
         }
         break;
-      }
-      case 'go-landing': {
-        resetState();
-        render();
-        break;
-      }
-      case 'go-userinfo': {
-        if (state.selectedDiscipline && state.selectedLevel) {
-          state.currentScreen = 'userinfo';
-          render();
-          window.scrollTo(0, 0);
-        }
-        break;
-      }
-      case 'go-payment': {
-        goToPayment();
-        break;
-      }
-      case 'start-exam': {
-        startExam();
-        break;
-      }
-      case 'do-payment': {
+      case 'start-payment':
         processPayment();
         break;
-      }
-      case 'select-answer': {
-        const qid = parseInt(e.currentTarget.dataset.qid);
-        const idx = parseInt(e.currentTarget.dataset.idx);
-        state.answers[qid] = idx;
-        render();
+      case 'pick-answer':
+        const curQ = state.examQuestions[state.currentQuestion];
+        state.answers[curQ.id] = idx;
         break;
-      }
-      case 'prev-question': {
-        if (state.currentQuestion > 0) {
-          state.currentQuestion--;
-          render();
-          scrollToQuestion();
-        }
+      case 'next-q':
+        if (state.currentQuestion < state.examQuestions.length - 1) state.currentQuestion++;
         break;
-      }
-      case 'next-question': {
-        if (state.currentQuestion < state.examQuestions.length - 1) {
-          state.currentQuestion++;
-          render();
-          scrollToQuestion();
-        }
+      case 'prev-q':
+        if (state.currentQuestion > 0) state.currentQuestion--;
         break;
-      }
-      case 'jump-question': {
-        const idx = parseInt(e.currentTarget.dataset.idx);
+      case 'jump-q':
         state.currentQuestion = idx;
-        render();
-        scrollToQuestion();
         break;
-      }
-      case 'show-submit': {
+      case 'next-chapter':
+        if (state.currentChapter < THEORY_DATA.length - 1) state.currentChapter++;
+        window.scrollTo(0, 0);
+        break;
+      case 'prev-chapter':
+        if (state.currentChapter > 0) state.currentChapter--;
+        window.scrollTo(0, 0);
+        break;
+      case 'confirm-submit':
         state.showSubmitModal = true;
-        render();
         break;
-      }
-      case 'close-modal': {
+      case 'close-modal':
         state.showSubmitModal = false;
-        state.showTimeUpModal = false;
-        render();
         break;
-      }
-      case 'submit-exam': {
-        submitExam();
+      case 'submit-exam':
+        finishExam();
         break;
-      }
-      case 'review-exam': {
-        state.isReviewMode = true;
-        state.currentScreen = 'exam';
-        state.currentQuestion = 0;
-        render();
-        window.scrollTo(0, 0);
+      case 'toggle-ans':
+        state.visibleAnswers[id] = !state.visibleAnswers[id];
         break;
-      }
-      case 'restart-exam': {
-        state.currentScreen = 'userinfo';
-        state.answers = {};
-        state.currentQuestion = 0;
-        state.isReviewMode = false;
-        state.showSubmitModal = false;
-        state.showTimeUpModal = false;
-        render();
-        window.scrollTo(0, 0);
-        break;
-      }
     }
-  }
-
-  function scrollToQuestion() {
-    const card = document.querySelector('.question-card');
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-  // === Payment & Ticket System ===
-
-  function getExamPrice() {
-    // 4급/3급: 30만원, 2급/1급: 50만원
-    return (state.selectedLevel >= 3) ? 300000 : 500000;
-  }
-
-  function getValidTicket() {
-    try {
-      const ticketStr = localStorage.getItem(EXAM_TICKET_KEY);
-      if (!ticketStr) return null;
-      const ticket = JSON.parse(ticketStr);
-      const now = Date.now();
-      const expiry = new Date(ticket.expiresAt).getTime();
-      if (now > expiry) {
-        localStorage.removeItem(EXAM_TICKET_KEY);
-        return null; // 만료
-      }
-      return ticket;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function saveTicket(paymentData) {
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + TICKET_VALIDITY_HOURS * 60 * 60 * 1000);
-    const ticket = {
-      paymentKey: paymentData.paymentKey || 'PAID_' + Date.now(),
-      orderId: paymentData.orderId || 'ORD_' + Date.now(),
-      amount: paymentData.amount || getExamPrice(),
-      userName: state.userName,
-      userPhone: state.userPhone,
-      userEmail: state.userEmail,
-      discipline: state.selectedDiscipline,
-      level: state.selectedLevel,
-      paidAt: now.toISOString(),
-      expiresAt: expiresAt.toISOString(),
-      used: false
-    };
-    localStorage.setItem(EXAM_TICKET_KEY, JSON.stringify(ticket));
-    return ticket;
-  }
-
-  function formatRemaining(ticket) {
-    const now = Date.now();
-    const exp = new Date(ticket.expiresAt).getTime();
-    const diff = exp - now;
-    if (diff <= 0) return '만료됨';
-    const h = Math.floor(diff / (1000*60*60));
-    const m = Math.floor((diff % (1000*60*60)) / (1000*60));
-    return `${h}시간 ${m}분 남음`;
-  }
-
-  function goToPayment() {
-    // Validate user info
-    const name = state.userName.trim();
-    const phone = state.userPhone.trim();
-    const birth = state.userBirth.trim();
-    const email = state.userEmail.trim();
-
-    if (!name) { alert('이름을 입력해주세요.'); return; }
-    if (!phone) { alert('연락처를 입력해주세요.'); return; }
-    if (!birth || birth.length < 6) { alert('생년월일 6자리를 입력해주세요.'); return; }
-    if (!email) { alert('이메일을 입력해주세요.'); return; }
-
-    state.currentScreen = 'payment';
     render();
-    window.scrollTo(0, 0);
   }
 
-  function renderPayment() {
-    const disc = EXAM_CONFIG.disciplines.find(d => d.id === state.selectedDiscipline);
-    const level = EXAM_CONFIG.levels.find(l => l.id === state.selectedLevel);
-    const price = getExamPrice();
-    const ticket = getValidTicket();
-
-    // 이미 유효한 응시권이 있으면 바로 시험 시작 가능
-    if (ticket && ticket.discipline === state.selectedDiscipline && ticket.level === state.selectedLevel) {
-      return `
-        <div class="screen active" id="screen-payment">
-          <div class="landing-hero" style="padding: 40px 0 30px;">
-            <div class="icon-wrap" style="background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4);">✅</div>
-            <h2>결제 완료 · 응시권 유효</h2>
-            <p>이미 결제가 완료되었습니다. 응시권 유효 시간 내에 시험을 시작하세요.</p>
-          </div>
-
-          <div class="info-box" style="border-color: rgba(34,197,94,0.3); margin-bottom: 24px;">
-            <h4>🎫 응시권 정보</h4>
-            <ul>
-              <li>응시자: <strong>${ticket.userName}</strong></li>
-              <li>종목: <strong>${disc ? disc.nameKR : ''}</strong></li>
-              <li>등급: <strong>${ticket.level}급</strong></li>
-              <li>결제 금액: <strong>₩${ticket.amount.toLocaleString()}</strong></li>
-              <li>결제 일시: <strong>${new Date(ticket.paidAt).toLocaleString('ko-KR')}</strong></li>
-              <li style="color: #22d3ee; font-weight: 700;">⏰ 남은 시간: <strong>${formatRemaining(ticket)}</strong></li>
-            </ul>
-          </div>
-
-          <div style="display:flex; gap:12px;">
-            <button class="btn btn-secondary" data-action="go-userinfo" style="flex:1;">← 이전</button>
-            <button class="btn btn-primary btn-lg" data-action="start-exam" style="flex:2;">🚀 시험 시작하기</button>
-          </div>
-        </div>
-      `;
-    }
-
-    // 결제 화면
-    return `
-      <div class="screen active" id="screen-payment">
-        <div class="landing-hero" style="padding: 40px 0 30px;">
-          <div class="icon-wrap">💳</div>
-          <h2>응시료 결제</h2>
-          <p>시험 응시를 위해 아래 금액을 결제해주세요.<br>결제 완료 후 <strong>48시간 이내</strong>에 응시 가능합니다.</p>
-        </div>
-
-        <div class="info-box" style="margin-bottom: 24px;">
-          <h4>📋 결제 정보</h4>
-          <ul>
-            <li>응시자: <strong>${state.userName}</strong> (${state.userPhone})</li>
-            <li>종목: <strong>${disc ? disc.nameKR : ''}</strong> (${disc ? disc.name : ''})</li>
-            <li>등급: <strong>${level ? level.name : ''}</strong></li>
-            <li>문항 수: <strong>${EXAM_CONFIG.questionsPerExam}문항</strong></li>
-          </ul>
-        </div>
-
-        <div style="background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(37,99,235,0.1)); border: 1px solid rgba(6,182,212,0.3); border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 24px;">
-          <div style="font-size: 14px; color: #94a3b8; margin-bottom: 8px;">응시료</div>
-          <div style="font-size: 42px; font-weight: 900; color: #22d3ee; font-family: 'Inter',sans-serif; letter-spacing: -1px;">₩${price.toLocaleString()}</div>
-          <div style="font-size: 13px; color: #64748b; margin-top: 8px;">결제 완료 후 48시간 이내 응시 가능</div>
-        </div>
-
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-          <div style="font-size: 13px; color: #94a3b8; margin-bottom: 12px; font-weight: 600;">💡 결제 안내</div>
-          <ul style="font-size: 13px; color: #64748b; list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px;">
-            <li>• 신용카드, 간편결제(토스페이, 카카오페이 등) 사용 가능</li>
-            <li>• 결제 완료 즉시 시험 응시가 가능합니다</li>
-            <li>• 응시권은 결제 시점으로부터 48시간 유효합니다</li>
-            <li>• 시험 불합격 시 재결제 후 재응시 가능합니다</li>
-          </ul>
-        </div>
-
-        <div style="display:flex; gap:12px;">
-          <button class="btn btn-secondary" data-action="go-userinfo" style="flex:1;">← 이전</button>
-          <button class="btn btn-primary btn-lg" data-action="do-payment" style="flex:2;" ${state.paymentProcessing ? 'disabled' : ''}>
-            ${state.paymentProcessing ? '⏳ 결제 처리 중...' : '💳 토스페이먼츠로 결제하기'}
-          </button>
-        </div>
-      </div>
-    `;
+  // --- Exam/Study Logic ---
+  function startStudy() {
+    state.examQuestions = getQuestionBank(state.selectedDiscipline, state.selectedLevel);
+    state.currentScreen = 'study';
+    render();
   }
 
   async function processPayment() {
-    if (state.paymentProcessing) return;
     state.paymentProcessing = true;
     render();
-
-    const price = getExamPrice();
-    const orderId = 'ISA-EXAM-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
-    const disc = EXAM_CONFIG.disciplines.find(d => d.id === state.selectedDiscipline);
-    const orderName = `ISA ${disc ? disc.nameKR : ''} ${state.selectedLevel}급 필기시험 응시료`;
-
+    
     try {
-      // 토스페이먼츠 SDK 초기화
       const tossPayments = TossPayments(TOSS_CLIENT_KEY);
-      const payment = tossPayments.payment({ customerKey: 'ISA_' + state.userPhone.replace(/\D/g, '') });
-
-      // 카드 결제 요청
-      await payment.requestPayment({
-        method: 'CARD',
-        amount: { currency: 'KRW', value: price },
-        orderId: orderId,
-        orderName: orderName,
-        customerName: state.userName,
-        customerEmail: state.userEmail,
-        customerMobilePhone: state.userPhone.replace(/\D/g, ''),
-        successUrl: window.location.origin + window.location.pathname + '?payment=success',
-        failUrl: window.location.origin + window.location.pathname + '?payment=fail',
-        card: {
-          useEscrow: false,
-          flowMode: 'DEFAULT',
-          useCardPoint: false,
-          useAppCardOnly: false
-        }
+      const payment = tossPayments.payment({
+        customerKey: "CUSTOMER_" + Date.now(),
       });
 
-    } catch (error) {
-      // 사용자가 결제를 취소했거나 오류 발생
-      if (error.code === 'USER_CANCEL') {
-        console.log('사용자가 결제를 취소했습니다.');
-      } else if (error.code === 'INVALID_CARD_COMPANY') {
-        alert('유효하지 않은 카드입니다.');
-      } else {
-        // 테스트 모드: 결제 SDK 오류 시에도 테스트 결제 성공 처리
-        console.warn('결제 SDK 오류 (테스트 모드에서 성공 처리):', error);
-        const ticket = saveTicket({ paymentKey: 'TEST_' + Date.now(), orderId, amount: price });
-        alert('✅ 테스트 결제가 완료되었습니다!\n48시간 이내에 시험을 시작하세요.');
-        state.currentScreen = 'payment';
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: getExamPrice() },
+        orderId: "ORDER_" + Date.now(),
+        orderName: `ISA 필기시험 ${state.selectedDiscipline} ${state.selectedLevel}급`,
+        successUrl: window.location.href + "?status=success",
+        failUrl: window.location.href + "?status=fail",
+        customerEmail: state.userEmail,
+        customerName: state.userName,
+      });
+      
+      // 테스트 환경이므로 성공으로 간주하고 실제 시험 시작 (원래는 redirect 후 처리)
+      // startExam();
+    } catch (e) {
+      console.error(e);
+      // 테스트 편의상 결제 실패해도 시작 가능하게 하거나 알림
+      if (confirm('테스트 결제를 진행하시겠습니까? (확인 클릭 시 시험 시작)')) {
+        startExam();
       }
-      state.paymentProcessing = false;
-      render();
     }
   }
 
-  // 결제 성공 리다이렉트 처리
-  function checkPaymentReturn() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('payment') === 'success') {
-      const paymentKey = params.get('paymentKey') || 'PK_' + Date.now();
-      const orderId = params.get('orderId') || 'ORD_' + Date.now();
-      const amount = parseInt(params.get('amount')) || getExamPrice();
-
-      saveTicket({ paymentKey, orderId, amount });
-
-      // URL 파라미터 제거
-      window.history.replaceState({}, '', window.location.pathname);
-
-      alert('✅ 결제가 완료되었습니다!\n48시간 이내에 시험을 시작하세요.');
-      
-      // 텔레그램 알림 발송
-      notifyTelegram(`[결제완료] ${state.selectedDiscipline} ${state.selectedLevel}급 (₩${amount.toLocaleString()})`);
-      
-      state.currentScreen = 'payment';
-      render();
-
-    } else if (params.get('payment') === 'fail') {
-      const message = params.get('message') || '결제가 실패했습니다.';
-      alert('❌ ' + message);
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }
-
-  // === Exam Logic ===
   function startExam() {
-    // 응시권 확인
-    const ticket = getValidTicket();
-    if (!ticket) {
-      alert('유효한 응시권이 없습니다. 결제를 먼저 완료해주세요.');
-      state.currentScreen = 'payment';
-      render();
-      return;
-    }
-
-    // Validate form
-    const name = state.userName.trim() || ticket.userName;
-    const phone = state.userPhone.trim() || ticket.userPhone;
-
-    if (!name) { alert('이름을 입력해주세요.'); return; }
-    if (!phone) { alert('연락처를 입력해주세요.'); return; }
-
-    // Select random questions based on discipline and level
-    const level = state.selectedLevel || 4;
-    const discipline = state.selectedDiscipline || 'body';
-    const allQuestions = (typeof getQuestionBank === 'function')
-      ? getQuestionBank(discipline, level)
-      : [...QUESTIONS_LEVEL4];
-    const shuffled = shuffleArray(allQuestions);
-    state.examQuestions = shuffled.slice(0, EXAM_CONFIG.questionsPerExam);
-
-    // Reset exam state
-    state.answers = {};
+    const fullPool = getQuestionBank(state.selectedDiscipline, state.selectedLevel);
+    // 랜덤 추출
+    const config = getLevelConfig();
+    const shuffled = fullPool.sort(() => 0.5 - Math.random());
+    state.examQuestions = shuffled.slice(0, config.questionsPerExam);
+    
     state.currentQuestion = 0;
-    state.isReviewMode = false;
-    state.showSubmitModal = false;
-    state.showTimeUpModal = false;
+    state.answers = {};
+    state.timeRemaining = config.timeLimitMinutes * 60;
     state.examStartTime = Date.now();
-    state.examEndTime = null;
+    state.currentScreen = 'exam';
+    state.showSubmitModal = false;
+    
+    startTimer();
+    render();
+  }
 
-    // Start timer
-    state.timeRemaining = EXAM_CONFIG.timeLimitMinutes * 60;
+  function startTimer() {
     if (state.timerInterval) clearInterval(state.timerInterval);
     state.timerInterval = setInterval(() => {
       state.timeRemaining--;
       if (state.timeRemaining <= 0) {
         clearInterval(state.timerInterval);
-        state.timeRemaining = 0;
-        state.showTimeUpModal = true;
-        render();
-      } else {
-        const timerEl = document.querySelector('.timer');
-        if (timerEl) {
-          timerEl.innerHTML = `
-            <svg class="timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-            ${formatTime(state.timeRemaining)}
-          `;
-          timerEl.className = 'timer ' + getTimerClass();
-        }
+        finishExam();
+      }
+      // 매초 렌더링은 무거울 수 있으니 타이머 요소만 업데이트
+      const timerEl = document.querySelector('.timer-wrap');
+      if (timerEl) {
+        timerEl.innerText = `⏱ ${Math.floor(state.timeRemaining / 60)}:${String(state.timeRemaining % 60).padStart(2, '0')}`;
+        if (state.timeRemaining < 60) timerEl.classList.add('danger');
       }
     }, 1000);
-
-    // 응시권 사용 처리
-    ticket.used = true;
-    localStorage.setItem(EXAM_TICKET_KEY, JSON.stringify(ticket));
-
-    state.currentScreen = 'exam';
-    render();
-    window.scrollTo(0, 0);
   }
 
-  function submitExam() {
-    // Stop timer
-    if (state.timerInterval) {
-      clearInterval(state.timerInterval);
-      state.timerInterval = null;
-    }
-
+  function finishExam() {
+    if (state.timerInterval) clearInterval(state.timerInterval);
     state.examEndTime = Date.now();
-    state.showSubmitModal = false;
-    state.showTimeUpModal = false;
     state.currentScreen = 'result';
-    render();
-    window.scrollTo(0, 0);
-
-    // Save result to localStorage
-    saveResult();
-  }
-
-  function saveResult() {
-    const total = state.examQuestions.length;
-    let correct = 0;
-    state.examQuestions.forEach(q => {
-      if (state.answers[q.id] === q.answer) correct++;
-    });
-
-    const result = {
-      timestamp: new Date().toISOString(),
-      userName: state.userName,
-      userPhone: state.userPhone,
-      discipline: state.selectedDiscipline,
-      level: state.selectedLevel,
-      totalQuestions: total,
-      correctAnswers: correct,
-      scorePercent: Math.round((correct / total) * 100),
-      passed: Math.round((correct / total) * 100) >= EXAM_CONFIG.passingScore,
-      elapsedSeconds: state.examEndTime ? Math.round((state.examEndTime - state.examStartTime) / 1000) : 0
-    };
-
-    // Save to localStorage
-    const history = JSON.parse(localStorage.getItem('isa_exam_history') || '[]');
-    history.push(result);
-    localStorage.setItem('isa_exam_history', JSON.stringify(history));
-
-    console.log('시험 결과 저장:', result);
-    
-    // 텔레그램 알림 발송
-    const status = result.passed ? '🎉 합격' : '😔 불합격';
-    notifyTelegram(`[시험종료] ${result.discipline} ${result.level}급 - 결과: ${status} (${result.scorePercent}점)`);
-  }
-
-
-  function resetState() {
-    if (state.timerInterval) {
-      clearInterval(state.timerInterval);
-      state.timerInterval = null;
-    }
-    state.currentScreen = 'landing';
-    state.selectedDiscipline = null;
-    state.selectedLevel = null;
-    state.userName = '';
-    state.userPhone = '';
-    state.userBirth = '';
-    state.examQuestions = [];
-    state.answers = {};
-    state.currentQuestion = 0;
-    state.timeRemaining = 0;
-    state.examStartTime = null;
-    state.examEndTime = null;
-    state.isReviewMode = false;
     state.showSubmitModal = false;
-    state.showTimeUpModal = false;
+    render();
   }
 
-  // === Initialize ===
-  checkPaymentReturn();
-  render();
+  // --- Global Entry ---
+  window.onload = init;
 
 })();

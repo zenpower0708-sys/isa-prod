@@ -229,6 +229,7 @@
     <div class="admin-tabs">
         <button class="admin-tab active" onclick="switchTab('logbook')">로그북 승인 관리</button>
         <button class="admin-tab" onclick="switchTab('practical')">실기 평가 관리</button>
+        <button class="admin-tab" onclick="switchTab('promo')">홍보글/포인트 관리</button>
         <button class="admin-tab" onclick="switchTab('issuecert')" style="color:#d4af37">🏆 디지털 자격증 발급</button>
     </div>
 
@@ -270,6 +271,10 @@
             rawData.practical = [
                 { email: 'user3@example.com', name: '김철수', discipline: 'Standing', level: 3, youtubeUrl: 'https://youtu.be/example', timestamp: '2026-04-10' }
             ];
+            rawData.promo = [
+                { email: 'user4@example.com', name: '이영희', platform: '인스타그램', link: 'https://instagram.com/p/abc', status: '승인대기', rowIndex: 5 },
+                { email: 'user1@example.com', name: '홍길동', platform: '네이버블로그', link: 'https://blog.naver.com/xyz', status: '승인대기', rowIndex: 6 }
+            ];
             rawData.users = [{ email: 'u1@e.com' }, { email: 'u2@e.com' }, { email: 'u3@e.com' }];
 
             updateStats();
@@ -292,6 +297,7 @@
         document.querySelectorAll('.admin-tab').forEach(t => {
             if (tab === 'logbook') t.classList.toggle('active', t.textContent.includes('로그북'));
             else if (tab === 'practical') t.classList.toggle('active', t.textContent.includes('실기'));
+            else if (tab === 'promo') t.classList.toggle('active', t.textContent.includes('홍보글'));
             else if (tab === 'issuecert') t.classList.toggle('active', t.textContent.includes('자격증 발급'));
         });
         if (tab === 'issuecert') {
@@ -316,7 +322,20 @@
                     <td><span class="badge badge-pending">${l.status}</span></td>
                     <td>
                         <button class="action-btn btn-approve" onclick="approveLog(${l.rowIndex}, '승인완료')">승인</button>
-                        <button class="action-btn btn-reject" onclick="approveLog(${l.rowIndex}, '반려')">반려</button>
+                    </td>
+                </tr>
+            `).join('');
+        } else if (currentTab === 'promo') {
+            head.innerHTML = `<tr><th>신청자</th><th>플랫폼</th><th>링크</th><th>상태</th><th>관리</th></tr>`;
+            body.innerHTML = rawData.promo.map((p, i) => `
+                <tr>
+                    <td>${p.name}<br><small style="color:var(--text-dim)">${p.email}</small></td>
+                    <td><span style="color:var(--cyan)">${p.platform}</span></td>
+                    <td><a href="${p.link}" target="_blank" class="yt-link">🔗 게시글 보기</a></td>
+                    <td><span class="badge badge-pending">${p.status}</span></td>
+                    <td>
+                        <button class="action-btn btn-approve" onclick="approvePromo(${p.rowIndex}, '승인')">승인(+1000P)</button>
+                        <button class="action-btn btn-reject" onclick="approvePromo(${p.rowIndex}, '반려')">반려</button>
                     </td>
                 </tr>
             `).join('');
@@ -346,6 +365,27 @@
             });
             alert(`성공적으로 ${status} 처리되었습니다.`);
             fetchData(); 
+        } catch (e) {
+            alert('처리 중 오류가 발생했습니다.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function approvePromo(rowIndex, status) {
+        if (!confirm(`홍보 게시글을 ${status} 처리하시겠습니까?`)) return;
+        showLoading(true);
+        try {
+            // GAS API 호출 (action: approvePromoPost)
+            // status에 따라 포인트가 자동 지급되도록 GAS에서 처리됨
+            await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({ action: 'approvePromoPost', rowIndex, status })
+            });
+            alert(`홍보 게시글이 ${status} 처리되었습니다.`);
+            fetchData();
         } catch (e) {
             alert('처리 중 오류가 발생했습니다.');
         } finally {
@@ -406,6 +446,7 @@
                     <li>Google Drive 자동 저장</li>
                     <li>합격자 이메일로 자동 발송 📧</li>
                     <li>Google Sheets 자격증 시트 자동 기록</li>
+                    <li style="color:#22c55e; font-weight:700;">축하 포인트 자동 지급 (1급:5k, 2급:4k, 3급:3k, 4급:2k) 💰</li>
                 </ul>
             </div>
 

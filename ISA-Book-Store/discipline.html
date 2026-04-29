@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>급수 선택 | ISA BOOK STORE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+    <style>
+      .composition-badge {
+        display: inline-block;
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--cyan);
+        border: 1px solid rgba(6, 182, 212, 0.3);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        margin: 4px 2px;
+      }
+      .book-card-level {
+        padding-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container nav-content">
+        <div class="logo-area" style="display: flex; align-items: center; gap: 20px;">
+          <a href="/" class="btn-back-portal" style="color: var(--cyan); text-decoration: none; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(6, 182, 212, 0.1); border-radius: 20px; border: 1px solid rgba(6, 182, 212, 0.3); transition: var(--transition);">
+            <span>←</span> 스토어 메인
+          </a>
+          <div class="logo">
+            <span>ISA BOOK STORE</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main style="padding-top: 100px;">
+      <section class="storefront">
+        <div class="container">
+          <div class="section-header">
+            <h2 id="discipline-title">ISA E-PASS 급수별 교재</h2>
+            <p>필요한 급수를 선택하여 구매하세요.</p>
+          </div>
+
+          <div class="book-grid" id="level-grid">
+            <!-- Dynamic Content -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <span class="footer-logo">ISA BOOK STORE</span>
+        <div class="footer-nav">
+          <a href="#">이용약관</a>
+          <a href="#">개인정보처리방침</a>
+          <a href="#">취불규정</a>
+          <a href="#">고객센터</a>
+        </div>
+        <p class="copy">&copy; 2026 ISA (International Artificial Surfing Association). All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const vol = urlParams.get('vol') || 'standing';
+      
+      const bookData = {
+        'standing': { title: 'Standing/Flow Board', offset: '0% 0%' },
+        'body': { title: 'Body/Boogie Board', offset: '33% 0%' },
+        'wake': { title: 'Wake Surfing', offset: '66% 0%' },
+        'wave': { title: 'Wave Surfing', offset: '100% 0%' }
+      };
+
+      const discipline = bookData[vol] || bookData['standing'];
+      document.getElementById('discipline-title').innerText = `인공서핑 자격검정 - ${discipline.title}`;
+
+      const levels = [
+        { level: '4급', badge: '입문 과정', param: '4' },
+        { level: '3급', badge: '초급 과정', param: '3' },
+        { level: '2급', badge: '중급 과정', param: '2' },
+        { level: '1급', badge: '전문가 과정', param: '1' }
+      ];
+
+      const grid = document.getElementById('level-grid');
+      let html = '';
+
+      levels.forEach(l => {
+        html += `
+          <div class="book-card book-card-level">
+            <span class="book-vol" style="font-size:16px;">${l.level}</span>
+            <div class="book-image" style="height: 250px; aspect-ratio: auto;">
+              <img src="/images/covers.png" alt="${discipline.title}" style="object-position: ${discipline.offset}; object-fit: cover;">
+            </div>
+            <h3 class="book-title" style="font-size: 18px; margin-bottom: 8px;">${discipline.title} (${l.level})</h3>
+            
+            <div style="margin-bottom: 20px; text-align: left; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid var(--border-glass);">
+              <p style="font-size: 13px; font-weight: 700; color: white; margin-bottom: 8px;">📌 교재 구성 및 핵심 기능</p>
+              
+              <div style="margin-bottom: 12px;">
+                <span class="composition-badge" style="margin: 0 0 4px 0;">📖 프리미엄 학습모드(문제은행 + 해설서)</span>
+                <p style="font-size: 12px; color: #cbd5e1; margin: 0; line-height: 1.4;">한 문제씩 풀 때마다 즉각적인 정답 확인이 가능하며, 하단에 표출되는 상세 해설을 통해 꼼꼼한 오답 리뷰와 학습이 가능합니다.</p>
+              </div>
+              
+              <div style="margin-bottom: 12px;">
+                <span class="composition-badge" style="margin: 0 0 4px 0;">⏱️ 실전 모의고사 시스템</span>
+                <p style="font-size: 12px; color: #cbd5e1; margin: 0; line-height: 1.4;">실제 시험과 동일하게 무작위 랜덤 출제되며, 60점 기준 자동 채점 및 합격 판정을 제공합니다.</p>
+              </div>
+
+              <div>
+                <span class="composition-badge" style="margin: 0 0 4px 0;">📝 오답노트 시스템</span>
+                <p style="font-size: 12px; color: #cbd5e1; margin: 0; line-height: 1.4;">모의고사 종료 후, 틀린 문제들만 별도로 모아 상세 해설과 함께 집중적으로 복습할 수 있습니다.</p>
+              </div>
+            </div>
+            
+            <p class="book-price">₩15,000</p>
+            <a href="checkout.html?vol=${vol}&level=${l.param}" class="btn-buy" style="display:block; text-align:center; text-decoration:none;">결제하기</a>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    </script>
+  </body>
+</html>

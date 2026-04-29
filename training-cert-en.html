@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practical Training Completion Certificate - International Surfing Association (ISA)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    color: #1a1a2e;
+    background: #f0f4f8;
+    padding: 20px;
+  }
+
+  .page {
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 18mm 18mm 15mm 18mm;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #0ea5e9;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-box {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 13pt; letter-spacing: -1px;
+  }
+  .org-name { font-size: 9pt; color: #64748b; }
+  .org-name strong { display: block; font-size: 11.5pt; color: #0f172a; font-weight: 700; }
+  .doc-no { font-size: 8.5pt; color: #94a3b8; text-align: right; }
+  .doc-no span { display: block; font-size: 9pt; color: #64748b; }
+
+  /* ── Title ── */
+  .title-wrap {
+    text-align: center;
+    margin: 16px 0 18px;
+  }
+  .title-wrap h1 {
+    font-size: 18pt;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: 2px;
+  }
+  .title-wrap p {
+    font-size: 9pt;
+    color: #64748b;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* ── Section ── */
+  .section { margin-bottom: 14px; }
+  .section-title {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #0284c7;
+    background: #f0f9ff;
+    border-left: 3px solid #0ea5e9;
+    padding: 4px 8px;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Input Tables ── */
+  table { width: 100%; border-collapse: collapse; }
+  table td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 9px;
+    font-size: 10.5pt;
+    vertical-align: middle;
+  }
+  .label {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 9.5pt;
+    width: 28%;
+    white-space: nowrap;
+  }
+  .value { color: #1e293b; min-height: 26px; }
+  .value.wide { width: 72%; }
+  .required { color: #ef4444; font-size: 8pt; margin-left: 2px; }
+
+  /* ── Checkbox row ── */
+  .check-row {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    padding: 6px 10px;
+    background: #fafafa;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .check-item { display: flex; align-items: center; gap: 6px; font-size: 10.5pt; }
+  .checkbox {
+    width: 14px; height: 14px;
+    border: 1.5px solid #94a3b8;
+    display: inline-block;
+    border-radius: 2px; flex-shrink: 0;
+  }
+
+  /* ── Hours table ── */
+  .hour-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  .hour-table th {
+    background: #0ea5e9; color: white; font-size: 9.5pt;
+    font-weight: 600; padding: 6px; text-align: center; border: 1px solid #0284c7;
+  }
+  .hour-table td {
+    text-align: center; border: 1px solid #cbd5e1; padding: 5px 8px; font-size: 10pt;
+  }
+  .hour-table tr:nth-child(even) td { background: #f8fafc; }
+  .badge {
+    display: inline-block; padding: 1px 7px; border-radius: 10px;
+    font-size: 8.5pt; font-weight: 600;
+  }
+  .b4 { background: #dcfce7; color: #166534; }
+  .b3 { background: #dbeafe; color: #1e40af; }
+  .b2 { background: #fef9c3; color: #854d0e; }
+  .b1 { background: #fce7f3; color: #9d174d; }
+
+  /* ── Docs guidance ── */
+  .docs-box {
+    background: #fffbeb; border: 1px solid #fcd34d;
+    border-radius: 6px; padding: 10px 12px;
+    font-size: 9.5pt; color: #78350f;
+  }
+  .docs-box .row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; }
+  .docs-box .row:last-child { margin-bottom: 0; }
+  .dot { color: #f59e0b; font-weight: 700; flex-shrink: 0; }
+  .warn-box {
+    background: #fff1f2; border: 1px solid #fca5a5; border-radius: 6px;
+    padding: 8px 12px; font-size: 9pt; color: #991b1b; margin-top: 8px;
+  }
+
+  /* ── Signature ── */
+  .sign-section {
+    margin-top: 16px; border: 1px solid #e2e8f0;
+    border-radius: 6px; padding: 14px 16px; background: #fafafa;
+  }
+  .sign-date {
+    font-size: 10.5pt; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .sign-line { display: inline-block; width: 60px; border-bottom: 1.5px solid #475569; margin: 0 3px; }
+  .sign-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+  .sign-box {
+    flex: 1; border: 1px solid #cbd5e1; border-radius: 5px;
+    padding: 10px 12px; background: white;
+  }
+  .sign-box .s-label { font-size: 8.5pt; color: #64748b; margin-bottom: 6px; font-weight: 600; }
+  .sign-box .s-name { font-size: 10pt; color: #1e293b; }
+  .sign-area {
+    height: 36px; border-bottom: 1.5px solid #94a3b8; margin-top: 4px;
+    display: flex; align-items: flex-end; justify-content: flex-end;
+    padding-bottom: 2px; font-size: 8.5pt; color: #94a3b8;
+  }
+
+  /* ── Submit notice ── */
+  .submit-to {
+    margin-top: 14px; text-align: center; font-size: 9pt; color: #64748b;
+    border-top: 1px dashed #cbd5e1; padding-top: 10px;
+  }
+  .submit-to strong { color: #0284c7; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 18px; text-align: center; font-size: 8pt; color: #94a3b8;
+    border-top: 1px solid #e2e8f0; padding-top: 8px;
+  }
+
+  /* ── Print guide (screen only) ── */
+  .print-guide {
+    background: #0ea5e9; color: white; text-align: center;
+    padding: 10px; font-size: 10pt; border-radius: 8px;
+    margin: 0 auto 16px; width: 210mm; max-width: 100%;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { background: white; padding: 0; }
+    .page { box-shadow: none; margin: 0; padding: 15mm 16mm 12mm 16mm; }
+    .print-guide { display: none; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="print-guide">
+  📄 To save as PDF: Press <strong>Ctrl+P</strong> → Destination: <strong>Save as PDF</strong> → Click Print
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">ISA</div>
+      <div class="org-name">
+        <span>국제인공서핑협회</span>
+        <strong>International Surfing Association</strong>
+      </div>
+    </div>
+    <div class="doc-no">
+      <span>Document No.</span>
+      ISA-CERT-____-______
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div class="title-wrap">
+    <h1>Practical Training Completion Certificate</h1>
+    <p>실습 이수 확인서</p>
+  </div>
+
+  <!-- ① Applicant Information -->
+  <div class="section">
+    <div class="section-title">① Applicant Information</div>
+    <table>
+      <tr>
+        <td class="label">Full Name<span class="required">*</span></td>
+        <td class="value"></td>
+        <td class="label">Date of Birth<span class="required">*</span></td>
+        <td class="value"></td>
+      </tr>
+      <tr>
+        <td class="label">Contact Number<span class="required">*</span></td>
+        <td class="value"></td>
+        <td class="label">Applied Level<span class="required">*</span></td>
+        <td class="value">□ Level 4 (General)　□ Level 3 (Intermediate)　□ Level 2 (Advanced)　□ Level 1 (Pro)</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ② Training Details -->
+  <div class="section">
+    <div class="section-title">② Training Details</div>
+    <table>
+      <tr>
+        <td class="label">Training Period<span class="required">*</span></td>
+        <td class="value wide">____/____/______  ~  ____/____/______  (MM/DD/YYYY)</td>
+      </tr>
+      <tr>
+        <td class="label">Total Hours<span class="required">*</span></td>
+        <td class="value wide">________ hours</td>
+      </tr>
+      <tr>
+        <td class="label">Training Location<span class="required">*</span></td>
+        <td class="value wide"></td>
+      </tr>
+      <tr>
+        <td class="label">Facility / Venue Name</td>
+        <td class="value wide"></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ③ Instructor Classification -->
+  <div class="section">
+    <div class="section-title">③ Instructor Classification &amp; Information</div>
+    <div class="check-row">
+      <div class="check-item"><div class="checkbox"></div> ISA Certified Instructor (Certificate No. required)</div>
+      <div class="check-item"><div class="checkbox"></div> Non-Certified Instructor (Contact info &amp; signature mandatory)</div>
+    </div>
+    <table>
+      <tr>
+        <td class="label">Instructor Name<span class="required">*</span></td>
+        <td class="value"></td>
+        <td class="label">Instructor Contact<span class="required">*</span></td>
+        <td class="value"></td>
+      </tr>
+      <tr>
+        <td class="label">ISA Certificate No.</td>
+        <td class="value" colspan="3">(Certified instructors only)</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ④ Minimum Training Hours -->
+  <div class="section">
+    <div class="section-title">④ Minimum Required Training Hours by Level</div>
+    <table class="hour-table">
+      <tr>
+        <th>Level</th>
+        <th>Grade Name</th>
+        <th>Minimum Hours</th>
+        <th>Notes</th>
+      </tr>
+      <tr>
+        <td><span class="badge b4">Level 4</span></td>
+        <td>General (일반)</td>
+        <td><strong>10 hours or more</strong></td>
+        <td>Introductory course</td>
+      </tr>
+      <tr>
+        <td><span class="badge b3">Level 3</span></td>
+        <td>Intermediate (중급)</td>
+        <td><strong>20 hours or more</strong></td>
+        <td>Basic skills proficiency</td>
+      </tr>
+      <tr>
+        <td><span class="badge b2">Level 2</span></td>
+        <td>Advanced (상급)</td>
+        <td><strong>30 hours or more</strong></td>
+        <td>Advanced techniques</td>
+      </tr>
+      <tr>
+        <td><span class="badge b1">Level 1</span></td>
+        <td>Pro (프로)</td>
+        <td><strong>50 hours or more</strong></td>
+        <td>Expert / Instructor level</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ⑤ Accepted Documents -->
+  <div class="section">
+    <div class="section-title">⑤ Accepted Supporting Documents</div>
+    <div class="docs-box">
+      <div class="row"><span class="dot">●</span><span><strong>Completion certificate</strong> issued by an ISA-certified venue or instructor (training dates and hours must be clearly stated)</span></div>
+      <div class="row"><span class="dot">●</span><span>ISA <strong>official training confirmation form</strong> with instructor's signature</span></div>
+      <div class="row"><span class="dot">●</span><span><strong>Participation certificate</strong> for camp or clinic events (stamped by organizer or signed by instructor)</span></div>
+      <div class="row"><span class="dot">●</span><span>Personal training log (<strong>instructor's signature and contact required</strong>, detailed daily records with hours)</span></div>
+    </div>
+    <div class="warn-box">
+      ⚠️ For non-certified instructors, the instructor's full name and contact information must be provided. Any falsification may result in certification cancellation and legal liability.
+    </div>
+  </div>
+
+  <!-- Signature -->
+  <div class="sign-section">
+    <div class="sign-date">
+      I hereby confirm that all information stated above is true and accurate.&nbsp;&nbsp;&nbsp;
+      Date：<span class="sign-line"></span>/<span class="sign-line" style="width:40px"></span>/<span class="sign-line"></span>
+      &nbsp;(MM/DD/YYYY)
+    </div>
+    <div class="sign-row">
+      <div class="sign-box">
+        <div class="s-label">Applicant Signature</div>
+        <div class="s-name">Name：</div>
+        <div class="sign-area">（Signature）</div>
+      </div>
+      <div class="sign-box">
+        <div class="s-label">Instructor Signature <span style="color:#ef4444">*Required</span></div>
+        <div class="s-name">Instructor Name：</div>
+        <div class="sign-area">（Signature）</div>
+      </div>
+      <div class="sign-box">
+        <div class="s-label">Committee Verification (ISA Internal Use)</div>
+        <div class="s-name">Reviewer：</div>
+        <div class="sign-area">（Official Stamp）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit notice -->
+  <div class="submit-to">
+    Please submit this certificate to the <strong>ISA Certification Review Committee</strong>.<br>
+    Inquiries：<strong>isa-web-portal.vercel.app</strong>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    © 2025 International Surfing Association (ISA) · 국제인공서핑협회 · Unauthorized reproduction or alteration of this form is strictly prohibited.
+  </div>
+
+</div>
+</body>
+</html>

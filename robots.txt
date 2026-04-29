@@ -1,0 +1,14 @@
+# ================================================================
+# Copyright (c) 2025 국제인공서핑협회 (ISA)
+# Unauthorized reproduction or scraping is strictly prohibited.
+# ================================================================
+
+User-agent: *
+Disallow: /admin
+Disallow: /.env
+Disallow: /.vercel
+Disallow: /backup_before_deploy/
+
+# 검색엔진 색인은 허용 (공식 사이트 노출 유지)
+Allow: /
+Sitemap: https://isa-web-portal.vercel.app/sitemap.xml

@@ -3,409 +3,417 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ISA 합격 자격증</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<title>ISA 디지털 합격 자격증 - Premium Edition</title>
+<!-- 구글 폰트: 현대적인 Outfit과 Noto Sans KR 적용 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Outfit:wght@200;400;700;900&display=swap" rel="stylesheet">
 <style>
+  :root {
+    /* 티어별 컬러 토큰 */
+    --bronze-primary: #c4784a; --bronze-bg: #1c0e06; --bronze-glow: rgba(196,120,74,0.4);
+    --silver-primary: #b0b8c8; --silver-bg: #0d1118; --silver-glow: rgba(176,184,200,0.3);
+    --gold-primary: #d4a83a; --gold-bg: #0d1b2e; --gold-glow: rgba(184,146,42,0.4);
+    --diamond-primary: #5ac8f0; --diamond-bg: #03081a; --diamond-glow: rgba(90,200,240,0.5);
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: #060a12;
+    background: #020406;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'Noto Sans KR', 'Outfit', sans-serif;
+    padding: 20px;
+    overflow-x: hidden;
   }
 
-  .cert-wrap {
-    width: 100%;
-    min-height: 580px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
+  /* ── 상단 티어 스위처 ── */
+  .tier-switcher {
+    display: flex; gap: 12px; margin-bottom: 30px; 
+    padding: 6px; background: rgba(255,255,255,0.03); border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+  }
+  .ts-btn {
+    padding: 8px 22px; border-radius: 20px; font-size: 13px; font-weight: 700;
+    cursor: pointer; border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: rgba(255,255,255,0.5); background: transparent; font-family: 'Outfit';
+    letter-spacing: 0.5px;
+  }
+  .ts-btn:hover { color: #fff; transform: translateY(-2px); }
+  .ts-btn.active.bronze  { background: var(--bronze-primary); color: #000; box-shadow: 0 4px 15px var(--bronze-glow); }
+  .ts-btn.active.silver  { background: var(--silver-primary); color: #000; box-shadow: 0 4px 15px var(--silver-glow); }
+  .ts-btn.active.gold    { background: var(--gold-primary); color: #000; box-shadow: 0 4px 15px var(--gold-glow); }
+  .ts-btn.active.diamond { background: var(--diamond-primary); color: #000; box-shadow: 0 4px 15px var(--diamond-glow); }
+
+  /* ── 카드 컨테이너 ── */
+  .cert-container {
+    perspective: 1500px; width: 100%; max-width: 860px;
   }
 
   .cert-card {
     width: 100%;
-    max-width: 820px;
-    background: linear-gradient(135deg, #0d1b2e 0%, #0a1520 50%, #0f1e30 100%);
-    border-radius: 16px;
-    border: 1.5px solid #b8922a;
-    position: relative;
-    overflow: hidden;
-    padding: 32px;
-    box-shadow: 0 0 60px rgba(184,146,42,0.15), inset 0 0 80px rgba(0,30,60,0.5);
-    transition: transform 0.6s ease;
+    aspect-ratio: 1.6 / 1;
+    border-radius: 20px; border: 1.5px solid;
+    position: relative; overflow: hidden;
+    padding: 40px;
+    transition: transform 0.15s ease-out;
+    background-size: cover;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.8);
   }
 
-  .corner-tl, .corner-tr, .corner-bl, .corner-br {
-    position: absolute; width: 40px; height: 40px;
-    border-color: #d4a83a; border-style: solid;
+  /* ── 티어별 테마 ── */
+  .cert-card.bronze { background: linear-gradient(135deg, #1c0e06 0%, #0c0603 100%); border-color: rgba(196,120,74,0.4); }
+  .cert-card.silver { background: linear-gradient(135deg, #0d1118 0%, #05070a 100%); border-color: rgba(176,184,200,0.3); }
+  .cert-card.gold   { background: linear-gradient(135deg, #0d1b2e 0%, #050a12 100%); border-color: rgba(184,146,42,0.4); }
+  .cert-card.diamond{ background: linear-gradient(135deg, #03081a 0%, #010308 100%); border-color: rgba(90,200,240,0.4); }
+
+  /* ── 장식 요소 ── */
+  .hologram {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.02) 45%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 55%, transparent 60%);
+    background-size: 200% 200%; transition: 0.1s; z-index: 10;
   }
-  .corner-tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
-  .corner-tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
-  .corner-bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
-  .corner-br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
-
-  .wave-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; opacity: 0.18; }
-
-  .hologram-strip {
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(100,200,255,0.015) 3px, rgba(100,200,255,0.015) 6px);
-    pointer-events: none;
+  .noise {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.04;
+    background-image: url('https://www.transparenttextures.com/patterns/pinstripe.png'); pointer-events: none;
   }
-
   .glow-orb {
-    position: absolute; width: 300px; height: 300px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(52,120,220,0.12) 0%, transparent 70%);
-    top: -80px; right: -60px; pointer-events: none;
+    position: absolute; width: 450px; height: 450px; border-radius: 50%; blur: 80px;
+    filter: blur(100px); pointer-events: none; z-index: 1; opacity: 0.45;
   }
-  .glow-orb2 {
-    position: absolute; width: 200px; height: 200px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(184,146,42,0.1) 0%, transparent 70%);
-    bottom: -60px; left: 20px; pointer-events: none;
+  .bronze .glow-orb  { background: radial-gradient(circle, var(--bronze-primary), transparent 70%); top: -150px; right: -80px; }
+  .silver .glow-orb  { background: radial-gradient(circle, var(--silver-primary), transparent 70%); top: -150px; right: -80px; }
+  .gold .glow-orb    { background: radial-gradient(circle, #3478dc, transparent 70%); top: -150px; right: -80px; }
+  .diamond .glow-orb { background: radial-gradient(circle, var(--diamond-primary), transparent 70%); top: -150px; right: -80px; }
+
+  .wave-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 260px; opacity: 0.4; z-index: 2; pointer-events: none; }
+
+  /* ── 상단 정보 그룹 ── */
+  .top-right-group {
+    position: absolute; top: 32px; right: 40px;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 14px;
+    z-index: 15;
   }
-
-  .cert-body {
-    position: relative; z-index: 2;
-    display: grid; grid-template-columns: 200px 1fr; gap: 32px;
-  }
-
-  .left-panel { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-
-  .logo-inner {
-    width: 96px; height: 96px; border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #4a6fa5, #1a2d52 50%, #0a1020);
-    border: 2px solid #b8922a;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6), 0 0 30px rgba(184,146,42,0.2), inset 0 2px 4px rgba(255,255,255,0.1);
-  }
-
-  .logo-text-inner { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .logo-isa {
-    font-size: 22px; font-weight: 900; color: #d4a83a; letter-spacing: 3px;
-    text-shadow: 0 0 10px rgba(212,168,58,0.8), 0 0 20px rgba(212,168,58,0.4);
-  }
-
-  .org-name .en {
-    font-size: 9px; color: #4a7ab5; letter-spacing: 1.5px;
-    text-transform: uppercase; line-height: 1.4; text-align: center;
-  }
-  .org-name .kr { font-size: 13px; color: #c8a84e; font-weight: 700; margin-top: 4px; text-align: center; }
-
-  .photo-box {
-    width: 140px; height: 170px; border: 1.5px solid #b8922a; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.03); position: relative; overflow: hidden;
-  }
-  .photo-box::before {
-    content: ''; position: absolute; inset: 0;
-    background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(184,146,42,0.04) 4px, rgba(184,146,42,0.04) 8px);
-  }
-  .photo-label { font-size: 11px; color: #4a6080; letter-spacing: 1px; position: relative; z-index: 1; }
-  .issue-date-label {
-    font-size: 12px; color: #d4a83a; font-weight: 700; letter-spacing: 1px;
-    background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 4px;
-    border: 0.5px solid rgba(184,146,42,0.3); text-align: center; width: 100%;
-  }
-
-  .right-panel { display: flex; flex-direction: column; gap: 14px; }
-
-  .cert-header { border-bottom: 0.5px solid rgba(184,146,42,0.4); padding-bottom: 12px; }
-  .official-label { font-size: 10px; color: #4a7ab5; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
-  .cert-title-kr {
-    font-size: 32px; font-weight: 900; color: #ffffff; line-height: 1;
-    text-shadow: 0 0 20px rgba(255,255,255,0.15); letter-spacing: -1px;
-  }
-  .cert-title-en { font-size: 12px; color: #4a7ab5; margin-top: 4px; letter-spacing: 1px; }
-
-  .field-label { font-size: 10px; color: #4a6080; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
-
-  .name-value {
-    font-size: 38px; font-weight: 900; color: #ffffff; letter-spacing: -1px; line-height: 1;
-    text-shadow: 0 0 30px rgba(255,255,255,0.2);
-  }
-  .name-underline {
-    height: 2px; width: 100%;
-    background: linear-gradient(90deg, #d4a83a, transparent);
-    margin-top: 6px;
-  }
-
-  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .info-box {
-    background: rgba(255,255,255,0.04); border: 0.5px solid rgba(184,146,42,0.25);
-    border-radius: 8px; padding: 12px 16px; position: relative; overflow: hidden;
-  }
-  .info-box::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(184,146,42,0.4), transparent);
-  }
-  .info-value { font-size: 16px; font-weight: 700; }
-  .info-value.gold { color: #d4a83a; }
-  .info-value.white { color: #ffffff; }
-
-  /* TIER SECTION */
-  .tier-section {
-    background: rgba(255,255,255,0.03); border: 0.5px solid rgba(184,146,42,0.2);
-    border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden;
-  }
-  .tier-section::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(184,146,42,0.4), transparent);
-  }
-
-  .tier-label { font-size: 10px; color: #4a6080; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
-
-  .tier-track { display: flex; align-items: center; gap: 0; position: relative; padding: 0 4px; }
-
-  .tier-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
-    position: relative;
-  }
-
-  .tier-connector { flex: 0 0 24px; height: 2px; position: relative; top: -10px; }
-
-  .tier-badge {
-    width: 42px; height: 42px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    position: relative; transition: transform 0.3s ease;
-  }
-  .tier-badge svg { width: 28px; height: 28px; }
-
-  .tier-name { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-
-  .tier-bronze .tier-badge {
-    background: radial-gradient(circle at 35% 30%, #c4784a, #7a3d1e);
-    border: 1.5px solid #c4784a; box-shadow: 0 2px 10px rgba(196,120,74,0.3);
-  }
-  .tier-bronze .tier-name { color: #c4784a; }
-  .tier-connector.bronze { background: linear-gradient(90deg, #7a3d1e, #8a8a8a); }
-
-  .tier-silver .tier-badge {
-    background: radial-gradient(circle at 35% 30%, #d0d0d0, #888);
-    border: 1.5px solid #c0c0c0; box-shadow: 0 2px 10px rgba(192,192,192,0.3);
-  }
-  .tier-silver .tier-name { color: #c0c0c0; }
-  .tier-connector.silver { background: linear-gradient(90deg, #888, #c8a820); }
-
-  .tier-gold .tier-badge {
-    background: radial-gradient(circle at 35% 30%, #f5d060, #b8820a);
-    border: 1.5px solid #d4a83a; box-shadow: 0 2px 14px rgba(212,168,58,0.5);
-  }
-  .tier-gold .tier-name { color: #d4a83a; }
-  .tier-connector.gold { background: linear-gradient(90deg, #c8a820, #5ab8e8); }
-
-  .tier-diamond .tier-badge {
-    background: radial-gradient(circle at 35% 30%, #a8e4ff, #2a7ab0);
-    border: 1.5px solid #7dd4f8; box-shadow: 0 2px 16px rgba(100,210,255,0.5);
-  }
-  .tier-diamond .tier-name { color: #7dd4f8; }
-
-  .tier-item.active .tier-badge::after {
-    content: ''; position: absolute; inset: -4px; border-radius: 50%;
-    border: 2px solid currentColor;
-  }
-  .tier-bronze.active .tier-badge::after { border-color: #c4784a; }
-  .tier-silver.active .tier-badge::after { border-color: #c0c0c0; }
-  .tier-gold.active .tier-badge::after { border-color: #d4a83a; }
-  .tier-diamond.active .tier-badge::after { border-color: #7dd4f8; }
-
-  .cert-num-wrapper { display: flex; align-items: center; justify-content: space-between; }
-  .cert-num { display: flex; align-items: center; gap: 8px; }
-  .cert-num-label { font-size: 10px; color: #4a6080; letter-spacing: 1.5px; }
-  .cert-num-value { font-size: 13px; color: #5a90c8; font-weight: 700; letter-spacing: 1px; font-family: monospace; }
   
-  .qr-code img { width: 60px; height: 60px; border-radius: 4px; border: 1px solid rgba(184,146,42,0.4); }
+  .badge-top {
+    font-family: 'Outfit'; font-weight: 900; font-size: 19px; letter-spacing: 5px;
+    text-transform: uppercase; opacity: 1;
+  }
+  .bronze .badge-top  { color: #ffb080; text-shadow: 0 0 15px rgba(196,120,74,0.6); }
+  .silver .badge-top  { color: #e8edf8; text-shadow: 0 0 15px rgba(176,184,200,0.5); }
+  .gold .badge-top    { color: #ffe080; text-shadow: 0 0 15px rgba(212,168,58,0.6); }
+  .diamond .badge-top { color: #b0f0ff; text-shadow: 0 0 15px rgba(90,200,240,0.6); }
 
-  .watermark-3d {
-    position: absolute; bottom: 30px; right: 40px;
-    font-size: 72px; font-weight: 900; color: rgba(184,146,42,0.06);
-    letter-spacing: 4px; pointer-events: none;
-    transform: perspective(300px) rotateX(20deg); z-index: 1;
+  .qr-wrap { 
+    width: 68px; height: 68px; background: #fff; padding: 6px; border-radius: 10px; 
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s ease;
+  }
+  .qr-wrap:hover { transform: scale(1.05); }
+  .qr-wrap img { width: 100%; height: 100%; object-fit: contain; }
+
+  /* ── 메인 콘텐츠 ── */
+  .cert-body {
+    position: relative; z-index: 5; display: flex; gap: 40px; height: 100%;
+  }
+
+  /* LEFT: Profile & Brand */
+  .left-col { width: 170px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  
+  .brand-wrap { text-align: center; }
+  .brand-logo { 
+    width: 90px; height: 90px; object-fit: contain; margin-bottom: 10px;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+  }
+  .brand-name { font-size: 9.5px; font-weight: 700; color: #fff; opacity: 0.8; line-height: 1.4; letter-spacing: 0.5px; }
+  
+  .photo-frame {
+    width: 140px; height: 175px; border-radius: 10px; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
+    overflow: hidden; backdrop-filter: blur(5px);
+  }
+  .photo-frame span { font-size: 10px; color: rgba(255,255,255,0.3); text-align: center; line-height: 1.6; }
+
+  .issue-box { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; margin-top: auto; }
+  .issue-box b { display: block; font-family: 'Outfit'; font-size: 11px; color: #fff; margin-top: 4px; letter-spacing: 1px; }
+
+  /* RIGHT: Details */
+  .right-col { flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 5px; }
+  
+  .header-section { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; }
+  .official-tag { font-family: 'Outfit'; font-size: 10px; font-weight: 700; letter-spacing: 3px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+  .cert-main-title { font-size: 32px; font-weight: 900; color: #fff; letter-spacing: -1px; line-height: 1.1; }
+  .cert-sub-title { font-family: 'Outfit'; font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 3px; }
+
+  .user-section { margin: 5px 0; }
+  .label { font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .name-display { font-size: 46px; font-weight: 900; color: #fff; line-height: 1; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .glass-box {
+    background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 18px;
+    border: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(8px);
+  }
+  .value { font-size: 16px; font-weight: 700; color: #fff; }
+
+  /* ── 티어 트래커 ── */
+  .tier-section {
+    background: rgba(0,0,0,0.15); border-radius: 12px; padding: 15px 20px;
+    border: 1px solid rgba(255,255,255,0.05); margin: 5px 0;
+  }
+  .tier-label { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .tier-track { display: flex; align-items: center; gap: 0; position: relative; justify-content: space-between; padding: 0 10px; }
+  .tier-item { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 2; }
+  .tier-badge {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: saturate(0.5) brightness(0.7);
+  }
+  .tier-badge svg { width: 30px; height: 30px; }
+  .tier-name { font-family: 'Outfit'; font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+  
+  .tier-connector { flex: 1; height: 2px; background: rgba(255,255,255,0.05); margin: 0 -5px; margin-top: -24px; position: relative; z-index: 1; }
+
+  /* Active State */
+  .tier-item.active .tier-badge { filter: saturate(1.2) brightness(1.1); transform: scale(1.1); }
+  .tier-item.active .tier-name { color: #fff; }
+  
+  .bronze.active .tier-badge   { box-shadow: 0 0 20px var(--bronze-glow); }
+  .silver.active .tier-badge   { box-shadow: 0 0 20px var(--silver-glow); }
+  .gold.active .tier-badge     { box-shadow: 0 0 20px var(--gold-glow); }
+  .diamond.active .tier-badge  { box-shadow: 0 0 25px var(--diamond-glow); }
+
+  /* ── 하단 정보 ── */
+  .footer-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-bottom: 5px; }
+  .cert-no-box { 
+    display: flex; align-items: center; gap: 12px; 
+    font-family: 'Outfit'; font-size: 13px; color: rgba(255,255,255,0.6); letter-spacing: 0.5px;
+  }
+  .cert-no-box .label { margin-bottom: 0; font-size: 11px; opacity: 0.7; }
+  .cert-no-box b { color: #fff; font-size: 14px; letter-spacing: 1px; }
+
+  @media (max-width: 800px) {
+    .cert-card { height: auto; aspect-ratio: auto; padding: 25px; }
+    .cert-body { flex-direction: column; gap: 30px; }
+    .left-col { width: 100%; flex-direction: row; justify-content: space-between; }
+    .photo-frame { width: 100px; height: 130px; }
+    .top-right-group { position: static; margin-bottom: 20px; align-items: center; }
   }
 </style>
 </head>
 <body>
-<div class="cert-wrap">
-  <div class="cert-card" id="card">
-    <div class="corner-tl"></div><div class="corner-tr"></div>
-    <div class="corner-bl"></div><div class="corner-br"></div>
-    <div class="hologram-strip"></div>
-    <div class="glow-orb"></div><div class="glow-orb2"></div>
-    <canvas class="wave-canvas" id="waveCanvas"></canvas>
-    <div class="watermark-3d">ISA</div>
 
-    <div class="cert-body">
-      <!-- LEFT -->
-      <div class="left-panel">
-        <div class="logo-img-wrapper" style="width: 96px; height: 96px; margin-bottom: 5px; border-radius: 20%; background: linear-gradient(135deg, #111e30, #0a101a); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.8), 0 0 20px rgba(184,146,42,0.15), inset 0 2px 4px rgba(255,255,255,0.05); overflow: hidden; border: 1.5px solid rgba(184,146,42,0.5);">
-          <img src="https://isa-web-portal.vercel.app/images/isa-emblem.png" style="width: 80%; height: 80%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(184,146,42,0.4));" alt="ISA Logo" onerror="this.src='images/isa-emblem.png'" />
+  <!-- 티어 선택 UI -->
+  <div class="tier-switcher" id="switcher">
+    <button class="ts-btn bronze" onclick="setTier('bronze')">BRONZE</button>
+    <button class="ts-btn silver" onclick="setTier('silver')">SILVER</button>
+    <button class="ts-btn gold"   onclick="setTier('gold')">GOLD</button>
+    <button class="ts-btn diamond" onclick="setTier('diamond')">DIAMOND</button>
+  </div>
+
+  <div class="cert-container">
+    <div class="cert-card" id="card">
+      <div class="hologram" id="hologram"></div>
+      <div class="noise"></div>
+      <div class="glow-orb"></div>
+      <canvas class="wave-canvas" id="waveCanvas"></canvas>
+      
+      <!-- 상단 우측 그룹 -->
+      <div class="top-right-group">
+        <div class="badge-top" id="tierText">GOLD</div>
+        <div class="qr-wrap">
+          <img id="qrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=isa" alt="QR">
         </div>
-        <div class="org-name">
-          <div class="en">INTL. ARTIFICIAL<br>SURFING ASSOC.</div>
-          <div class="kr">국제인공서핑협회</div>
-        </div>
-        <div class="photo-box">
-          <span class="photo-label" style="text-align:center;">사진 없음<br><span style="font-size:9px;color:#cbd5e1;margin-top:2px;display:block;">No Photo</span></span>
-        </div>
-        <div class="issue-date-label">발급일 / DATE: <br><span style="font-weight:400;font-family:monospace;font-size:11px;">2026-04-12</span></div>
       </div>
 
-      <!-- RIGHT -->
-      <div class="right-panel">
-        <div class="cert-header">
-          <div class="official-label">OFFICIAL CERTIFICATION</div>
-          <div class="cert-title-kr">합격 자격증</div>
-          <div class="cert-title-en">Certificate of Qualification</div>
-        </div>
-
-        <div>
-          <div class="field-label">성명 / NAME</div>
-          <div class="name-value">홍길동</div>
-          <div class="name-underline"></div>
-        </div>
-
-        <div class="info-grid">
-          <div class="info-box">
-            <div class="field-label">등급 / LEVEL</div>
-            <div class="info-value gold">1급 (Professional)</div>
+      <div class="cert-body">
+        <div class="left-col">
+          <div class="brand-wrap">
+            <img class="brand-logo" src="images/isa-emblem.png" alt="ISA" 
+                 onerror="this.src='https://isa-web-portal.vercel.app/images/isa-emblem.png'">
+            <div class="brand-name">INTL. ARTIFICIAL SURFING ASSOC.<br>국제인공서핑협회</div>
           </div>
-          <div class="info-box">
-            <div class="field-label">종목 / DISCIPLINE</div>
-            <div class="info-value white">Wave Surfing</div>
+          <div class="photo-frame">
+            <span>PHOTO REQUIRED<br>사진 필요</span>
+          </div>
+          <div class="issue-box">
+            ISSUED ON / 발급일
+            <b id="dateVal">2026. 04. 18</b>
           </div>
         </div>
 
-        <!-- TIER -->
-        <div class="tier-section">
-          <div class="tier-label">티어 / TIER</div>
-          <div class="tier-track">
-
-            <div class="tier-item tier-bronze ">
-              <div class="tier-badge">
-                <svg viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="11" fill="url(#bronze-fill)" stroke="#c4784a" stroke-width="1"/>
-                  <text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,220,180,0.9)">B</text>
-                  <defs><radialGradient id="bronze-fill" cx="35%" cy="30%">
-                    <stop offset="0%" stop-color="#d4895a"/>
-                    <stop offset="100%" stop-color="#7a3d1e"/>
-                  </radialGradient></defs>
-                </svg>
-              </div>
-              <span class="tier-name">Bronze</span>
-            </div>
-
-            <div class="tier-connector bronze"></div>
-
-            <div class="tier-item tier-silver ">
-              <div class="tier-badge">
-                <svg viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="11" fill="url(#silver-fill)" stroke="#c0c0c0" stroke-width="1"/>
-                  <text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,255,255,0.9)">S</text>
-                  <defs><radialGradient id="silver-fill" cx="35%" cy="30%">
-                    <stop offset="0%" stop-color="#d8d8d8"/>
-                    <stop offset="100%" stop-color="#808080"/>
-                  </radialGradient></defs>
-                </svg>
-              </div>
-              <span class="tier-name">Silver</span>
-            </div>
-
-            <div class="tier-connector silver"></div>
-
-            <div class="tier-item tier-gold ">
-              <div class="tier-badge">
-                <svg viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="11" fill="url(#gold-fill)" stroke="#d4a83a" stroke-width="1"/>
-                  <text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,250,200,0.95)">G</text>
-                  <defs><radialGradient id="gold-fill" cx="35%" cy="30%">
-                    <stop offset="0%" stop-color="#f5d060"/>
-                    <stop offset="100%" stop-color="#a07010"/>
-                  </radialGradient></defs>
-                </svg>
-              </div>
-              <span class="tier-name">Gold</span>
-            </div>
-
-            <div class="tier-connector gold"></div>
-
-            <div class="tier-item tier-diamond active">
-              <div class="tier-badge">
-                <svg viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="11" fill="url(#diamond-fill)" stroke="#7dd4f8" stroke-width="1"/>
-                  <polygon points="14,5 20,11 14,22 8,11" fill="rgba(200,240,255,0.85)" stroke="rgba(150,220,255,0.6)" stroke-width="0.5"/>
-                  <defs><radialGradient id="diamond-fill" cx="35%" cy="30%">
-                    <stop offset="0%" stop-color="#b8eaff"/>
-                    <stop offset="100%" stop-color="#1a5a8a"/>
-                  </radialGradient></defs>
-                </svg>
-              </div>
-              <span class="tier-name">Diamond</span>
-            </div>
-
+        <div class="right-col">
+          <div class="header-section">
+            <div class="official-tag">OFFICIAL CERTIFICATION</div>
+            <div class="cert-main-title">합격 자격증</div>
+            <div class="cert-sub-title">Certificate of Technical Qualification</div>
           </div>
-        </div>
 
-        <div class="cert-num-wrapper">
-          <div class="cert-num">
-            <span class="cert-num-label">자격증 번호 / CERT No.</span>
-            <span class="cert-num-value">ISA-2026-000001</span>
+          <div class="user-section">
+            <div class="label">NAME / 성명</div>
+            <div class="name-display" id="nameVal">홍길동</div>
           </div>
-          <div class="qr-code">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=isa-web-portal.vercel.app" alt="QR" />
+
+          <div class="info-grid">
+            <div class="glass-box">
+              <div class="label">LEVEL / 등급</div>
+              <div class="value" id="levelVal">1급 (Professional)</div>
+            </div>
+            <div class="glass-box">
+              <div class="label">DISCIPLINE / 종목</div>
+              <div class="value" id="disciplineVal">Standing/Flow board</div>
+            </div>
+          </div>
+
+          <!-- 티어 섹션 -->
+          <div class="tier-section">
+            <div class="tier-label">티어 / TIER</div>
+            <div class="tier-track">
+              <!-- Bronze -->
+              <div class="tier-item t-bronze" id="t-bronze">
+                <div class="tier-badge"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="url(#b-fill)" stroke="#c4784a" stroke-width="1"/><text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,220,180,0.9)">B</text><defs><radialGradient id="b-fill" cx="35%" cy="30%"><stop offset="0%" stop-color="#d4895a"/><stop offset="100%" stop-color="#7a3d1e"/></radialGradient></defs></svg></div>
+                <span class="tier-name">Bronze</span>
+              </div>
+              <div class="tier-connector" id="c-bronze"></div>
+              <!-- Silver -->
+              <div class="tier-item t-silver" id="t-silver">
+                <div class="tier-badge"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="url(#s-fill)" stroke="#c0c0c0" stroke-width="1"/><text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,255,255,0.9)">S</text><defs><radialGradient id="s-fill" cx="35%" cy="30%"><stop offset="0%" stop-color="#d8d8d8"/><stop offset="100%" stop-color="#808080"/></radialGradient></defs></svg></div>
+                <span class="tier-name">Silver</span>
+              </div>
+              <div class="tier-connector" id="c-silver"></div>
+              <!-- Gold -->
+              <div class="tier-item t-gold" id="t-gold">
+                <div class="tier-badge"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="url(#g-fill)" stroke="#d4a83a" stroke-width="1"/><text x="14" y="19" text-anchor="middle" font-size="12" font-weight="900" fill="rgba(255,250,200,0.95)">G</text><defs><radialGradient id="g-fill" cx="35%" cy="30%"><stop offset="0%" stop-color="#f5d060"/><stop offset="100%" stop-color="#a07010"/></radialGradient></defs></svg></div>
+                <span class="tier-name">Gold</span>
+              </div>
+              <div class="tier-connector" id="c-gold"></div>
+              <!-- Diamond -->
+              <div class="tier-item t-diamond" id="t-diamond">
+                <div class="tier-badge"><svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="url(#d-fill)" stroke="#7dd4f8" stroke-width="1"/><polygon points="14,5 20,11 14,22 8,11" fill="rgba(200,240,255,0.85)" stroke="rgba(150,220,255,0.6)" stroke-width="0.5"/><defs><radialGradient id="d-fill" cx="35%" cy="30%"><stop offset="0%" stop-color="#b8eaff"/><stop offset="100%" stop-color="#1a5a8a"/></radialGradient></defs></svg></div>
+                <span class="tier-name">Diamond</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-row" style="justify-content: flex-start;">
+            <div class="cert-no-box" style="margin-right: 20px;">
+              <div>
+                <div class="label">자격증 번호 / CERT No.</div>
+                <b id="certVal">ISA-2026-000001</b>
+              </div>
+            </div>
+            <div style="display: flex; gap: 24px; align-items: center;">
+              <img src="images/mcst_logo_new.jpg" alt="문화체육관광부" style="height: 45px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+              <img src="images/kcg_logo_new.jpg" alt="해양경찰청" style="height: 45px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-<script>
-const canvas = document.getElementById('waveCanvas');
-if(canvas) {
-  const ctx = canvas.getContext('2d');
-  let t = 0;
-  function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
-  function drawWaves() {
-    if(!canvas.offsetWidth) return;
-    resize();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const waves = [
-      { amp: 22, freq: 0.012, speed: 0.018, y: 0.4, color: 'rgba(30,100,200,0.6)', width: 2 },
-      { amp: 16, freq: 0.018, speed: 0.025, y: 0.55, color: 'rgba(50,130,220,0.45)', width: 1.5 },
-      { amp: 28, freq: 0.008, speed: 0.012, y: 0.65, color: 'rgba(184,146,42,0.35)', width: 2.5 },
-      { amp: 12, freq: 0.022, speed: 0.03, y: 0.75, color: 'rgba(80,160,240,0.35)', width: 1 },
-    ];
-    waves.forEach(w => {
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height * w.y);
-      for (let x = 0; x <= canvas.width; x += 3) {
-        const y = canvas.height * w.y
-          + Math.sin(x * w.freq + t * w.speed * 60) * w.amp
-          + Math.sin(x * w.freq * 1.7 + t * w.speed * 40) * (w.amp * 0.4);
-        ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = w.color; ctx.lineWidth = w.width; ctx.stroke();
-    });
-    t += 0.016;
-    requestAnimationFrame(drawWaves);
-  }
-  drawWaves();
-}
 
-const card = document.getElementById('card');
-if(card) {
-  for (let i = 0; i < 12; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.left = (Math.random() * 100) + '%';
-    p.style.setProperty('--dx', (Math.random() * 60 - 30) + 'px');
-    p.style.animationDuration = (4 + Math.random() * 6) + 's';
-    p.style.animationDelay = (Math.random() * 6) + 's';
-    card.appendChild(p);
+<script>
+  // ── 종목 명칭 매핑 ──
+  const DISCIPLINE_MAP = {
+    'S/F': 'Standing/Flow board',
+    'B/B': 'Body/boogie board',
+    'Wake': 'Wake Surfing',
+    'Wave': 'Wave Surfing',
+    'Standing/Flow': 'Standing/Flow board',
+    'Body/boogie': 'Body/boogie board'
+  };
+
+  // ── 데이터 관리 ──
+  const params = new URLSearchParams(window.location.search);
+  
+  // 종목 파라미터 처리
+  let rawDisc = params.get('discipline') || 'Standing/Flow board';
+  const displayDisc = DISCIPLINE_MAP[rawDisc] || rawDisc;
+
+  const data = {
+    tier: (params.get('tier') || 'gold').toLowerCase(),
+    name: params.get('name') || '홍길동',
+    level: params.get('level') || '1급 (Professional)',
+    discipline: displayDisc,
+    cert: params.get('cert') || 'ISA-2026-000001',
+    date: params.get('date') || new Date().toISOString().slice(0, 10).replace(/-/g, '. ')
+  };
+
+  const WAVE_CONFIGS = {
+    bronze:  [ { a:25, f:0.015, s:0.02, y:0.5, c:'rgba(196,120,74,0.35)' }, { a:15, f:0.02, s:0.03, y:0.6, c:'rgba(140,80,40,0.25)' } ],
+    silver:  [ { a:25, f:0.015, s:0.02, y:0.5, c:'rgba(176,184,200,0.35)' }, { a:15, f:0.02, s:0.03, y:0.6, c:'rgba(100,120,160,0.25)' } ],
+    gold:    [ { a:30, f:0.012, s:0.02, y:0.45, c:'rgba(212,168,58,0.35)' }, { a:20, f:0.018, s:0.03, y:0.55, c:'rgba(52,120,220,0.25)' } ],
+    diamond: [ { a:35, f:0.01, s:0.025, y:0.4, c:'rgba(90,200,240,0.45)' }, { a:20, f:0.015, s:0.035, y:0.55, c:'rgba(60,180,255,0.3)' } ]
+  };
+
+  function setTier(tier) {
+    data.tier = tier;
+    const card = document.getElementById('card');
+    card.className = `cert-card ${tier}`;
+    document.getElementById('tierText').textContent = tier.toUpperCase();
+    ['bronze','silver','gold','diamond'].forEach(t => {
+      document.getElementById('t-' + t).classList.toggle('active', t === tier);
+    });
+    document.querySelectorAll('.ts-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.classList.contains(tier));
+    });
+    initWaves(tier);
+    try {
+      const url = new URL(window.location);
+      url.searchParams.set('tier', tier);
+      window.history.replaceState({}, '', url);
+    } catch(e) {}
   }
+
+  let animId;
+  function initWaves(tier) {
+    if (animId) cancelAnimationFrame(animId);
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+    let time = 0;
+    const configs = WAVE_CONFIGS[tier];
+    function draw() {
+      canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      configs.forEach(conf => {
+        ctx.beginPath();
+        for(let x=0; x<=canvas.width; x+=2) {
+          const y = canvas.height * conf.y + Math.sin(x * conf.f + time * conf.s) * conf.a;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height);
+        ctx.fillStyle = conf.c; ctx.fill();
+      });
+      time += 0.5; animId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  const card = document.getElementById('card');
+  const holo = document.getElementById('hologram');
   card.addEventListener('mousemove', e => {
     const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    card.style.transform = \
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rX = (0.5 - y) * 15; const rY = (x - 0.5) * 15;
+    card.style.transform = `rotateX(${rX}deg) rotateY(${rY}deg) scale(1.02)`;
+    if(holo) holo.style.backgroundPosition = `${x*100}% ${y*100}%`;
+  });
+  card.addEventListener('mouseleave', () => { card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`; });
+
+  function init() {
+    document.getElementById('nameVal').textContent = data.name;
+    document.getElementById('levelVal').textContent = data.level;
+    document.getElementById('disciplineVal').textContent = data.discipline;
+    document.getElementById('certVal').textContent = data.cert;
+    document.getElementById('dateVal').textContent = data.date;
+    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data.cert)}`;
+    setTier(data.tier);
+  }
+  init();
+</script>
+</body>
+</html>

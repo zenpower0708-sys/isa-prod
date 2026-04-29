@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>실기평가 기술 요구사항 - Wake Surfing</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    font-size: 10.5pt; color: #1a1a2e; background: #f0f4f8; padding: 20px;
+  }
+  .page {
+    background: #fff;
+    width: 210mm; height: 297mm;
+    margin: 0 auto;
+    padding: 14mm 15mm 12mm 15mm;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid #10b981; padding-bottom: 8px; margin-bottom: 10px;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .logo-box {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 11pt;
+  }
+  .org-name span { display: block; font-size: 8pt; color: #64748b; }
+  .org-name strong { font-size: 11pt; color: #0f172a; }
+  .doc-meta { text-align: right; font-size: 8pt; color: #94a3b8; line-height: 1.6; }
+
+  /* ── 제목 ── */
+  .title-wrap { text-align: center; margin: 10px 0 12px; }
+  .title-wrap h1 { font-size: 16pt; font-weight: 700; color: #0f172a; letter-spacing: 3px; }
+  .title-wrap .subtitle {
+    display: inline-block; margin-top: 5px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white; font-size: 9pt; font-weight: 600;
+    padding: 3px 16px; border-radius: 99px; letter-spacing: 1px;
+  }
+
+  /* ── 안내 박스 ── */
+  .info-box {
+    background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 7px;
+    padding: 8px 12px; margin-bottom: 12px;
+  }
+  .info-box .ib-title { color: #15803d; font-weight: 700; font-size: 9pt; margin-bottom: 3px; }
+  .info-box p { font-size: 8.5pt; color: #166534; line-height: 1.65; }
+
+  /* ── 섹션 (급수별) ── */
+  .level-section { margin-bottom: 9px; border: 1px solid #e2e8f0; border-radius: 7px; overflow: hidden; }
+
+  .level-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 11px;
+  }
+  .level-badge {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14pt; color: white; flex-shrink: 0;
+  }
+  .lv4 { background: linear-gradient(135deg, #64748b, #475569); }
+  .lv3 { background: linear-gradient(135deg, #c97d39, #a85c21); }
+  .lv2 { background: linear-gradient(135deg, #6b7f9a, #94a3b8); }
+  .lv1 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+  .level-header-bg4 { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+  .level-header-bg3 { background: #fff8f1; border-bottom: 1px solid #fde8c8; }
+  .level-header-bg2 { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+  .level-header-bg1 { background: #fffbeb; border-bottom: 1px solid #fde68a; }
+
+  .level-title { font-size: 10.5pt; font-weight: 700; color: #0f172a; }
+  .level-sub { font-size: 8pt; color: #64748b; margin-left: auto; }
+
+  .level-body { padding: 8px 11px; }
+
+  /* ── 영상 안내 줄 ── */
+  .video-line {
+    font-size: 8.5pt; font-weight: 600; color: #10b981;
+    background: #f0fdf4; border: 1px solid #86efac;
+    border-radius: 4px; padding: 4px 9px; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .video-line-2 {
+    font-size: 8.5pt; font-weight: 600; color: #7c3aed;
+    background: #f5f3ff; border: 1px solid #c4b5fd;
+    border-radius: 4px; padding: 4px 9px; margin-top: 4px; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  /* ── 지정 기술 줄 ── */
+  .designated-skills {
+    font-size: 8.5pt; color: #475569;
+    background: #f8fafc; border-left: 3px solid #10b981;
+    padding: 4px 9px; margin-bottom: 6px; line-height: 1.55;
+  }
+  .designated-skills strong { color: #059669; }
+
+  /* ── 요구 항목 테이블 ── */
+  .req-table { width: 100%; border-collapse: collapse; }
+  .req-table td {
+    border: 1px solid #e2e8f0; padding: 4px 9px;
+    font-size: 9pt; vertical-align: middle;
+  }
+  .req-table .req-lbl {
+    background: #f8fafc; color: #475569; font-weight: 600;
+    font-size: 8pt; width: 28%; white-space: nowrap;
+  }
+  .req-table .req-val { color: #1e293b; }
+  .req-table .req-bonus {
+    background: #fefce8; color: #78350f;
+  }
+  .req-table .req-bonus-lbl {
+    background: #fef9c3; color: #713f12; font-weight: 600;
+    font-size: 8pt; white-space: nowrap;
+  }
+  .req-table .req-mandatory {
+    background: #fff1f2; color: #991b1b; font-weight: 600;
+  }
+  .req-table .req-mandatory-lbl {
+    background: #ffe4e6; color: #be123c; font-weight: 600;
+    font-size: 8pt; white-space: nowrap;
+  }
+
+  /* ── 1급 특이사항 ── */
+  .notice-lv1 {
+    margin-top: 6px; background: #fff7ed; border: 1.5px solid #fed7aa;
+    border-radius: 5px; padding: 6px 10px;
+  }
+  .notice-lv1 p { font-size: 8pt; color: #9a3412; line-height: 1.6; }
+
+  /* ── 서브 헤더 (2페이지) ── */
+  .page-sub-header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid #10b981; padding-bottom: 7px; margin-bottom: 12px;
+  }
+  .page-sub-header .p2-org { font-size: 8.5pt; color: #64748b; }
+  .page-sub-header .p2-org strong { display: block; font-size: 10.5pt; color: #0f172a; }
+  .page-sub-header .p2-doc { font-size: 8pt; color: #94a3b8; text-align: right; line-height: 1.5; }
+
+  /* ── 푸터 ── */
+  .footer {
+    position: absolute; bottom: 10mm; left: 15mm; right: 15mm;
+    text-align: center; font-size: 7pt; color: #94a3b8;
+    border-top: 1px solid #e2e8f0; padding-top: 5px;
+  }
+
+  /* ── 인쇄 안내 ── */
+  .print-guide {
+    background: #10b981; color: white; text-align: center;
+    padding: 9px; font-size: 9.5pt; border-radius: 7px;
+    margin: 0 auto 14px; width: 210mm; max-width: 100%;
+  }
+
+  @media screen { .page + .page { margin-top: 24px; } }
+  @media print {
+    body { background: white; padding: 0; }
+    .print-guide { display: none; }
+    .page {
+      box-shadow: none; margin: 0;
+      padding: 12mm 14mm 10mm 14mm;
+      page-break-after: always;
+      overflow: visible;
+    }
+    .page:last-child { page-break-after: avoid; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="print-guide">
+  📄 PDF로 저장: <strong>Ctrl+P</strong> → 대상: <strong>PDF로 저장</strong> → 인쇄
+</div>
+
+<!-- ════════════════════════════
+     1페이지
+════════════════════════════ -->
+<div class="page">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">ISA</div>
+      <div class="org-name">
+        <span>International Surfing Association</span>
+        <strong>국제인공서핑협회</strong>
+      </div>
+    </div>
+    <div class="doc-meta">
+      실기평가 기준 공고<br>
+      2026년 기준
+    </div>
+  </div>
+
+  <div class="title-wrap">
+    <h1>실기평가 기술 요구사항</h1>
+    <div class="subtitle">Wake Surfing 종목</div>
+  </div>
+
+  <div class="info-box">
+    <div class="ib-title">📹 공통 제출 규정</div>
+    <p>
+      · 모든 급수: <strong>실기 영상은 1분~2분 이내 원테이크</strong>로 촬영 (입/퇴수 전후 5초 포함 필수)<br>
+      · 1급은 <strong>기술 영상 + 강습 영상 총 2개</strong> 제출 필수<br>
+      · 영상은 YouTube에 <strong>'일부 공개'</strong> 설정 후 링크 제출<br>
+      · Wake Surfing은 <strong>S/F(Standing/Flow Board) 지정기술을 준용</strong>합니다.
+    </p>
+  </div>
+
+  <!-- 4급 -->
+  <div class="level-section">
+    <div class="level-header level-header-bg4">
+      <div class="level-badge lv4">4</div>
+      <div class="level-title">4급 · 강사 자격</div>
+      <div class="level-sub">기초 탑승 및 균형 평가</div>
+    </div>
+    <div class="level-body">
+      <div class="video-line">📹 ① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)</div>
+      <table class="req-table">
+        <tr>
+          <td class="req-lbl">입수 방법</td>
+          <td class="req-val">밸런스 탑승 (기본 자세 유지)</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">웨이크 파도 유지</td>
+          <td class="req-val">보트 웨이크 파도 안정적 라이딩 유지</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">정지 균형</td>
+          <td class="req-val">10초 이상</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">슬라럼</td>
+          <td class="req-val">좌우/상하 각 5회</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3급 -->
+  <div class="level-section">
+    <div class="level-header level-header-bg3">
+      <div class="level-badge lv3">3</div>
+      <div class="level-title">3급 · 강사 자격</div>
+      <div class="level-sub">기술 수행 평가</div>
+    </div>
+    <div class="level-body">
+      <div class="video-line">📹 ① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)</div>
+      <div class="designated-skills">
+        <strong>지정 기술 (S/F 준용):</strong> 알리, 셔빗, 쓰리 셔빗, 원에이티 이상<br>
+        <strong>Wake Surfing 추가 기술:</strong> 웨이크 투 웨이크, 올리 시도, 스위치 탑승
+      </div>
+      <table class="req-table">
+        <tr>
+          <td class="req-lbl">입수 방법</td>
+          <td class="req-val">측면 점프 / 후방 입수 (택1)</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">남자 기준</td>
+          <td class="req-val">지정 기술 중 3개 이상</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">여자 기준</td>
+          <td class="req-val">지정 기술 중 2개 이상</td>
+        </tr>
+        <tr>
+          <td class="req-bonus-lbl">가산점</td>
+          <td class="req-bonus">콤보(2개 이상 기술 연계), 능숙함, 스타일</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 2급 -->
+  <div class="level-section">
+    <div class="level-header level-header-bg2">
+      <div class="level-badge lv2">2</div>
+      <div class="level-title">2급 · 강사 자격</div>
+      <div class="level-sub">지정 기술 평가</div>
+    </div>
+    <div class="level-body">
+      <div class="video-line">📹 ① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)</div>
+      <div class="designated-skills">
+        <strong>지정 기술 (S/F 준용):</strong> 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀 이상<br>
+        <strong>Wake Surfing 추가 기술:</strong> 360° 스핀, 에어 시도, 래일 턴 완성
+      </div>
+      <table class="req-table">
+        <tr>
+          <td class="req-lbl">입수 방법</td>
+          <td class="req-val">후방 입수 (필수)</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">남자 기준</td>
+          <td class="req-val">지정 기술 중 4개 이상</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">여자 기준</td>
+          <td class="req-val">지정 기술 중 3개 이상</td>
+        </tr>
+        <tr>
+          <td class="req-bonus-lbl">가산점</td>
+          <td class="req-bonus">콤보(2개 이상 기술 연계), 능숙함, 스타일</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    국제인공서핑협회 (ISA) · 실기평가 기술 요구사항 · 2026년 기준 · 1 / 2
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     2페이지
+════════════════════════════ -->
+<div class="page">
+
+  <div class="page-sub-header">
+    <div class="p2-org">
+      <span>International Surfing Association</span>
+      <strong>국제인공서핑협회</strong>
+    </div>
+    <div class="p2-doc">실기평가 기술 요구사항<br>Wake Surfing · 2026</div>
+  </div>
+
+  <!-- 1급 -->
+  <div class="level-section">
+    <div class="level-header level-header-bg1">
+      <div class="level-badge lv1">1</div>
+      <div class="level-title">1급 · 강사 자격</div>
+      <div class="level-sub">🚨 영상 2개 제출 필수</div>
+    </div>
+    <div class="level-body">
+
+      <div class="video-line">
+        📹 ① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)
+      </div>
+      <div class="designated-skills">
+        <strong>지정 기술 (S/F 준용):</strong><br>
+        <strong>남자:</strong> 쓰리셔빗 이상 / 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>
+        <strong>여자:</strong> 쓰리셔빗, 원에이티 이상 기술 중 3개 이상<br>
+        <strong>Wake Surfing 추가 기술:</strong> 에어 트릭 완성, 콤보 라이딩, 코칭 능력
+      </div>
+      <table class="req-table" style="margin-bottom:8px;">
+        <tr>
+          <td class="req-lbl">남자 기준</td>
+          <td class="req-val">지정 기술 중 3개 이상</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">여자 기준</td>
+          <td class="req-val">지정 기술 중 3개 이상</td>
+        </tr>
+        <tr>
+          <td class="req-bonus-lbl">가산점</td>
+          <td class="req-bonus">콤보(2개 이상 기술 연계), 능숙함, 스타일</td>
+        </tr>
+      </table>
+
+      <div class="video-line-2">
+        📹 ② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력 · 심사 · 강사 자격 실기 평가용)
+      </div>
+      <table class="req-table">
+        <tr>
+          <td class="req-mandatory-lbl">제출 조건</td>
+          <td class="req-mandatory">실제 코칭 장면이 포함된 3분~5분 이내 영상</td>
+        </tr>
+        <tr>
+          <td class="req-lbl">평가 항목</td>
+          <td class="req-val">코칭 능력 · 심판 자격 · 강사 자격 실기</td>
+        </tr>
+      </table>
+
+      <div class="notice-lv1">
+        <p>
+          ⚠️ <strong>1급 유의사항:</strong> 기술 영상과 강습 영상 <strong>두 개 모두 제출</strong>해야 심사가 진행됩니다.
+          영상 미제출 시 접수 불가합니다. 각 영상은 YouTube <strong>'일부 공개'</strong>로 업로드 후 링크를 제출하세요.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 종합 안내 -->
+  <div style="margin-top:14px; border:1.5px solid #e2e8f0; border-radius:7px; overflow:hidden;">
+    <div style="background:#10b981; color:white; font-weight:700; font-size:9.5pt; padding:5px 11px;">
+      📌 심사 공통 유의사항
+    </div>
+    <div style="padding:9px 11px;">
+      <table style="width:100%; border-collapse:collapse; font-size:8.5pt;">
+        <tr>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#475569; font-weight:600; width:30%;">영상 길이</td>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#1e293b;">1분~2분 이내 (4급~2급) / 기술 1분~2분 + 강습 3분~5분 (1급)</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#475569; font-weight:600;">촬영 방식</td>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#1e293b;">원테이크 (편집 없는 단일 촬영)</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#475569; font-weight:600;">입·퇴수</td>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#1e293b;">입/퇴수 전후 5초 포함 필수</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#475569; font-weight:600;">업로드 설정</td>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#1e293b;">YouTube '일부 공개' 설정 후 링크 제출</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#475569; font-weight:600;">지정기술 기준</td>
+          <td style="padding:4px 6px; border-bottom:1px solid #f1f5f9; color:#1e293b;">S/F(Standing/Flow Board) 지정기술을 Wake Surfing에 준용</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 6px; color:#475569; font-weight:600;">가산점</td>
+          <td style="padding:4px 6px; color:#1e293b;">콤보(2개 이상 기술 연계), 능숙함, 스타일</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    국제인공서핑협회 (ISA) · 실기평가 기술 요구사항 · 2026년 기준 · 2 / 2
+  </div>
+</div>
+
+</body>
+</html>

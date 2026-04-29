@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISA 디지털 자격증 관리 시스템</title>
+<link rel="apple-touch-icon" href="../images/cert-icon.png">
+<link rel="icon" type="image/png" href="../images/cert-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body { background: #0f172a; color: white; font-family: 'Noto Sans KR', sans-serif; padding: 40px; }
+  h1 { font-family: 'Orbitron', sans-serif; text-align: center; color: #06b6d4; margin-bottom: 40px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+  .card { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 16px; padding: 24px; transition: 0.3s; text-decoration: none; color: white; display: block; }
+  .card:hover { transform: translateY(-5px); border-color: #06b6d4; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2); }
+  .card h2 { font-size: 18px; margin-bottom: 10px; color: #fff; }
+  .card p { font-size: 14px; color: #94a3b8; margin: 5px 0; }
+  .badge { display: inline-block; padding: 4px 12px; background: rgba(6, 182, 212, 0.2); color: #06b6d4; border-radius: 999px; font-size: 12px; font-weight: 700; margin-top: 10px; }
+  .admin-bar { max-width: 1200px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center; }
+  .btn-home { padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 8px; color: white; text-decoration: none; font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="admin-bar">
+    <a href="../index.html" class="btn-home">🏠 사이트 메인</a>
+    <div style="color:#94a3b8; font-size:14px;">로그인 사용자: <b>곽세영 (협회장)</b></div>
+  </div>
+  <h1>ISA DIGITAL CERTIFICATES</h1>
+  <div class="grid">
+    <a href="cert_standing.html" class="card">
+      <h2>Standing/Flow board</h2>
+      <p>성명: 곽세영</p>
+      <p>등급: 1급 (Professional)</p>
+      <p>번호: ISA-2026-500001</p>
+      <div class="badge">DIAMOND TIER</div>
+    </a>
+    <a href="cert_body.html" class="card">
+      <h2>Body/Boogie board</h2>
+      <p>성명: 곽세영</p>
+      <p>등급: 1급 (Professional)</p>
+      <p>번호: ISA-2026-500002</p>
+      <div class="badge">DIAMOND TIER</div>
+    </a>
+    <a href="cert_wake.html" class="card">
+      <h2>Wake Surfing</h2>
+      <p>성명: 곽세영</p>
+      <p>등급: 1급 (Professional)</p>
+      <p>번호: ISA-2026-500003</p>
+      <div class="badge">DIAMOND TIER</div>
+    </a>
+    <a href="cert_wave.html" class="card">
+      <h2>Wave Surfing</h2>
+      <p>성명: 곽세영</p>
+      <p>등급: 1급 (Professional)</p>
+      <p>번호: ISA-2026-500004</p>
+      <div class="badge">DIAMOND TIER</div>
+    </a>
+  </div>
+</body>
+</html>

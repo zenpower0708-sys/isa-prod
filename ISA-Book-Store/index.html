@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ISA BOOK STORE | 디지털 에듀케이션 플랫폼</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <div class="container nav-content">
+        <div class="logo-area" style="display: flex; align-items: center; gap: 20px;">
+          <a href="https://isa-web-portal.vercel.app" class="btn-back-portal" style="color: var(--cyan); text-decoration: none; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(6, 182, 212, 0.1); border-radius: 20px; border: 1px solid rgba(6, 182, 212, 0.3); transition: var(--transition);">
+            <span>←</span> 협회 홈페이지
+          </a>
+          <div class="logo">
+            <span>ISA BOOK STORE</span>
+          </div>
+        </div>
+        <div class="auth-btns">
+          <a href="/auth.html" class="btn-secondary">로그인</a>
+          <a href="/auth.html" class="btn-primary">실명인증 가입</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="container hero-content">
+          <h1>인공서핑의 마스터 가이드,<br>디지털로 결합되다</h1>
+          <p>문제은행부터 해설서, 실전 모의고사까지. ISA 공식 E-PASS 시리즈로 자격검정을 완벽하게 준비하세요.</p>
+          <div class="hero-actions">
+            <a href="#store" class="btn-primary" style="padding: 16px 40px; font-size: 18px;">교재 확인하기</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="store" class="storefront">
+        <div class="container">
+          <div class="section-header">
+            <h2>ISA E-PASS 급수별 교재 시리즈</h2>
+            <p style="font-size: 18px; font-weight: 700; color: var(--cyan); margin-bottom: 24px;">문제은행 + 해설서 + 실전모의고사 10회 + 오답노트</p>
+            <div style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-glass); border-radius: 16px; padding: 24px; text-align: left; max-width: 600px; margin: 0 auto; font-size: 14px; color: var(--text-dim); line-height: 1.6;">
+              <p style="color: white; margin-bottom: 12px; font-size: 16px;"><strong>📌 구매 및 이용 안내</strong></p>
+              <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 8px; display: flex; gap: 8px;"><span>✅</span> <span>1회 구매 시 <strong>결제일로부터 1년간</strong> 자유롭게 이용 가능합니다.</span></li>
+                <li style="margin-bottom: 8px; display: flex; gap: 8px;"><span>©️</span> <span><strong>저작권 고지:</strong> 본 교재의 모든 내용과 디자인은 국제인공서핑협회(ISA)에 저작권이 있으며, 무단 복제, 배포 및 도용을 엄격히 금지합니다.</span></li>
+                <li style="color: #ef4444; display: flex; gap: 8px;"><span>🔒</span> <span><strong>보안 정책:</strong> 저작권 보호를 위해 해당 교재는 <strong>인쇄 출력과 다운로드가 불가능</strong>하도록 설정되어 있으며 <strong>화면 캡쳐 방지 시스템</strong>이 적용되어 있습니다.<br><span style="color: #38bdf8; font-size: 13px;">※ 웹과 모바일에서만 이용 가능한 편리 기능이 추가되어 있습니다.</span></span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="book-grid" style="margin-top: 40px;">
+            <!-- VOL.1 -->
+            <div class="book-card">
+              <span class="book-vol">VOL.1</span>
+              <div class="book-image">
+                <img src="/images/covers.png" alt="Standing/Flow Board" style="object-position: 0% 0%;">
+              </div>
+              <h3 class="book-title">인공서핑 자격검정<br>Standing/Flow Board</h3>
+              <a href="discipline.html?vol=standing" class="btn-buy" style="display:block; text-align:center; text-decoration:none;">급수 선택하기</a>
+            </div>
+
+            <!-- VOL.2 -->
+            <div class="book-card">
+              <span class="book-vol">VOL.2</span>
+              <div class="book-image">
+                <img src="/images/covers.png" alt="Body/Boogie Board" style="object-position: 33% 0%;">
+              </div>
+              <h3 class="book-title">인공서핑 자격검정<br>Body/Boogie Board</h3>
+              <a href="discipline.html?vol=body" class="btn-buy" style="display:block; text-align:center; text-decoration:none;">급수 선택하기</a>
+            </div>
+
+            <!-- VOL.3 -->
+            <div class="book-card">
+              <span class="book-vol">VOL.3</span>
+              <div class="book-image">
+                <img src="/images/covers.png" alt="Wake Surfing" style="object-position: 66% 0%;">
+              </div>
+              <h3 class="book-title">인공서핑 자격검정<br>Wake Surfing</h3>
+              <a href="discipline.html?vol=wake" class="btn-buy" style="display:block; text-align:center; text-decoration:none;">급수 선택하기</a>
+            </div>
+
+            <!-- VOL.4 -->
+            <div class="book-card">
+              <span class="book-vol">VOL.4</span>
+              <div class="book-image">
+                <img src="/images/covers.png" alt="Wave Surfing" style="object-position: 100% 0%;">
+              </div>
+              <h3 class="book-title">인공서핑 자격검정<br>Wave Surfing</h3>
+              <a href="discipline.html?vol=wave" class="btn-buy" style="display:block; text-align:center; text-decoration:none;">급수 선택하기</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <span class="footer-logo">ISA BOOK STORE</span>
+        <div class="footer-nav">
+          <a href="#">이용약관</a>
+          <a href="#">개인정보처리방침</a>
+          <a href="#">취불규정</a>
+          <a href="#">고객센터</a>
+        </div>
+        <p class="copy">&copy; 2026 ISA (International Artificial Surfing Association). All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+    <script>
+      // Anti-copy & Developer tools prevention
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      document.addEventListener('keydown', e => {
+        if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'u' || e.key === 'c' || e.key === 'a')) {
+          e.preventDefault();
+        }
+        if (e.key === 'F12') e.preventDefault();
+      });
+    </script>
+  </body>
+</html>

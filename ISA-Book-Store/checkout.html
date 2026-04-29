@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>주문/결제 | ISA BOOK STORE</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <style>
+      .checkout-container {
+        padding: 120px 0 80px;
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 40px;
+      }
+
+      .payment-methods {
+        background: var(--bg-card);
+        border: 1px solid var(--border-glass);
+        border-radius: 20px;
+        padding: 32px;
+      }
+
+      .payment-section {
+        margin-bottom: 32px;
+      }
+
+      .payment-section h3 {
+        font-size: 18px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-glass);
+      }
+
+      .method-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .method-item {
+        background: rgba(0,0,0,0.2);
+        border: 1px solid var(--border-glass);
+        padding: 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: var(--transition);
+      }
+
+      .method-item:hover, .method-item.active {
+        border-color: var(--cyan);
+        background: rgba(6, 182, 212, 0.1);
+      }
+
+      .method-item img {
+        height: 24px;
+        filter: grayscale(1) brightness(1.5);
+      }
+
+      .method-item.active img {
+        filter: none;
+      }
+
+      .summary-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border-glass);
+        border-radius: 20px;
+        padding: 32px;
+        height: min-content;
+        position: sticky;
+        top: 120px;
+      }
+
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        font-size: 15px;
+        color: var(--text-dim);
+      }
+
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 2px solid var(--border-glass);
+        font-size: 20px;
+        font-weight: 800;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container nav-content">
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <a href="javascript:history.back()" style="color: var(--cyan); text-decoration: none; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(6, 182, 212, 0.1); border-radius: 20px; border: 1px solid rgba(6, 182, 212, 0.3); transition: var(--transition);">
+            <span>←</span> 뒤로가기
+          </a>
+          <div class="logo">ISA BOOK STORE</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container checkout-container">
+      <div class="payment-methods">
+        <div class="payment-section">
+          <h3>국내 결제 수단</h3>
+          <div class="method-grid">
+            <div class="method-item active">
+              <span>💳 신용/체크카드</span>
+            </div>
+            <div class="method-item">
+              <span>🏦 실시간 계좌이체</span>
+            </div>
+            <div class="method-item">
+              <span>🖥️ 가상계좌</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="payment-section">
+          <h3>간편 결제 (Domestic Easy Pay)</h3>
+          <div class="method-grid">
+            <div class="method-item"><span>🟡 카카오페이</span></div>
+            <div class="method-item"><span>🔵 토스페이</span></div>
+            <div class="method-item"><span>🟢 네이버페이</span></div>
+            <div class="method-item"><span>🔴 페이코</span></div>
+          </div>
+        </div>
+
+        <div class="payment-section">
+          <h3>해외 결제 (Global Payment)</h3>
+          <div class="method-grid">
+            <div class="method-item"><span>🌎 PayPal</span></div>
+            <div class="method-item"><span>💳 Stripe (Visa/Master)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <h3>주문 요약</h3>
+        <div style="margin: 24px 0;">
+          <div class="price-row">
+            <span id="order-item-title" style="max-width: 70%;">로딩 중...</span>
+            <span>₩15,000</span>
+          </div>
+        </div>
+        <div class="total-row">
+          <span>최종 결제 금액</span>
+          <span>₩15,000</span>
+        </div>
+        <button class="btn-primary" onclick="completePurchase()" style="width: 100%; margin-top: 32px; border: none; font-size: 16px; cursor: pointer;">결제하기</button>
+        <p style="font-size: 12px; color: var(--text-dim); text-align: center; margin-top: 16px;">
+          결제 완료 시 라이선스가 영구 유효하며,<br>디지털 상품 특성상 열람 시 환불이 어렵습니다.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const vol = urlParams.get('vol') || 'standing';
+      const level = urlParams.get('level') || '4';
+      
+      const bookData = {
+        'standing': 'Standing/Flow Board',
+        'body': 'Body/Boogie Board',
+        'wake': 'Wake Surfing',
+        'wave': 'Wave Surfing'
+      };
+
+      const bookTitle = bookData[vol] || 'Standing/Flow Board';
+      document.getElementById('order-item-title').innerText = `${bookTitle} (${level}급)`;
+
+      function completePurchase() {
+          alert('결제가 완료되었습니다. 교재 열람실로 이동합니다.');
+          window.location.href = `viewer.html?vol=${vol}&level=${level}`;
+      }
+    </script>
+  </body>
+</html>

@@ -7,7 +7,7 @@
 //
 const CONFIG = {
   // Google Apps Script 웹앱 URL (배포 후 받은 URL을 여기에 붙여넣기)
-  GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx4vgymeXaEn_JybMZMQP_610jWtWpUKWL_Tdie0FH03cCmdStaUFOqPMBeCVYOfC8wNw/exec',
+  GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxhkc4PNMg1o3gx9v4owhydgns3UaZLTJ_XKoc64pQupnWfYXq0k1rh3GibjzVvR6Xm6/exec',
   
   // 구글 시트 연동 활성화됨!
   USE_GOOGLE_SHEETS: true

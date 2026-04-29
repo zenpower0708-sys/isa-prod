@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mutual Aid Claim Form - ISA International Surfing Association</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-size: 10.5pt; color: #1a1a2e; background: #f0f4f8; padding: 20px;
+  }
+  .page {
+    background: #fff;
+    width: 210mm; height: 297mm;
+    margin: 0 auto;
+    padding: 14mm 15mm 12mm 15mm;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid #ef4444; padding-bottom: 8px; margin-bottom: 10px;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .logo-box {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 11pt;
+  }
+  .org-name span { display: block; font-size: 8pt; color: #64748b; }
+  .org-name strong { font-size: 11pt; color: #0f172a; }
+  .doc-no { text-align: right; font-size: 8pt; color: #94a3b8; }
+  .doc-no span { display: block; font-size: 8.5pt; color: #64748b; }
+
+  .title-wrap { text-align: center; margin: 10px 0 12px; }
+  .title-wrap h1 { font-size: 17pt; font-weight: 700; color: #0f172a; letter-spacing: 2px; }
+  .title-wrap p { font-size: 8.5pt; color: #64748b; margin-top: 2px; }
+
+  .warn-top {
+    background: #fff1f2; border: 1.5px solid #fca5a5; border-radius: 7px;
+    padding: 8px 12px; margin-bottom: 12px;
+  }
+  .warn-top .wt-title { color: #dc2626; font-weight: 700; font-size: 9.5pt; margin-bottom: 4px; }
+  .warn-top ul { padding-left: 14px; }
+  .warn-top li { font-size: 8.5pt; color: #991b1b; line-height: 1.65; }
+
+  .page-sub-header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid #ef4444; padding-bottom: 7px; margin-bottom: 12px;
+  }
+  .page-sub-header .p2-org { font-size: 8.5pt; color: #64748b; }
+  .page-sub-header .p2-org strong { display: block; font-size: 10.5pt; color: #0f172a; }
+  .page-sub-header .p2-doc { font-size: 8pt; color: #94a3b8; text-align: right; line-height: 1.5; }
+
+  @media screen { .page + .page { margin-top: 24px; } }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .print-guide { display: none; }
+    .page {
+      box-shadow: none; margin: 0;
+      padding: 12mm 14mm 10mm 14mm;
+      page-break-after: always;
+      overflow: visible;
+    }
+    .page:last-child { page-break-after: avoid; }
+    @page { size: A4; margin: 0; }
+  }
+
+  .section { margin-bottom: 10px; }
+  .section-title {
+    font-size: 9pt; font-weight: 700; color: #dc2626;
+    background: #fff1f2; border-left: 3px solid #ef4444;
+    padding: 3px 8px; margin-bottom: 6px;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  td { border: 1px solid #cbd5e1; padding: 4px 7px; font-size: 9.5pt; vertical-align: middle; }
+  .lbl {
+    background: #f8fafc; color: #475569; font-weight: 600;
+    font-size: 8.5pt; width: 26%; white-space: nowrap;
+  }
+  .val { color: #1e293b; min-height: 22px; }
+  .req { color: #ef4444; font-size: 7.5pt; }
+
+  .check-group {
+    display: flex; gap: 10px 14px; flex-wrap: wrap; padding: 4px 7px;
+    border: 1px solid #cbd5e1; font-size: 9.5pt;
+  }
+  .ci { display: flex; align-items: center; gap: 4px; }
+  .cb {
+    width: 12px; height: 12px; border: 1.5px solid #94a3b8;
+    display: inline-block; border-radius: 2px; flex-shrink: 0;
+  }
+
+  .checklist { border: 1px solid #e2e8f0; border-radius: 5px; overflow: hidden; }
+  .cl-header { background: #ef4444; color: white; font-weight: 700; font-size: 9.5pt; padding: 5px 11px; }
+  .cl-item {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 7px 11px; border-bottom: 1px solid #f1f5f9;
+  }
+  .cl-item:last-child { border-bottom: none; }
+  .cl-item:nth-child(even) { background: #fafafa; }
+  .cl-num {
+    min-width: 18px; height: 18px; background: #ef4444; color: white;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 8pt; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+  }
+  .cl-content .cl-title { font-size: 9.5pt; font-weight: 600; color: #1e293b; }
+  .cl-content .cl-desc { font-size: 8pt; color: #64748b; margin-top: 1px; }
+  .cl-check { margin-left: auto; flex-shrink: 0; }
+  .cl-box { width: 14px; height: 14px; border: 1.5px solid #94a3b8; border-radius: 3px; margin-top: 2px; }
+
+  .fraud-box {
+    background: #fef9c3; border: 1.5px solid #fbbf24; border-radius: 5px;
+    padding: 8px 12px; margin: 8px 0;
+  }
+  .fraud-box .fb-title { color: #92400e; font-weight: 700; font-size: 9.5pt; margin-bottom: 4px; }
+  .fraud-box p { font-size: 8.5pt; color: #78350f; line-height: 1.6; }
+
+  .sign-section {
+    margin-top: 10px; border: 1px solid #e2e8f0; border-radius: 5px;
+    padding: 10px 12px; background: #fafafa;
+  }
+  .sign-date { font-size: 9.5pt; margin-bottom: 10px; }
+  .sign-line { display: inline-block; width: 48px; border-bottom: 1.5px solid #475569; margin: 0 2px; }
+  .sign-row { display: flex; justify-content: space-between; gap: 12px; }
+  .sign-box {
+    flex: 1; border: 1px solid #cbd5e1; border-radius: 4px;
+    padding: 8px 9px; background: white;
+  }
+  .sign-box .s-lbl { font-size: 8pt; color: #64748b; font-weight: 600; margin-bottom: 4px; }
+  .sign-area {
+    height: 32px; border-bottom: 1.5px solid #94a3b8; margin-top: 3px;
+    display: flex; align-items: flex-end; justify-content: flex-end;
+    padding-bottom: 2px; font-size: 7.5pt; color: #94a3b8; font-style: italic;
+  }
+
+  .submit-to {
+    margin-top: 10px; text-align: center; font-size: 8pt; color: #64748b;
+    border-top: 1px dashed #cbd5e1; padding-top: 8px;
+  }
+  .submit-to strong { color: #dc2626; }
+
+  .footer {
+    margin-top: 8px; text-align: center; font-size: 7pt; color: #94a3b8;
+    border-top: 1px solid #e2e8f0; padding-top: 6px;
+  }
+
+  .print-guide {
+    background: #ef4444; color: white; text-align: center;
+    padding: 9px; font-size: 9.5pt; border-radius: 7px;
+    margin: 0 auto 14px; width: 210mm; max-width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<div class="print-guide">
+  📄 To save as PDF: Press <strong>Ctrl+P</strong> → Destination: <strong>Save as PDF</strong> → Print
+</div>
+
+<!-- ════════════════════════════════
+     Page 1 : Claimant Info + Accident Info
+════════════════════════════════ -->
+<div class="page">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-box">ISA</div>
+      <div class="org-name">
+        <span>국제인공서핑협회</span>
+        <strong>ISA Mutual Aid — International Surfing Association</strong>
+      </div>
+    </div>
+    <div class="doc-no">
+      <span>Claim Receipt No.</span>
+      ISA-CLM-____-______
+    </div>
+  </div>
+
+  <div class="title-wrap">
+    <h1>Mutual Aid Claim Form</h1>
+    <p>공제금 청구서 &nbsp;(1 / 4)</p>
+  </div>
+
+  <div class="warn-top">
+    <div class="wt-title">⚠️ Please Read Before Filing a Claim</div>
+    <ul>
+      <li>Claims must be submitted within <strong>72 hours (3 days)</strong> of the accident.</li>
+      <li>A medical diagnosis certificate issued <strong>on the day of or the day after</strong> the accident is required.</li>
+      <li>A <strong>facility operator confirmation</strong> verifying your use of the wave pool on the day of the accident is mandatory.</li>
+      <li>Fraudulent claims may result in certification cancellation and criminal prosecution.</li>
+    </ul>
+  </div>
+
+  <!-- ① Claimant Info -->
+  <div class="section">
+    <div class="section-title">① Claimant Information</div>
+    <table>
+      <tr>
+        <td class="lbl">Full Name <span class="req">*</span></td>
+        <td class="val"></td>
+        <td class="lbl">Date of Birth <span class="req">*</span></td>
+        <td class="val"></td>
+      </tr>
+      <tr>
+        <td class="lbl">Contact Number <span class="req">*</span></td>
+        <td class="val"></td>
+        <td class="lbl">Policy Number</td>
+        <td class="val" style="font-family:monospace; font-size:9pt; color:#0284c7;"></td>
+      </tr>
+      <tr>
+        <td class="lbl">Address</td>
+        <td class="val" colspan="3"></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ② Accident Info -->
+  <div class="section">
+    <div class="section-title">② Accident Information</div>
+    <table>
+      <colgroup>
+        <col style="width:22%"><col style="width:35%"><col style="width:17%"><col style="width:26%">
+      </colgroup>
+      <tr>
+        <td class="lbl">Accident Date <span class="req">*</span></td>
+        <td class="val" style="white-space:nowrap;">____/____/______  (MM/DD/YYYY)</td>
+        <td class="lbl">Time</td>
+        <td class="val" style="white-space:nowrap;">____:____ AM/PM</td>
+      </tr>
+      <tr>
+        <td class="lbl">Location (Facility Name) <span class="req">*</span></td>
+        <td class="val" colspan="3"></td>
+      </tr>
+      <tr>
+        <td class="lbl">Entry Method <span class="req">*</span></td>
+        <td class="val" colspan="3">
+          <div class="check-group">
+            <div class="ci"><div class="cb"></div> QR Code Check-in</div>
+            <div class="ci"><div class="cb"></div> RFID Wristband</div>
+            <div class="ci"><div class="cb"></div> Sign-in Sheet</div>
+            <div class="ci"><div class="cb"></div> Membership Card Scan</div>
+            <div class="ci"><div class="cb"></div> Other：_______________</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">Injured Body Part <span class="req">*</span></td>
+        <td class="val"></td>
+        <td class="lbl">Sport / Discipline</td>
+        <td class="val">
+          <div class="check-group" style="padding:0; border:none; gap:8px 12px;">
+            <div class="ci"><div class="cb"></div> S/F</div>
+            <div class="ci"><div class="cb"></div> B/B</div>
+            <div class="ci"><div class="cb"></div> Wake</div>
+            <div class="ci"><div class="cb"></div> Wave</div>
+            <div class="ci"><div class="cb"></div> Other</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">Accident Description <span class="req">*</span></td>
+        <td class="val" colspan="3" style="height:52px; vertical-align:top;"></td>
+      </tr>
+    </table>
+  </div>
+
+</div><!-- /Page 1 -->
+
+<!-- ════════════════════════════════
+     Page 2 : Facility Verification + Witness + Medical
+════════════════════════════════ -->
+<div class="page">
+
+  <div class="page-sub-header">
+    <div class="p2-org">
+      <span>국제인공서핑협회 · International Surfing Association · Mutual Aid</span>
+      <strong>ISA Mutual Aid Claim Form</strong>
+    </div>
+    <div class="p2-doc">Claim Form (2 / 4)</div>
+  </div>
+
+  <!-- ③ Facility Use Verification -->
+  <div class="section">
+    <div class="section-title">③ Facility Use Verification <span style="font-weight:400;color:#ef4444;font-size:8pt;">— Operator's signature required to prevent fraudulent claims</span></div>
+    <table>
+      <tr>
+        <td class="lbl">Facility Manager / Operator <span class="req">*</span></td>
+        <td class="val"></td>
+        <td class="lbl">Operator Contact <span class="req">*</span></td>
+        <td class="val"></td>
+      </tr>
+      <tr>
+        <td class="lbl">Entry Time on Accident Day <span class="req">*</span></td>
+        <td class="val">____:____ AM/PM</td>
+        <td class="lbl">Total Usage Time</td>
+        <td class="val">approx. _______ min</td>
+      </tr>
+      <tr>
+        <td class="lbl" style="vertical-align:top; padding-top:7px;">Operator Confirmation <span class="req">*</span></td>
+        <td class="val" colspan="3">
+          <div style="font-size:8.5pt; color:#64748b; margin-bottom:5px;">
+            I confirm that the above claimant used this facility on the date of the accident.
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:8px;">
+            <span style="font-size:9pt;">Facility Name：</span>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+              <span style="font-size:8pt; color:#94a3b8;">Operator's Signature or Stamp</span>
+              <div style="width:88px; height:30px; border-bottom:1.5px solid #475569;"></div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ④ Witness -->
+  <div class="section">
+    <div class="section-title">④ Witness / Accompanying Instructor <span style="font-weight:400;font-size:8pt;">(if applicable)</span></div>
+    <table>
+      <tr>
+        <td class="lbl">Witness / Instructor Name</td>
+        <td class="val"></td>
+        <td class="lbl">Contact</td>
+        <td class="val"></td>
+      </tr>
+      <tr>
+        <td class="lbl">Relationship</td>
+        <td class="val">
+          <div class="check-group" style="padding:0;border:none;">
+            <div class="ci"><div class="cb"></div> ISA Certified Instructor</div>
+            <div class="ci"><div class="cb"></div> Facility Staff</div>
+            <div class="ci"><div class="cb"></div> Companion</div>
+            <div class="ci"><div class="cb"></div> Other</div>
+          </div>
+        </td>
+        <td class="lbl">Witness Signature</td>
+        <td class="val" style="text-align:right; padding-right:10px; color:#94a3b8; font-size:8pt;">(Signature)</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ⑤ Medical Info -->
+  <div class="section">
+    <div class="section-title">⑤ Medical Information &amp; Claim Amount</div>
+    <table>
+      <tr>
+        <td class="lbl">Hospital / Clinic <span class="req">*</span></td>
+        <td class="val"></td>
+        <td class="lbl">Treatment Date <span class="req">*</span></td>
+        <td class="val">____/____/______</td>
+      </tr>
+      <tr>
+        <td class="lbl" style="color:#dc2626; font-size:8pt;">※ Within 48 hrs of accident</td>
+        <td class="val" colspan="3" style="font-size:8.5pt; color:#64748b;">Claims with initial diagnosis after 48 hours may be subject to enhanced scrutiny.</td>
+      </tr>
+      <tr>
+        <td class="lbl">Treatment Details</td>
+        <td class="val" colspan="3"></td>
+      </tr>
+      <tr>
+        <td class="lbl" style="width:19%;">Total Medical Cost <span class="req">*</span></td>
+        <td class="val" style="width:31%;">₩ / $</td>
+        <td class="lbl" style="width:19%;">Nat'l Insurance Copay</td>
+        <td class="val" style="width:31%;">₩ / $</td>
+      </tr>
+      <tr>
+        <td class="lbl">Out-of-Pocket Amount <span class="req">*</span></td>
+        <td class="val" colspan="3" style="font-weight:700;">₩ / $&nbsp;&nbsp;<span style="font-size:8pt; color:#64748b; font-weight:400;">(Reimbursement up to ₩300,000)</span></td>
+      </tr>
+    </table>
+  </div>
+
+</div><!-- /Page 2 -->
+
+<!-- ════════════════════════════════
+     Page 3 : Checklist + Fraud Notice + Signatures
+════════════════════════════════ -->
+<div class="page">
+
+  <div class="page-sub-header">
+    <div class="p2-org">
+      <span>국제인공서핑협회 · International Surfing Association · Mutual Aid</span>
+      <strong>ISA Mutual Aid Claim Form</strong>
+    </div>
+    <div class="p2-doc">Claim Form (3 / 4)</div>
+  </div>
+
+  <!-- ⑥ Document Checklist -->
+  <div class="section">
+    <div class="section-title">⑥ Required Document Checklist</div>
+    <div class="checklist">
+      <div class="cl-header">📎 Please attach all documents listed below</div>
+      <div class="cl-item">
+        <div class="cl-num">1</div>
+        <div class="cl-content">
+          <div class="cl-title">Medical Diagnosis Certificate <span style="color:#ef4444;font-size:8pt;">(Required)</span></div>
+          <div class="cl-desc">Hospital-issued · Must include initial visit on or the day after the accident</div>
+        </div>
+        <div class="cl-check"><div class="cl-box"></div></div>
+      </div>
+      <div class="cl-item">
+        <div class="cl-num">2</div>
+        <div class="cl-content">
+          <div class="cl-title">Medical Receipt / Itemized Bill <span style="color:#ef4444;font-size:8pt;">(Required)</span></div>
+          <div class="cl-desc">Must include covered and non-covered charges breakdown</div>
+        </div>
+        <div class="cl-check"><div class="cl-box"></div></div>
+      </div>
+      <div class="cl-item">
+        <div class="cl-num">3</div>
+        <div class="cl-content">
+          <div class="cl-title">Facility Use Confirmation <span style="color:#ef4444;font-size:8pt;">(Required — Operator Signature)</span></div>
+          <div class="cl-desc">Entry record on accident day · QR/sign-in capture or operator-signed confirmation ★ Key document</div>
+        </div>
+        <div class="cl-check"><div class="cl-box"></div></div>
+      </div>
+      <div class="cl-item">
+        <div class="cl-num">4</div>
+        <div class="cl-content">
+          <div class="cl-title">Accident Scene &amp; Injury Photos <span style="color:#ef4444;font-size:8pt;">(Required — taken on day of accident)</span></div>
+          <div class="cl-desc">At least 1 photo each of the injury and the scene (timestamp recommended)</div>
+        </div>
+        <div class="cl-check"><div class="cl-box"></div></div>
+      </div>
+      <div class="cl-item">
+        <div class="cl-num">5</div>
+        <div class="cl-content">
+          <div class="cl-title">Government-Issued ID Copy</div>
+          <div class="cl-desc">Passport, national ID, or driver's license</div>
+        </div>
+        <div class="cl-check"><div class="cl-box"></div></div>
+      </div>
+      <div class="cl-item">
+        <div class="cl-num">6</div>
+        <div class="cl-content">
+          <div class="cl-title">Witness / Instructor Statement <span style="color:#64748b;font-size:8pt;">(if available)</span></div>
+          <div class="cl-desc">Signed statement with contact information</div>
+        </div>
+        <div class="cl-check"><div class="cl-box"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fraud Warning -->
+  <div class="fraud-box">
+    <div class="fb-title">⚠️ Fraud Prevention Notice</div>
+    <p>If any information provided in this claim form is found to be false, the claim will be rejected and any paid amount will be recovered in full.
+    Furthermore, actions may be taken in accordance with applicable criminal law and <strong>ISA certification regulations</strong>, including certification cancellation and criminal prosecution.
+    Facility usage on the date of the accident may be cross-verified through operator confirmation and CCTV records.</p>
+  </div>
+
+  <!-- Signatures -->
+  <div class="sign-section">
+    <div class="sign-date">
+      I hereby certify that all information stated above is true and accurate, and submit this claim for mutual aid reimbursement.&nbsp;&nbsp;
+      Date：<span class="sign-line"></span>/<span class="sign-line" style="width:38px"></span>/<span class="sign-line"></span>&nbsp;(MM/DD/YYYY)
+    </div>
+    <div class="sign-row">
+      <div class="sign-box">
+        <div class="s-lbl">Claimant Signature</div>
+        <div style="font-size:9.5pt;">Name：</div>
+        <div class="sign-area">（Signature）</div>
+      </div>
+      <div class="sign-box">
+        <div class="s-lbl">Facility Operator Signature <span style="color:#ef4444">*Required</span></div>
+        <div style="font-size:9.5pt;">Facility Name：</div>
+        <div class="sign-area">（Signature or Stamp）</div>
+      </div>
+      <div class="sign-box">
+        <div class="s-lbl">ISA Review Committee (Internal Use)</div>
+        <div style="font-size:9.5pt;">Reviewer：</div>
+        <div class="sign-area">（Official Stamp）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-to">
+    Please submit this form and all attachments to the <strong>ISA Mutual Aid Claim Review Committee</strong>.<br>
+    Online submission：<strong>isa-web-portal.vercel.app/mutualaid</strong>　|　Inquiries：ISA Official Contact
+  </div>
+
+  <div class="footer">
+    © 2025 ISA International Surfing Association Mutual Aid · Unauthorized reproduction or alteration of this form is strictly prohibited.
+  </div>
+
+</div><!-- /Page 3 -->
+
+<!-- ════════════════════════════════
+     Page 4 : Personal Information Consent
+════════════════════════════════ -->
+<div class="page">
+
+  <div class="page-sub-header">
+    <div class="p2-org">
+      <span>국제인공서핑협회 · International Surfing Association · Mutual Aid</span>
+      <strong>ISA Mutual Aid Claim Form</strong>
+    </div>
+    <div class="p2-doc">Claim Form (4 / 4)<br><span style="color:#ef4444;font-weight:700;">Personal Information Consent</span></div>
+  </div>
+
+  <!-- ⑦ Personal Information Consent -->
+  <div class="section">
+    <div class="section-title">⑦ Personal Information Collection, Use &amp; Third-Party Disclosure Consent</div>
+    <div style="border:1.5px solid #cbd5e1; border-radius:5px; overflow:hidden; font-size:8.5pt;">
+
+      <div style="border-bottom:1px solid #e2e8f0;">
+        <div style="background:#f8fafc; padding:5px 11px; font-weight:700; color:#1e293b; font-size:9pt; border-bottom:1px solid #e2e8f0;">
+          [Required] Consent to Collection &amp; Use of Personal Information
+        </div>
+        <div style="padding:7px 11px; color:#475569; line-height:1.6;">
+          <strong>Items collected：</strong>Name, date of birth, contact number, address, policy number<br>
+          <strong>Purpose：</strong>Claim processing, identity verification, review and payment<br>
+          <strong>Retention：</strong>5 years after claim resolution (as required by applicable law)
+        </div>
+        <div style="display:flex; align-items:center; gap:7px; padding:5px 11px 7px; background:#fafafa;">
+          <div class="cb" style="border-color:#475569;"></div>
+          <span style="font-weight:600; color:#1e293b;">I consent to the collection and use of my personal information. <span class="req">(Required)</span></span>
+        </div>
+      </div>
+
+      <div style="border-bottom:1px solid #e2e8f0;">
+        <div style="background:#f8fafc; padding:5px 11px; font-weight:700; color:#1e293b; font-size:9pt; border-bottom:1px solid #e2e8f0;">
+          [Required] Consent to Collection &amp; Use of Sensitive Information (Medical / Health Records)
+        </div>
+        <div style="padding:7px 11px; color:#475569; line-height:1.6;">
+          <strong>Items collected：</strong>Diagnosis, injury location, treatment details, medical costs, hospital name<br>
+          <strong>Purpose：</strong>Claim review, accident verification, duplicate claim prevention<br>
+          <strong>Retention：</strong>5 years after claim resolution
+        </div>
+        <div style="display:flex; align-items:center; gap:7px; padding:5px 11px 7px; background:#fafafa;">
+          <div class="cb" style="border-color:#475569;"></div>
+          <span style="font-weight:600; color:#1e293b;">I consent to the collection and use of my sensitive (medical/health) information. <span class="req">(Required)</span></span>
+        </div>
+      </div>
+
+      <div>
+        <div style="background:#f8fafc; padding:5px 11px; font-weight:700; color:#1e293b; font-size:9pt; border-bottom:1px solid #e2e8f0;">
+          [Required] Consent to Third-Party Disclosure of Personal Information
+        </div>
+        <div style="padding:7px 11px; color:#475569; line-height:1.6;">
+          <strong>Recipients：</strong>ISA Claim Review Committee, affiliated medical institutions (for verification), authorities as required by law<br>
+          <strong>Items disclosed：</strong>Name, contact, accident date/location, diagnosis, medical cost details<br>
+          <strong>Purpose：</strong>Accident verification, medical cost validation, claim review<br>
+          <strong>Retention：</strong>Destroyed upon completion of purpose (except where retention is legally required)
+        </div>
+        <div style="display:flex; align-items:center; gap:7px; padding:5px 11px 7px; background:#fafafa;">
+          <div class="cb" style="border-color:#475569;"></div>
+          <span style="font-weight:600; color:#1e293b;">I consent to the disclosure of my personal information to the above third parties. <span class="req">(Required)</span></span>
+        </div>
+      </div>
+
+    </div>
+    <div style="margin-top:6px; font-size:8pt; color:#64748b; padding-left:3px;">
+      ※ The above consents are mandatory for claim processing. You have the right to refuse, but refusal will prevent your claim from being processed.<br>
+      ※ For details on personal information handling, please refer to the ISA Privacy Policy at isa-web-portal.vercel.app.
+    </div>
+  </div>
+
+  <!-- Consent Signature -->
+  <div class="sign-section">
+    <div class="sign-date">
+      I have read and fully understood the above personal information consent terms and hereby agree.&nbsp;&nbsp;
+      Date：<span class="sign-line"></span>/<span class="sign-line" style="width:38px"></span>/<span class="sign-line"></span>&nbsp;(MM/DD/YYYY)
+    </div>
+    <div class="sign-row">
+      <div class="sign-box">
+        <div class="s-lbl">Data Subject (Claimant) Signature</div>
+        <div style="font-size:9.5pt;">Name：</div>
+        <div class="sign-area">（Signature）</div>
+      </div>
+      <div class="sign-box" style="flex:0.65;">
+        <div class="s-lbl">Date of Birth</div>
+        <div style="font-size:9.5pt; color:#94a3b8; padding-top:3px;">____/____/______ (MM/DD/YYYY)</div>
+        <div style="height:32px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-to">
+    Please submit this consent form together with your Claim Form to the <strong>ISA Mutual Aid Claim Review Committee</strong>.
+  </div>
+
+  <div class="footer">
+    © 2025 ISA International Surfing Association Mutual Aid · Unauthorized reproduction or alteration of this form is strictly prohibited.
+  </div>
+
+</div><!-- /Page 4 -->
+</body>
+</html>
