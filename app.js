@@ -1934,12 +1934,12 @@ function openInstructorAuth(type) {
 
     if (type === 'coaching') {
         if (titleEl) titleEl.textContent = '코칭 허브 인증';
-        if (descEl) descEl.textContent = '2급이상 자격증 보유강사를 위한 지원 프로그램입니다';
-        if (noteEl) noteEl.innerHTML = '💡 코칭 허브 입장을 위해서는 ISA 2급 이상 자격증이 필요합니다. 인증 후 코칭 허브로 이동합니다.';
+        if (descEl) descEl.textContent = '3급이상 자격증 보유강사를 위한 지원 프로그램입니다';
+        if (noteEl) noteEl.innerHTML = '💡 코칭 허브 입장을 위해서는 ISA 3급 이상 자격증이 필요합니다. 인증 후 코칭 허브로 이동합니다.';
     } else {
         if (titleEl) titleEl.textContent = '강사 워크스페이스 인증';
-        if (descEl) descEl.textContent = '3급이상 자격증 보유강사를 위한 지원 프로그램입니다';
-        if (noteEl) noteEl.innerHTML = '💡 강사 워크스페이스 입장을 위해서는 ISA 3급 이상 자격증이 필요합니다. 인증 후 강사 워크스페이스로 이동합니다.';
+        if (descEl) descEl.textContent = '2급이상 자격증 보유강사를 위한 지원 프로그램입니다';
+        if (noteEl) noteEl.innerHTML = '💡 강사 워크스페이스 입장을 위해서는 ISA 2급 이상 자격증이 필요합니다. 인증 후 강사 워크스페이스로 이동합니다.';
     }
 
     if (inputEl) { inputEl.value = ''; setTimeout(() => inputEl.focus(), 100); }
@@ -1981,10 +1981,10 @@ window.verifyInstructorCert = async function() {
             const hasLevel2 = lvl.includes('2급');
             const hasLevel3 = lvl.includes('3급');
 
-            // 코칭 허브: 1급 또는 2급만, 강사 워크스페이스: 1급, 2급, 3급
+            // 코칭 허브: 1급, 2급, 3급 / 강사 워크스페이스: 1급, 2급만
             const hasAccess = isCoaching
-                ? (hasLevel1 || hasLevel2)
-                : (hasLevel1 || hasLevel2 || hasLevel3);
+                ? (hasLevel1 || hasLevel2 || hasLevel3)
+                : (hasLevel1 || hasLevel2);
 
             if (hasAccess) {
                 const targetUrl = isCoaching
@@ -2002,7 +2002,7 @@ window.verifyInstructorCert = async function() {
                     type: currentInstructorType, verifiedAt: new Date().toISOString()
                 }));
             } else {
-                const required = isCoaching ? '2급' : '3급';
+                const required = isCoaching ? '3급' : '2급';
                 resultEl.innerHTML = `
                 <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px;text-align:center;">
                     <p style="color:#f59e0b;font-weight:700;margin:0 0 4px;">⚠️ 권한 부족</p>
