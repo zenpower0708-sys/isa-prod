@@ -721,7 +721,7 @@ function renderMapPage() {
         `).join('');
 
         return `
-        <div class="intro-discipline-block" style="margin-bottom:80px;">
+        <div class="intro-discipline-block map-discipline-block" id="map-block-${dIdx}" style="margin-bottom:80px;${dIdx===0?'':'display:none;'}">
 
             <!-- 헤더 배너 -->
             <div style="position:relative;border-radius:20px;overflow:hidden;margin-bottom:32px;
@@ -817,7 +817,7 @@ function renderMapPage() {
                     ${isKO ? '4가지 인공서핑 종목의 등급별 기술 요구사항을 확인하세요.' : 'Check level skill requirements for each of the 4 disciplines.'}
                 </p>
 
-                <!-- 종목 빠른 이동 -->
+                <!-- 종목 탭 -->
                 <div class="discipline-tabs" style="margin-top:28px;">
                     ${DISCIPLINES.map((d,i)=>`
                     <button class="discipline-tab intro-tab-btn${i===0?' active':''}"
@@ -825,14 +825,15 @@ function renderMapPage() {
                         onclick="
                             document.querySelectorAll('.intro-tab-btn').forEach(b=>b.classList.remove('active'));
                             document.getElementById('map-tab-${i}').classList.add('active');
-                            document.getElementById('map-anchor-${i}').scrollIntoView({behavior:'smooth'})
+                            document.querySelectorAll('.map-discipline-block').forEach(el=>el.style.display='none');
+                            document.getElementById('map-block-${i}').style.display='block';
+                            window.scrollTo({top:0,behavior:'smooth'});
                         ">${d}
                     </button>`).join('')}
                 </div>
             </div>
 
-            <!-- 종목 앵커 + 내용 -->
-            ${DISCIPLINES.map((d,i)=>`<div id="map-anchor-${i}"></div>`).join('')}
+            <!-- 종목 내용 (탭별 개별 표시) -->
             ${disciplineSections}
 
         </div>
