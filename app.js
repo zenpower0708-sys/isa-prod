@@ -2498,7 +2498,9 @@ window.toggleLoginMode = function() {
     const tf = $('login-title'); if(tf) tf.textContent = isLoginMode ? '로그인' : '회원가입';
     const tt = $('login-toggle-text'); if(tt) tt.textContent = isLoginMode ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인';
     const sf = $('signup-fields'); if(sf) sf.style.display = isLoginMode ? 'none' : 'block';
-    
+    const sfa = $('signup-fields-after'); if(sfa) sfa.style.display = isLoginMode ? 'none' : 'block';
+    const sb = $('login-submit-btn'); if(sb) sb.textContent = isLoginMode ? '로그인' : '회원가입';
+
     // 이메일 필드만 전환 (비밀번호 필드는 회원가입 시에도 표시)
     const loginEmailGroup = document.getElementById('login-email-group');
     if (loginEmailGroup) loginEmailGroup.style.display = isLoginMode ? 'block' : 'none';
