@@ -111,7 +111,7 @@ function renderPage(page) {
             case 'intro': content.innerHTML = renderIntroPage(); break;
             case 'verify': content.innerHTML = renderVerifyPage(); break;
             case 'admin': window.location.href = '/admin.html'; break;
-            case 'board': content.innerHTML = renderBoardPage(); break;
+            case 'board': renderBoardPage().then(html => { if (content) content.innerHTML = html; }); break;
             default: content.innerHTML = renderHomePage(); break;
         }
     } catch (err) {
@@ -638,11 +638,203 @@ function renderShopPage() {
 
 // ===== MAP & EDU & INTRO (CLAUDE STATIC FALLBACKS) =====
 function renderMapPage() {
+    const t = LANG[currentLang];
+    const isKO = currentLang === 'KO';
+    const di = DISCIPLINE_INFO[currentLang];
+
+    const skillMap = isKO ? {
+        'Standing/Flow Board': [
+            { level: 4, skills: ['전/측/후방 입수 (택1)', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+            { level: 3, skills: ['측면 점프/후방 입수 (택1)', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 알리, 셔빗, 쓰리 셔빗, 원에이티, 본래스(패스트플랜트), 빅스핀 이상' },
+            { level: 2, skills: ['후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀, 킥플립 이상' },
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 핸드플립 / 콤보(2개 이상 기술 연계), 능숙함, 스타일', '강습 영상 (3분~5분 이내)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>(남) 쓰리셔빗 이상, 킥플립 이상 기술 중 1개 필수 포함 (총 3개 이상)<br>(여) 팝셔빗, 쓰리셔빗, 원에이티, 킥플립 이상 기술 중 3개 이상<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
+        ],
+        'Body/Boogie Board': [
+            { level: 4, skills: ['전/측/후방 입수 (택1)', '원드롭니 균형 (10초↑)', '원드롭니 슬라럼 (좌우/상하 각 5회)', '원/투드롭니 360°(1바퀴돌기) 턴'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+            { level: 3, skills: ['지정 기술 중 3개 포함', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 원/투드롭니 540° 스핀(2바퀴돌기), 헬리콥터, YoYo, Umbrella, 바디 롤, 바디 로데오, 빅스핀, 리버스 이상의 기술' },
+            { level: 2, skills: ['(남) 지정 기술 중 5개 이상', '(여) 지정 기술 중 4개 이상', '가산점: 콤보(3개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 360°(1바퀴돌기)이상의 바디턴, 360°(1바퀴돌기)이상의 바디로데오, 허브, 허브캡, 180° 셔빗, 드롭니 롤, 디테이, 드롭니 로데오, 빅스핀, 리버스 이상의 기술' },
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '(남) 지정 기술 중 5개 이상', '(여) 지정 기술 중 4개 이상', '가산점: 콤보(4개 이상 기술 연계), 능숙함, 스타일', '강습 영상 (3분~5분 이내)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>지정 기술: 540° 바디턴, 540° 바디로데오, 디테이(오버로드), 디테이 프론, 드롭니 로데오, 드롭니 로데오 프론, 180° 셔빗, 허브캡(멀티), 빅스핀 이상의 기술<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
+        ],
+        'Wake Surfing': [
+            { level: 4, skills: ['밸런스 탑승', '웨이크 파도 유지', '기본 자세', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+            { level: 3, skills: ['웨이크 투 웨이크', '올리 시도', '스위치 탑승', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 셔빗, 쓰리 셔빗, 원에이티 이상' },
+            { level: 2, skills: ['360° 스핀', '에어 시도', '래일 턴 완성', '후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀 이상' },
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '에어 트릭 완성', '콤보 라이딩', '코칭 능력', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일', '강습 영상 (3분~5분 이내)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: (남) 쓰리셔빗 이상 / (여) 쓰리셔빗, 원에이티 이상 기술 중 3개 이상<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
+        ],
+        'Wave Surfing': [
+            { level: 4, skills: ['파도 탑승 기초', '트림 라이딩', '폼위에서 균형', '밸런스 탑승', '웨이크 파도 유지', '기본 자세', '정지 균형 10초↑', '좌우/상하 슬라럼 (각 5회)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)' },
+            { level: 3, skills: ['커팅백', '탑턴', '파도 읽기', '웨이크 투 웨이크', '올리 시도', '스위치 탑승', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 2개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 셔빗, 쓰리 셔빗, 원에이티 이상' },
+            { level: 2, skills: ['에어리얼', '튜브 라이딩 시도', '고난이도 턴', '360° 스핀', '에어 시도', '래일 턴 완성', '후방 입수 (필수)', '(남) 지정 기술 중 4개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: 알리, 쓰리셔빗, 능숙한 알리, 원에이티, 빅스핀 이상' },
+            { level: 1, skills: ['<span style="color:#ef4444;font-weight:700;">[필수] 영상 2개 제출</span>', '에어리얼 완성', '채점 기준 이해', '심판·강사 자격', '에어 트릭 완성', '콤보 라이딩', '코칭 능력', '(남) 지정 기술 중 3개 이상', '(여) 지정 기술 중 3개 이상', '가산점: 콤보(2개 이상 기술 연계), 능숙함, 스타일', '강습 영상 (3분~5분 이내)'], details: '① 기술 영상: 1분~2분 이내 원테이크 (입/퇴수 전후 5초 포함)<br>S/F 지정기술 준용: (남) 쓰리셔빗 이상 / (여) 쓰리셔빗, 원에이티 이상 기술 중 3개 이상<br><br>② 강습 영상: 3분~5분 이내 코칭 시범 (코칭 능력, 심사, 강사 자격 실기 평가용)' }
+        ]
+    } : {
+        'Standing/Flow Board': [
+            { level: 4, skills: ['Maintain basic stance', 'Straight riding', 'Ride 10sec without fall'] },
+            { level: 3, skills: ['Frontside/Backside turns', 'Switch stance', 'Basic pumping'] },
+            { level: 2, skills: ['Aerial attempts', '360° spin', 'Nose riding'] },
+            { level: 1, skills: ['Full aerials', 'Combo tricks', 'Demonstration & teaching'] }
+        ],
+        'Body/Boogie Board': [
+            { level: 4, skills: ['Prone position', 'Wave entry', 'Basic direction change'] },
+            { level: 3, skills: ['El Rollo turns', 'Spin attempts', 'Fade ride'] },
+            { level: 2, skills: ['Aerial roll attempts', '360° roll', 'High-speed control'] },
+            { level: 1, skills: ['Full aerial rolls', 'Backflip attempts', 'Judge capability'] }
+        ],
+        'Wake Surfing': [
+            { level: 4, skills: ['Balance riding', 'Wake wave sustain', 'Basic stance'] },
+            { level: 3, skills: ['Wake-to-wake', 'Ollie attempts', 'Switch riding'] },
+            { level: 2, skills: ['360° spin', 'Air attempts', 'Rail turn mastery'] },
+            { level: 1, skills: ['Air tricks mastery', 'Combo riding', 'Coaching ability'] }
+        ],
+        'Wave Surfing': [
+            { level: 4, skills: ['Basic wave riding', 'Trim riding', 'Balance on foam'] },
+            { level: 3, skills: ['Cutback', 'Top turn', 'Wave reading'] },
+            { level: 2, skills: ['Aerial', 'Tube riding attempt', 'Advanced turns'] },
+            { level: 1, skills: ['Full aerials', 'Scoring criteria', 'Judge & instructor'] }
+        ]
+    };
+
+    const disciplineSections = DISCIPLINES.map((disc, dIdx) => {
+        const info = di[disc] || {};
+        const skills = skillMap[disc] || [];
+        const gradColors = [
+            ['#06b6d4','#2563eb'],
+            ['#8b5cf6','#ec4899'],
+            ['#f59e0b','#ef4444'],
+            ['#10b981','#06b6d4']
+        ];
+        const [c1, c2] = gradColors[dIdx % 4];
+
+        const skillsHTML = skills.map(s => `
+            <div style="display:flex;flex-direction:column;gap:8px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,${c1}33,${c2}33);
+                        border:1px solid ${c1}55;display:flex;align-items:center;justify-content:center;
+                        font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;color:${c1};flex-shrink:0;">${s.level}</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                        ${s.skills.map(sk => `<span style="font-size:12px;background:rgba(255,255,255,0.05);
+                            border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:3px 10px;color:#cbd5e1;">${sk}</span>`).join('')}
+                    </div>
+                </div>
+                ${s.details ? `<div style="padding-left:40px;font-size:11px;color:#64748b;line-height:1.5;">${s.details}</div>` : ''}
+            </div>
+        `).join('');
+
+        return `
+        <div class="intro-discipline-block" style="margin-bottom:80px;">
+
+            <!-- 헤더 배너 -->
+            <div style="position:relative;border-radius:20px;overflow:hidden;margin-bottom:32px;
+                background:linear-gradient(135deg, rgba(${dIdx%2===0?'6,182,212':'168,85,247'},0.08) 0%, rgba(15,23,42,0.9) 100%);
+                border:1px solid rgba(255,255,255,0.08);padding:32px;">
+                <div style="position:absolute;top:0;right:0;bottom:0;width:120px;
+                    background:linear-gradient(to left,rgba(15,23,42,0),rgba(15,23,42,0));
+                    display:flex;align-items:center;justify-content:center;opacity:0.15;">
+                    <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </div>
+                <div style="position:absolute;top:0;left:0;bottom:0;width:4px;
+                    background:linear-gradient(to bottom,${c1},${c2});border-radius:4px 0 0 4px;"></div>
+                <div style="padding-left:16px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                        <span style="font-size:11px;font-weight:700;letter-spacing:2px;
+                            background:linear-gradient(135deg,${c1}22,${c2}22);
+                            border:1px solid ${c1}44;border-radius:999px;padding:4px 12px;color:${c1};">
+                            DISCIPLINE ${dIdx+1}/4
+                        </span>
+                    </div>
+                    <h3 class="game-font" style="font-size:clamp(22px,4vw,32px);font-weight:900;color:white;margin-bottom:8px;">
+                        ${info.title || disc}
+                    </h3>
+                    <p style="color:#94a3b8;font-size:15px;max-width:600px;line-height:1.7;">${info.desc || ''}</p>
+                </div>
+            </div>
+
+            <!-- 등급별 기술 요구사항 -->
+            <div style="margin-top:0;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.07);
+                border-radius:16px;padding:24px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h4 style="color:white;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">
+                        <span style="display:inline-block;width:3px;height:18px;background:linear-gradient(to bottom,${c1},${c2});border-radius:2px;"></span>
+                        ${isKO ? '등급별 기술 요구사항' : 'Level Skill Requirements'}
+                    </h4>
+                    <span style="font-size:11px;color:#475569;">${isKO ? '4급(초급) → 1급(전문가)' : 'Level 4 (Beginner) → Level 1 (Expert)'}</span>
+                </div>
+                ${isKO ? `
+                <div style="margin-bottom:16px;padding:14px;background:rgba(${dIdx%2===0?'6,182,212':'168,85,247'},0.05);border:1px dashed rgba(255,255,255,0.15);border-radius:10px;">
+                    <p style="font-size:12px;color:white;margin:0 0 6px;font-weight:700;">[공통 규정]</p>
+                    <ul style="margin:0;padding-left:18px;font-size:12px;color:#94a3b8;line-height:1.6;">
+                        <li><strong>영상 촬영:</strong> 1분~2분 이내 원테이크 (입수 전 5초, 퇴수 후 5초 반드시 포함)</li>
+                        <li><strong>합격 기준:</strong> 타인의 도움 없이 1회 주행 내에 기술 완성 시 합격</li>
+                    </ul>
+                </div>
+                ` : ''}
+                ${skillsHTML}
+            </div>
+
+            <!-- 자격증 신청 CTA -->
+            <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+                <button onclick="selectedDiscipline='${disc}';selectedLevel=null;renderPage('cert')"
+                    style="flex:1;min-width:200px;padding:16px 24px;
+                    background:linear-gradient(135deg,${c1},${c2});
+                    border:none;border-radius:12px;color:white;font-weight:900;font-size:15px;
+                    cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:8px;
+                    box-shadow:0 0 20px ${c1}44;"
+                    onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px ${c1}66'"
+                    onmouseout="this.style.transform='none';this.style.boxShadow='0 0 20px ${c1}44'">
+                    🏆 ${isKO ? `${disc.split('/')[0]} 자격증 신청하기` : `Apply for ${disc.split('/')[0]} Cert`}
+                </button>
+                <button onclick="renderPage('cert')"
+                    style="padding:16px 20px;background:rgba(255,255,255,0.06);
+                    border:1px solid rgba(255,255,255,0.15);border-radius:12px;color:#94a3b8;
+                    font-weight:700;font-size:14px;cursor:pointer;transition:all 0.3s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='white'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='#94a3b8'">
+                    📋 ${isKO ? '자격증 전체 보기' : 'View All Certs'}
+                </button>
+            </div>
+
+        </div>`;
+    }).join('');
+
     return `
-    <section class="page-section page-enter">
-        <div class="content-container text-center" style="padding: 100px 20px">
-            <h2 class="game-font" style="font-size:32px; color:var(--cyan)">Map</h2>
-            <p style="color:white; margin-top:20px;">${currentLang === 'KO' ? '인공서핑장 위치정보 준비 중입니다.' : 'Locations map is coming soon.'}</p>
+    <section class="page-section page-enter" style="background:var(--bg-dark);padding-bottom:80px;">
+        <div class="content-container">
+
+            <!-- 페이지 헤더 -->
+            <div style="text-align:center;padding:60px 0 48px;">
+                <div style="display:inline-flex;align-items:center;gap:8px;
+                    background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);
+                    border-radius:999px;padding:6px 16px;margin-bottom:20px;">
+                    <span style="font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;">ISA DISCIPLINES</span>
+                </div>
+                <h2 class="game-font section-title" style="margin-bottom:12px;">
+                    ${isKO ? '실기평가' : 'Practical Evaluation'}
+                </h2>
+                <p style="color:#94a3b8;font-size:16px;max-width:480px;margin:0 auto;line-height:1.7;">
+                    ${isKO ? '4가지 인공서핑 종목의 등급별 기술 요구사항을 확인하세요.' : 'Check level skill requirements for each of the 4 disciplines.'}
+                </p>
+
+                <!-- 종목 빠른 이동 -->
+                <div class="discipline-tabs" style="margin-top:28px;">
+                    ${DISCIPLINES.map((d,i)=>`
+                    <button class="discipline-tab intro-tab-btn${i===0?' active':''}"
+                        id="map-tab-${i}"
+                        onclick="
+                            document.querySelectorAll('.intro-tab-btn').forEach(b=>b.classList.remove('active'));
+                            document.getElementById('map-tab-${i}').classList.add('active');
+                            document.getElementById('map-anchor-${i}').scrollIntoView({behavior:'smooth'})
+                        ">${d}
+                    </button>`).join('')}
+                </div>
+            </div>
+
+            <!-- 종목 앵커 + 내용 -->
+            ${DISCIPLINES.map((d,i)=>`<div id="map-anchor-${i}"></div>`).join('')}
+            ${disciplineSections}
+
         </div>
     </section>`;
 }
