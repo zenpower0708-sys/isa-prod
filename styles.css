@@ -121,6 +121,17 @@ input, select, textarea { font-family: inherit; }
     border-radius: 50%;
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
+/* 실제 로고 이미지 */
+.gov-logo-crop {
+    width: 26px; height: 26px; overflow: hidden; flex-shrink: 0;
+}
+.gov-logo-mcst {
+    /* 이미지 하단 텍스트 잘라내기: 원형 로고만 표시 */
+    width: 26px; height: 36px; object-fit: cover; object-position: center top; display: block;
+}
+.gov-logo-kcg {
+    height: 30px; width: auto; flex-shrink: 0; object-fit: contain;
+}
 
 /* ===== NAVIGATION ===== */
 #main-nav {
