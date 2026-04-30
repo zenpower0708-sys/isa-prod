@@ -1167,6 +1167,174 @@ window.verifyCertById = async function(certId) {
 
 
 function renderIntroPage() {
+    const isKO = currentLang === 'KO';
+
+    const steps = [
+        { n:1, icon:'📁', title:'실습이수시간\n확인증 업로드', desc:'종목별 필수 실습 이수 시간 충족 후 확인증을 업로드합니다.' },
+        { n:2, icon:'📝', title:'필기시험 응시',         desc:'온라인 필기시험으로 이론 지식을 검증받습니다.' },
+        { n:3, icon:'🎥', title:'실기평가\n영상 업로드',  desc:'기술 수행 영상을 촬영 제출하고 전문가 평가를 받습니다.' },
+        { n:4, icon:'🏅', title:'디지털 자격증 발급',    desc:'심사 통과 후 공식 디지털 자격증이 즉시 발급됩니다.' }
+    ];
+
+    const benefits = [
+        { icon:'🎯', title:'협회 코칭 시스템 이용',       desc:'ISA에서 제공하는 전용 코칭 시스템을 이용할 수 있습니다.',                          rgb:'139,92,246' },
+        { icon:'👥', title:'강습 전문성 공인',             desc:'각종 동호회·단체·개인 강습에서 협회 공인 전문 강사로 활동할 수 있습니다.',          rgb:'6,182,212' },
+        { icon:'📄', title:'지원서·제안서 작성 프로그램', desc:'각종 동호회·단체 개인 강습 지원서 및 제안서 작성 프로그램을 이용할 수 있습니다.',   rgb:'16,185,129' },
+        { icon:'🏆', title:'대회 프로 자격 참가',         desc:'ISA 주관 및 협력 대회에 프로 자격으로 참가할 수 있습니다.',                         rgb:'245,158,11' }
+    ];
+
+    const coachPrograms = [
+        { icon:'📊', title:'수강생 관리 프로그램 (코칭허브)',     desc:'강습 수강생의 출석·진도·기술 성장을 체계적으로 관리할 수 있는 협회 전용 프로그램입니다.' },
+        { icon:'📋', title:'지원서·제안서 작성 프로그램',         desc:'각종 동호회·단체 개인 강습 지원서 및 제안서를 손쉽게 작성할 수 있는 프로그램입니다.' }
+    ];
+
+    const sectionTitle = (label, rgb1, rgb2) => `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;">
+            <div style="width:4px;height:28px;background:linear-gradient(180deg,rgb(${rgb1}),rgb(${rgb2}));border-radius:2px;flex-shrink:0;"></div>
+            <h3 style="font-size:clamp(18px,3vw,22px);font-weight:900;color:white;font-family:'Orbitron',sans-serif;letter-spacing:1px;margin:0;">${label}</h3>
+        </div>`;
+
+    return `
+    <section class="page-section page-enter" style="background:var(--bg-dark);padding-bottom:100px;">
+        <div class="content-container">
+
+            <!-- ── 헤더 ── -->
+            <div style="text-align:center;padding:60px 0 56px;">
+                <div style="display:inline-flex;align-items:center;gap:8px;
+                    background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);
+                    border-radius:999px;padding:6px 16px;margin-bottom:20px;">
+                    <span style="font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;">ISA CERTIFICATION</span>
+                </div>
+                <h2 class="game-font section-title" style="margin-bottom:12px;">자격증 소개</h2>
+                <p style="color:#94a3b8;font-size:16px;max-width:520px;margin:0 auto;line-height:1.7;">
+                    국제인공서핑협회(ISA) 자격증 제도와 혜택을 안내해 드립니다.
+                </p>
+            </div>
+
+            <!-- ── 섹션 1: 자격증 발급 절차 ── -->
+            <div style="margin-bottom:72px;">
+                ${sectionTitle('자격증 발급 절차','6,182,212','37,99,235')}
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                    ${steps.map((s,i) => `
+                    <div style="position:relative;display:flex;flex-direction:column;align-items:center;
+                        padding:32px 20px;text-align:center;border-radius:16px;
+                        background:rgba(6,182,212,0.05);border:1px solid rgba(6,182,212,0.15);transition:all 0.3s;"
+                        onmouseover="this.style.borderColor='rgba(6,182,212,0.4)';this.style.background='rgba(6,182,212,0.1)'"
+                        onmouseout="this.style.borderColor='rgba(6,182,212,0.15)';this.style.background='rgba(6,182,212,0.05)'">
+                        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+                            width:28px;height:28px;background:linear-gradient(135deg,var(--cyan),#2563eb);
+                            border-radius:50%;display:flex;align-items:center;justify-content:center;
+                            font-size:12px;font-weight:900;color:white;font-family:'Orbitron',sans-serif;">
+                            ${s.n}
+                        </div>
+                        <div style="font-size:40px;margin-bottom:16px;margin-top:8px;">${s.icon}</div>
+                        <div style="font-size:15px;font-weight:800;color:white;margin-bottom:10px;line-height:1.5;white-space:pre-line;">${s.title}</div>
+                        <div style="font-size:12px;color:#64748b;line-height:1.6;">${s.desc}</div>
+                        ${i < 3 ? `<div style="position:absolute;right:-12px;top:50%;transform:translateY(-50%);
+                            color:var(--cyan);font-size:20px;font-weight:700;z-index:2;display:none;" class="step-arr">›</div>` : ''}
+                    </div>`).join('')}
+                </div>
+                <style>@media(min-width:640px){.step-arr{display:block!important;}}</style>
+            </div>
+
+            <!-- ── 섹션 2: 자격증 보유자 혜택 ── -->
+            <div style="margin-bottom:72px;">
+                ${sectionTitle('자격증 보유자 혜택','139,92,246','236,72,153')}
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+                    ${benefits.map(b => `
+                    <div style="padding:28px 24px;border-radius:16px;
+                        background:rgba(${b.rgb},0.07);border:1px solid rgba(${b.rgb},0.2);
+                        transition:all 0.3s;"
+                        onmouseover="this.style.background='rgba(${b.rgb},0.13)';this.style.borderColor='rgba(${b.rgb},0.4)'"
+                        onmouseout="this.style.background='rgba(${b.rgb},0.07)';this.style.borderColor='rgba(${b.rgb},0.2)'">
+                        <div style="font-size:36px;margin-bottom:16px;">${b.icon}</div>
+                        <div style="font-size:16px;font-weight:800;color:white;margin-bottom:10px;line-height:1.4;">${b.title}</div>
+                        <div style="font-size:13px;color:#94a3b8;line-height:1.7;">${b.desc}</div>
+                    </div>`).join('')}
+                </div>
+            </div>
+
+            <!-- ── 섹션 3: 강사 지원 업무 · 코칭 시스템 ── -->
+            <div style="margin-bottom:72px;">
+                ${sectionTitle('강사 지원 업무 · 코칭 시스템','6,182,212','16,185,129')}
+                <div style="padding:32px;border-radius:20px;
+                    background:linear-gradient(135deg,rgba(6,182,212,0.05),rgba(16,185,129,0.05));
+                    border:1px solid rgba(6,182,212,0.2);">
+                    <p style="color:#94a3b8;font-size:14px;margin-bottom:28px;line-height:1.8;margin-top:0;">
+                        ISA 강사 자격증 보유자에게 협회의 전문 강사 지원 업무 시스템이 제공됩니다.<br>
+                        전문적인 강습 운영을 위한 다양한 도구를 활용하세요.
+                    </p>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
+                        ${coachPrograms.map(p => `
+                        <div style="padding:24px;border-radius:12px;
+                            background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+                            transition:all 0.3s;"
+                            onmouseover="this.style.borderColor='rgba(6,182,212,0.35)'"
+                            onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                                <span style="font-size:28px;">${p.icon}</span>
+                                <span style="font-size:14px;font-weight:800;color:var(--cyan);line-height:1.4;">${p.title}</span>
+                            </div>
+                            <p style="font-size:13px;color:#64748b;line-height:1.7;margin:0;">${p.desc}</p>
+                        </div>`).join('')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── 섹션 4: 지원서·제안서 맞춤 작성 ── -->
+            <div style="margin-bottom:32px;">
+                ${sectionTitle('각종 지원서·제안서 맞춤 작성','245,158,11','239,68,68')}
+                <div style="padding:32px;border-radius:20px;
+                    background:linear-gradient(135deg,rgba(245,158,11,0.06),rgba(239,68,68,0.04));
+                    border:1px solid rgba(245,158,11,0.2);
+                    display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
+                    <div style="font-size:52px;flex-shrink:0;">📝</div>
+                    <div style="flex:1;min-width:200px;">
+                        <div style="font-size:17px;font-weight:800;color:white;margin-bottom:12px;">
+                            다양한 컨셉에 맞춘 제안서·기획서 작성 지원
+                        </div>
+                        <p style="font-size:14px;color:#94a3b8;line-height:1.7;margin:0;">
+                            강습 제안서, 단체 프로그램 기획서, 이벤트 계획서 등<br>
+                            목적과 컨셉에 맞는 맞춤형 문서 작성을 지원합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── 섹션 5: 스코어엘리트 앱 할인 이용 ── -->
+            <div style="margin-bottom:0;">
+                ${sectionTitle('스코어엘리트 기술측정앱 할인 이용','250,204,21','245,158,11')}
+                <div style="padding:32px;border-radius:20px;
+                    background:linear-gradient(135deg,rgba(250,204,21,0.06),rgba(245,158,11,0.04));
+                    border:1px solid rgba(250,204,21,0.2);
+                    display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
+                    <div style="font-size:52px;flex-shrink:0;">📊</div>
+                    <div style="flex:1;min-width:200px;">
+                        <div style="font-size:17px;font-weight:800;color:#facc15;margin-bottom:12px;">
+                            일반 회원 대비 차별화된 스코어엘리트앱 이용 혜택
+                        </div>
+                        <p style="font-size:14px;color:#94a3b8;line-height:1.7;margin-bottom:20px;">
+                            AI 카메라 기반 인공서핑 기술 측정 앱 <strong style="color:white;">스코어엘리트</strong>를<br>
+                            자격증 보유자는 할인된 가격으로 이용할 수 있습니다.
+                        </p>
+                        <button onclick="openScoreEliteModal()"
+                            style="padding:12px 24px;background:rgba(250,204,21,0.12);
+                            border:1px solid rgba(250,204,21,0.4);border-radius:8px;
+                            color:#facc15;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.3s;"
+                            onmouseover="this.style.background='rgba(250,204,21,0.22)'"
+                            onmouseout="this.style.background='rgba(250,204,21,0.12)'">
+                            📊 스코어엘리트 앱 바로가기 →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>`;
+}
+
+// ===== [구버전 renderIntroPage 참고용 - 사용안함] =====
+function renderIntroPage_disciplines_unused() {
     const t = LANG[currentLang];
     const isKO = currentLang === 'KO';
     const di = DISCIPLINE_INFO[currentLang];
@@ -1739,22 +1907,51 @@ function openQuickModal(type) {
 }
 function closeQuickModal() { const m = $('quick-modal'); if(m) m.classList.remove('open'); }
 
+let currentInstructorType = null; // 'coaching' | 'instructor'
+
 function openInstructorModal() {
-    const m = $('instructor-modal');
-    if (m) {
-        m.classList.add('open');
-        const input = $('instructor-cert-input');
-        if (input) {
-            input.value = '';
-            input.focus();
-        }
-        $('instructor-verify-result').innerHTML = '';
-    }
+    const m = $('instructor-select-modal');
+    if (m) m.classList.add('open');
+}
+
+function closeInstructorSelectModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const m = $('instructor-select-modal');
+    if (m) m.classList.remove('open');
 }
 
 function closeInstructorModal(event) {
+    closeInstructorSelectModal(event);
+}
+
+function openInstructorAuth(type) {
+    currentInstructorType = type;
+    const titleEl = $('instructor-auth-title');
+    const descEl = $('instructor-auth-desc');
+    const noteEl = $('instructor-auth-note');
+    const inputEl = $('instructor-cert-input');
+    const resultEl = $('instructor-verify-result');
+
+    if (type === 'coaching') {
+        if (titleEl) titleEl.textContent = '코칭 허브 인증';
+        if (descEl) descEl.textContent = '2급이상 자격증 보유강사를 위한 지원 프로그램입니다';
+        if (noteEl) noteEl.innerHTML = '💡 코칭 허브 입장을 위해서는 ISA 2급 이상 자격증이 필요합니다. 인증 후 코칭 허브로 이동합니다.';
+    } else {
+        if (titleEl) titleEl.textContent = '강사 워크스페이스 인증';
+        if (descEl) descEl.textContent = '3급이상 자격증 보유강사를 위한 지원 프로그램입니다';
+        if (noteEl) noteEl.innerHTML = '💡 강사 워크스페이스 입장을 위해서는 ISA 3급 이상 자격증이 필요합니다. 인증 후 강사 워크스페이스로 이동합니다.';
+    }
+
+    if (inputEl) { inputEl.value = ''; setTimeout(() => inputEl.focus(), 100); }
+    if (resultEl) resultEl.innerHTML = '';
+
+    const m = $('instructor-auth-modal');
+    if (m) m.classList.add('open');
+}
+
+function closeInstructorAuthModal(event) {
     if (event && event.target !== event.currentTarget) return;
-    const m = $('instructor-modal');
+    const m = $('instructor-auth-modal');
     if (m) m.classList.remove('open');
 }
 
@@ -1762,45 +1959,54 @@ window.verifyInstructorCert = async function() {
     const input = $('instructor-cert-input');
     const resultEl = $('instructor-verify-result');
     if (!input || !resultEl) return;
-    
+
     const certId = input.value.trim().toUpperCase();
     if (!certId) {
         resultEl.innerHTML = `<p style="color:#ef4444;font-size:13px;text-align:center;margin:0;">자격증 번호를 입력해주세요.</p>`;
         return;
     }
-    
-    const isKO = currentLang === 'KO';
+
     resultEl.innerHTML = `<div style="text-align:center;"><div style="display:inline-block;width:20px;height:20px;border:2px solid var(--cyan);border-top:2px solid transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div>`;
-    
+
     try {
         const url = GOOGLE_SCRIPT_URL + '?action=verifyCertificate&certId=' + encodeURIComponent(certId);
         const res = await fetch(url);
         const json = await res.json();
-        
+
         if (json.status === 'success' && json.valid) {
             const c = json.cert;
-            // Check if level is 1급 or 2급
-            const levelNum = parseInt(c.level) || (c.level.includes('1') ? 1 : c.level.includes('2') ? 2 : 0);
-            
-            if (c.level.includes('1급') || c.level.includes('2급') || levelNum === 1 || levelNum === 2) {
+            const isCoaching = currentInstructorType === 'coaching';
+            const lvl = c.level || '';
+            const hasLevel1 = lvl.includes('1급');
+            const hasLevel2 = lvl.includes('2급');
+            const hasLevel3 = lvl.includes('3급');
+
+            // 코칭 허브: 1급 또는 2급만, 강사 워크스페이스: 1급, 2급, 3급
+            const hasAccess = isCoaching
+                ? (hasLevel1 || hasLevel2)
+                : (hasLevel1 || hasLevel2 || hasLevel3);
+
+            if (hasAccess) {
+                const targetUrl = isCoaching
+                    ? 'https://isa-coaching-workspace.vercel.app/coaching-hub.html'
+                    : 'https://isa-instructor-workspace-v1.vercel.app/instructor.html';
+
                 resultEl.innerHTML = `
                 <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:12px;text-align:center;">
                     <p style="color:#10b981;font-weight:700;margin:0 0 4px;">✅ 인증 성공: ${c.name} 강사님</p>
                     <p style="color:#94a3b8;font-size:11px;margin:0;">등급: ${c.level} | 종목: ${c.discipline}</p>
-                    <button onclick="window.location.href='#/instructor-dashboard';closeInstructorModal();" class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:12px;">강사 전용 페이지 이동</button>
+                    <button onclick="window.open('${targetUrl}','_blank');closeInstructorAuthModal();" class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:12px;">입장하기 →</button>
                 </div>`;
-                // Store instructor session locally
                 localStorage.setItem('isa_instructor_verified', JSON.stringify({
-                    certId: c.certNumber,
-                    name: c.name,
-                    level: c.level,
-                    verifiedAt: new Date().toISOString()
+                    certId: c.certNumber, name: c.name, level: c.level,
+                    type: currentInstructorType, verifiedAt: new Date().toISOString()
                 }));
             } else {
+                const required = isCoaching ? '2급' : '3급';
                 resultEl.innerHTML = `
                 <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px;text-align:center;">
                     <p style="color:#f59e0b;font-weight:700;margin:0 0 4px;">⚠️ 권한 부족</p>
-                    <p style="color:#94a3b8;font-size:11px;margin:0;">해당 자격증(${c.level})은 강사 전용 기능을 이용할 수 없습니다.<br>(2급 이상 필요)</p>
+                    <p style="color:#94a3b8;font-size:11px;margin:0;">해당 자격증(${c.level})은 이 프로그램을 이용할 수 없습니다.<br>(${required} 이상 필요)</p>
                 </div>`;
             }
         } else {

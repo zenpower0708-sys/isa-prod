@@ -762,6 +762,21 @@ input, select, textarea { font-family: inherit; }
 }
 .login-box { max-width: 420px; overflow-y: auto; max-height: 90vh; }
 .instructor-box { max-width: 440px; border-color: rgba(6,182,212,0.5); box-shadow: 0 0 40px rgba(6,182,212,0.25); }
+.instructor-select-box { max-width: 860px; width: 95vw; border-color: rgba(6,182,212,0.4); box-shadow: 0 0 40px rgba(6,182,212,0.2); padding-bottom: 24px; }
+.instructor-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 24px; }
+.instructor-preview-card { position: relative; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; cursor: pointer; transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s; background: rgba(255,255,255,0.03); }
+.instructor-preview-card:hover { border-color: rgba(6,182,212,0.6); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(6,182,212,0.2); }
+.instructor-preview-badge { position: absolute; top: 12px; right: 12px; z-index: 10; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; }
+.instructor-preview-badge.level2 { background: rgba(6,182,212,0.2); border: 1px solid rgba(6,182,212,0.5); color: #06b6d4; }
+.instructor-preview-badge.level3 { background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.5); color: #a78bfa; }
+.instructor-preview-frame { position: relative; width: 100%; height: 200px; overflow: hidden; background: rgba(0,0,0,0.5); }
+.instructor-preview-frame iframe { width: 200%; height: 200%; transform: scale(0.5); transform-origin: top left; pointer-events: none; border: none; }
+.instructor-preview-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(15,23,42,0.55)); cursor: pointer; }
+.instructor-preview-info { padding: 16px; }
+.instructor-preview-info h3 { color: white; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.instructor-preview-info p { color: #94a3b8; font-size: 12px; line-height: 1.5; margin-bottom: 10px; }
+.preview-click-hint { font-size: 11px; color: var(--cyan); font-weight: 600; letter-spacing: 0.5px; }
+@media (max-width: 640px) { .instructor-select-grid { grid-template-columns: 1fr; } }
 .quick-box { max-width: 420px; }
 .legal-box { max-width: 800px; }
 

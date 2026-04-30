@@ -581,36 +581,77 @@
         </div>
     </div>
 
-    <!-- Instructor Modal -->
-    <div class="modal-overlay" id="instructor-modal" onclick="closeInstructorModal(event)">
-        <div class="modal-box instructor-box" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeInstructorModal()">✕</button>
-            <div class="modal-header">
-                <h2 id="instructor-modal-title" class="game-font" style="color:var(--cyan);font-size:24px;">강사 전용 인증</h2>
-                <p style="color:#94a3b8;font-size:14px;margin-top:4px;">2급이상 자격증 보유 강사 전용</p>
+    <!-- Instructor Select Modal -->
+    <div class="modal-overlay" id="instructor-select-modal" onclick="closeInstructorSelectModal(event)">
+        <div class="modal-box instructor-select-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeInstructorSelectModal()">✕</button>
+            <div style="padding:20px 24px 0;">
+                <h2 class="game-font" style="color:var(--cyan);font-size:20px;margin-bottom:4px;">강사 전용 프로그램</h2>
+                <p style="color:#94a3b8;font-size:13px;">이용하실 프로그램을 선택하세요</p>
             </div>
-            
-            <div style="padding:24px 0;">
+            <div class="instructor-select-grid">
+                <!-- Option A: Coaching Hub (2급이상) -->
+                <div class="instructor-preview-card" onclick="openInstructorAuth('coaching')">
+                    <div class="instructor-preview-badge level2">2급 이상</div>
+                    <div class="instructor-preview-frame">
+                        <iframe src="https://isa-coaching-workspace.vercel.app/coaching-hub.html"
+                            scrolling="no" frameborder="0" tabindex="-1" loading="lazy"></iframe>
+                        <div class="instructor-preview-overlay"></div>
+                    </div>
+                    <div class="instructor-preview-info">
+                        <h3>코칭 허브</h3>
+                        <p>2급이상 자격증 보유강사를 위한 지원 프로그램입니다</p>
+                        <span class="preview-click-hint">클릭하여 입장 →</span>
+                    </div>
+                </div>
+                <!-- Option B: Instructor Workspace (3급이상) -->
+                <div class="instructor-preview-card" onclick="openInstructorAuth('instructor')">
+                    <div class="instructor-preview-badge level3">3급 이상</div>
+                    <div class="instructor-preview-frame">
+                        <iframe src="https://isa-instructor-workspace-v1.vercel.app/instructor.html"
+                            scrolling="no" frameborder="0" tabindex="-1" loading="lazy"></iframe>
+                        <div class="instructor-preview-overlay"></div>
+                    </div>
+                    <div class="instructor-preview-info">
+                        <h3>강사 워크스페이스</h3>
+                        <p>3급이상 자격증 보유강사를 위한 지원 프로그램입니다</p>
+                        <span class="preview-click-hint">클릭하여 입장 →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructor Auth Modal -->
+    <div class="modal-overlay" id="instructor-auth-modal" onclick="closeInstructorAuthModal(event)">
+        <div class="modal-box instructor-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeInstructorAuthModal()">✕</button>
+            <div class="modal-header">
+                <h2 id="instructor-auth-title" class="game-font" style="color:var(--cyan);font-size:22px;">강사 전용 인증</h2>
+            </div>
+            <div style="padding:16px 24px 0;">
+                <p id="instructor-auth-desc" style="color:#e2e8f0;font-size:14px;line-height:1.6;margin:0;"></p>
+            </div>
+
+            <div style="padding:20px 24px 0;">
                 <div class="form-group">
                     <label style="color:#94a3b8;font-size:12px;letter-spacing:1px;margin-bottom:8px;display:block;">자격증 번호 입력</label>
                     <div class="input-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
-                        <input type="text" id="instructor-cert-input" placeholder="ISA-2026-000001" 
+                        <input type="text" id="instructor-cert-input" placeholder="ISA-2026-000001"
                             style="width:100%;padding:14px 16px 14px 44px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:white;font-family:monospace;letter-spacing:1px;outline:none;">
                     </div>
                 </div>
-                
+
                 <div id="instructor-verify-result" style="margin-top:16px;min-height:40px;"></div>
-                
+
                 <button onclick="verifyInstructorCert()" class="btn-primary" style="width:100%;margin-top:20px;padding:14px;font-weight:800;font-size:15px;letter-spacing:1px;">
                     인증하기
                 </button>
             </div>
-            
-            <div style="background:rgba(6,182,212,0.05);border-radius:12px;padding:16px;border:1px solid rgba(6,182,212,0.15);">
-                <p style="font-size:12px;color:#64748b;line-height:1.6;margin:0;">
-                    💡 강사 전용 인증을 위해서는 ISA 1급 또는 2급 자격증이 필요합니다. 인증 후 강사 전용 콘텐츠 및 관리 기능을 이용하실 수 있습니다.
-                </p>
+
+            <div style="margin:20px 24px 24px;background:rgba(6,182,212,0.05);border-radius:12px;padding:16px;border:1px solid rgba(6,182,212,0.15);">
+                <p id="instructor-auth-note" style="font-size:12px;color:#64748b;line-height:1.6;margin:0;"></p>
             </div>
         </div>
     </div>
