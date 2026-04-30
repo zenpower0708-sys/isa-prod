@@ -1872,6 +1872,16 @@ function accruePoints(email, name, amount, reason) {
         name: name,
         amount: amount,
         reason: reason
+    }).then(result => {
+        const newBalance = (result && result.newBalance !== undefined)
+            ? result.newBalance
+            : (getSession()?.points || 0) + amount;
+        refreshPointsUI(newBalance);
+        showPointsToast(amount, reason);
+    }).catch(() => {
+        // 서버 실패 시 로컬 추정치로 갱신
+        const est = (getSession()?.points || 0) + amount;
+        refreshPointsUI(est);
     });
 }
 
@@ -2832,6 +2842,8 @@ window.startPointCharge = function() {
     const user = getSession();
     if (!user) { alert('로그인이 필요합니다.'); return; }
     if (selectedChargePrice <= 0) { alert('충전 금액을 선택해주세요.'); return; }
+    if (selectedChargePrice < 10000) { alert('최소 충전 금액은 10,000원입니다.'); return; }
+    if (selectedChargePrice % 10000 !== 0) { alert('10,000원 단위로만 충전할 수 있습니다.'); return; }
 
     if (typeof innopay === 'undefined') {
         alert('결제 시스템을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
@@ -2852,6 +2864,7 @@ window.startPointCharge = function() {
         ResultYN: 'N',
         callback: async function(res) {
             if (res.res_cd === '0000') {
+                let newBalance = (user.points || 0) + selectedChargeAmount;
                 try {
                     // GAS 서버에 포인트 충전 기록 저장
                     const result = await callGAS({
@@ -2862,20 +2875,12 @@ window.startPointCharge = function() {
                         price: selectedChargePrice,
                         tid: res.tid || moid
                     });
-                    // 세션의 포인트도 최신값으로 업데이트
                     if (result && result.newBalance !== undefined) {
-                        user.points = result.newBalance;
-                    } else {
-                        user.points = (user.points || 0) + selectedChargeAmount;
+                        newBalance = result.newBalance;
                     }
-                    localStorage.setItem('isa_session_v1', JSON.stringify(user));
-                } catch(e) {
-                    // 서버 저장 실패해도 로컬은 업데이트
-                    user.points = (user.points || 0) + selectedChargeAmount;
-                    localStorage.setItem('isa_session_v1', JSON.stringify(user));
-                }
-                alert(`✅ ${selectedChargeAmount.toLocaleString()}P 충전이 완료되었습니다!`);
-                initAuth();
+                } catch(e) { /* 서버 실패해도 로컬 업데이트 */ }
+                refreshPointsUI(newBalance);
+                alert(`✅ ${selectedChargeAmount.toLocaleString()}P 충전이 완료되었습니다!\n현재 잔액: ${newBalance.toLocaleString()}P`);
                 openProfileModal();
             } else {
                 alert('결제 실패: ' + (res.res_msg || '알 수 없는 오류'));
@@ -3278,6 +3283,27 @@ function saveSession(data) {
     localStorage.setItem('isa_session_v1', JSON.stringify(data));
 }
 
+// ── 포인트 UI 전체 동기화 (네비바 + 프로필 배지 + 충전탭 잔액 한 번에) ──
+function refreshPointsUI(newPoints) {
+    // 1. 세션 저장
+    const sess = getSession();
+    if (sess) { sess.points = newPoints; saveSession(sess); }
+
+    // 2. 네비바 버튼
+    updateNavbarAuth(getSession());
+
+    // 3. 프로필 모달 포인트 배지
+    const ptEl = document.getElementById('profile-points-value');
+    if (ptEl) ptEl.textContent = newPoints.toLocaleString() + ' P';
+
+    // 4. 충전탭 현재 잔액
+    const chargeCurrent = document.getElementById('profile-charge-current-pts');
+    if (chargeCurrent) chargeCurrent.textContent = newPoints.toLocaleString();
+
+    // 5. 충전탭 "충전 후 잔액" 미리보기 갱신
+    if (selectedChargeAmount > 0) updateChargeDisplay(selectedChargeAmount, selectedChargePrice);
+}
+
 // ── 기존 openProfileModal 오버라이드 (포인트 표시 추가) ──
 function openProfileModal() {
     const user = getSession();
@@ -3308,12 +3334,9 @@ function openProfileModal() {
 
     fetchLogbook();
 
-    // 서버에서 최신 포인트 비동기 갱신
+    // 서버에서 최신 포인트 비동기 갱신 후 전체 UI 동기화
     fetchMyPoints(user.email).then(freshPoints => {
-        const el = document.getElementById('profile-points-value');
-        if (el) el.textContent = freshPoints.toLocaleString() + ' P';
-        const sess = getSession();
-        if (sess) { sess.points = freshPoints; saveSession(sess); }
+        refreshPointsUI(freshPoints);
     }).catch(() => {});
 }
 
@@ -3329,6 +3352,18 @@ function switchProfileTab(tab) {
 
     const tabContent = document.getElementById('profile-' + tab + '-content');
     if (tabContent) tabContent.classList.add('active');
+
+    // 충전 탭 열 때 최신 잔액 표시
+    if (tab === 'charge') {
+        const s = getSession();
+        const cur = document.getElementById('profile-charge-current-pts');
+        if (cur && s) cur.textContent = (s.points || 0).toLocaleString();
+        // 선택 초기화
+        selectedChargeAmount = 0; selectedChargePrice = 0;
+        document.querySelectorAll('.charge-opt-btn').forEach(b => b.classList.remove('active'));
+        const fp = document.getElementById('charge-final-price'); if (fp) fp.textContent = '0원';
+        const ap = document.getElementById('charge-after-pts'); if (ap) ap.textContent = '0 P';
+    }
 
     // 포인트 내역 탭 렌더링
     if (tab === 'points') {
@@ -3493,10 +3528,7 @@ async function submitReviewForm() {
         const result = await res.json();
         if (msg) { msg.style.color = result.status === 'success' ? '#22c55e' : '#ef4444'; msg.textContent = result.message; }
         if (result.status === 'success') {
-            const newPoints = result.balance || 0;
-            const ptEl = document.getElementById('profile-points-value');
-            if (ptEl) ptEl.textContent = newPoints.toLocaleString() + ' P';
-            const sess = getSession(); if (sess) { sess.points = newPoints; saveSession(sess); }
+            refreshPointsUI(result.balance || 0);
             const textEl = document.getElementById('review-text');
             if (textEl) textEl.value = '';
         }
