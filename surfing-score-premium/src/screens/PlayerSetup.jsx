@@ -3,13 +3,11 @@ import { motion } from 'framer-motion';
 import { UserPlus, ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 
 const PlayerSetup = ({ players, onUpdatePlayer, onNext, onBack }) => {
-  const [authNeeded, setAuthNeeded] = useState(players.map(() => true));
-
   const handleNameChange = (idx, name) => {
     onUpdatePlayer(idx, { name });
   };
 
-  const allAuthed = authNeeded.every(a => !a);
+  const allNamed = players.every(p => p.name.trim() !== '');
 
   return (
     <div className="min-h-screen p-6 md:p-12 max-w-4xl mx-auto">
@@ -19,7 +17,7 @@ const PlayerSetup = ({ players, onUpdatePlayer, onNext, onBack }) => {
         </button>
         <div>
           <h2 className="text-3xl font-bold text-white">참가자 설정</h2>
-          <p className="text-slate-400">선수들의 정보를 입력하고 인증을 진행하세요.</p>
+          <p className="text-slate-400">선수들의 이름을 입력해 주세요.</p>
         </div>
       </div>
 
@@ -52,24 +50,10 @@ const PlayerSetup = ({ players, onUpdatePlayer, onNext, onBack }) => {
             </div>
 
             <div className="shrink-0 w-full md:w-auto">
-              {authNeeded[idx] ? (
-                <button 
-                  onClick={() => {
-                    const next = [...authNeeded];
-                    next[idx] = false;
-                    setAuthNeeded(next);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-isa-sky/10 border border-isa-sky/30 text-isa-sky font-bold hover:bg-isa-sky hover:text-isa-deep transition-all"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  실명 인증하기
-                </button>
-              ) : (
-                <div className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-bold">
-                  <ShieldCheck className="w-4 h-4" />
-                  인증 완료
-                </div>
-              )}
+              <div className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-bold">
+                <ShieldCheck className="w-4 h-4" />
+                준비 완료
+              </div>
             </div>
           </motion.div>
         ))}
@@ -78,18 +62,18 @@ const PlayerSetup = ({ players, onUpdatePlayer, onNext, onBack }) => {
       <div className="mt-12">
         <button
           onClick={onNext}
-          disabled={!allAuthed}
+          disabled={!allNamed}
           className={`w-full py-6 rounded-[32px] font-black text-xl flex items-center justify-center gap-3 transition-all
-            ${allAuthed 
+            ${allNamed 
               ? 'bg-white text-isa-deep shadow-2xl hover:bg-isa-sky' 
               : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'}`}
         >
           <span>영상 입력 단계로 이동</span>
           <ArrowRight className="w-6 h-6" />
         </button>
-        {!allAuthed && (
+        {!allNamed && (
           <p className="text-center text-rose-400 text-xs mt-4 font-bold uppercase tracking-widest">
-            Please complete real-name authentication for all riders
+            Please enter names for all riders
           </p>
         )}
       </div>

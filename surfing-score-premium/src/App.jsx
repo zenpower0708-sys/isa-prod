@@ -71,7 +71,7 @@ function App() {
 
         {screen === 'setup' && (
           <motion.div key="setup" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
-            <PlayerSetup players={players} onUpdatePlayer={updatePlayer} onNext={() => setIsPaymentOpen(true)} onBack={() => goTo('mode')} />
+            <PlayerSetup players={players} onUpdatePlayer={updatePlayer} onNext={() => goTo('video')} onBack={() => goTo('mode')} />
           </motion.div>
         )}
 
@@ -108,16 +108,6 @@ function App() {
 
       {/* Global Modals */}
       <CopyrightModal />
-      <AnimatePresence>
-        {isPaymentOpen && (
-          <PaymentModule 
-            isOpen={isPaymentOpen}
-            amount={15000}
-            onComplete={() => { setIsPaymentOpen(false); goTo('video'); }}
-            onCancel={() => setIsPaymentOpen(false)}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
