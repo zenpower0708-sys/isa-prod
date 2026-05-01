@@ -13,7 +13,7 @@ import ResultScreen from './screens/ResultScreen';
 import HistoryScreen from './screens/HistoryScreen';
 
 // Components
-import PaymentModule from './components/PaymentModule';
+// import PaymentModule from './components/PaymentModule';
 import CopyrightModal from './components/CopyrightModal';
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
     saveHistory, reset 
   } = useSurfingApp();
 
-  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  // const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
   const handleVideoComplete = (blob) => {
     setCurrentVideo(blob);
