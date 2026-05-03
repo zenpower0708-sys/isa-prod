@@ -129,6 +129,7 @@ const LANG = {
             footerName: '한국인공서핑협회',
             govCulture: '문화체육관광부',
             govCoast: '해양경찰청',
+            kakaoChannel: '카카오채널 문의',
             login: '로그인',
             signup: '회원가입',
             footer: { contact: '연락처', legal: '법적 고지', privacy: '개인정보처리방침', terms: '이용약관', insTerms: '공제회 약관', rights: 'ISA. All rights reserved.' }
@@ -185,6 +186,7 @@ const LANG = {
             footerName: 'ISA Korea',
             govCulture: 'Ministry of Culture',
             govCoast: 'Coast Guard',
+            kakaoChannel: 'KakaoTalk Inquiry',
             login: 'Login',
             signup: 'Sign Up',
             footer: { contact: 'Contact', legal: 'Legal', privacy: 'Privacy Policy', terms: 'Terms of Service', insTerms: 'Insurance Terms', rights: 'ISA. All rights reserved.' }

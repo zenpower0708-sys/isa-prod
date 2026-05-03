@@ -132,6 +132,30 @@ input, select, textarea { font-family: inherit; }
 .gov-logo-kcg {
     height: 30px; width: auto; flex-shrink: 0; object-fit: contain;
 }
+/* 카카오채널 문의 버튼 */
+#kakao-channel-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #FEE500;
+    color: #3C1E1E;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 13px;
+    border-radius: 999px;
+    text-decoration: none;
+    margin-left: auto;
+    white-space: nowrap;
+    border: none;
+    box-shadow: 0 2px 8px rgba(254,229,0,0.3);
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: -0.3px;
+}
+#kakao-channel-btn:hover {
+    background: #FFD700;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(254,229,0,0.45);
+}
 
 /* ===== NAVIGATION ===== */
 #main-nav {

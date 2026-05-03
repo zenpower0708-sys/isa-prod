@@ -143,6 +143,7 @@ function updateLangUI() {
     safeSet('nav-title', t.common.headerName);
     safeSet('gov-culture', t.common.govCulture);
     safeSet('gov-coast', t.common.govCoast);
+    safeSet('kakao-btn-text', t.common.kakaoChannel);
     
     ['cert', 'insurance', 'shop', 'map', 'edu', 'book', 'instructor'].forEach(key => {
         safeSet(`nav-${key}`, t.nav[key]);
