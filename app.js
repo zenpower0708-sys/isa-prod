@@ -16,7 +16,7 @@ let isLoginMode = true;
 let selectedDiscipline = 'Standing/Flow Board';
 let selectedLevel = null;
 // ===== CONFIG =====
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsYM7UHULVVyAL1uUgE6vZMg-lYOPvY7TVSPERdYaCfjlghE3kj27gScSCpInBfQ4GVQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk6Lh_5BiDrRC2OuXcBBhtbCUzXVlr27MuTPW0_BJBlQBW-49t8wxD8O0DmLCLiAjkUw/exec';
 
 // ===== PG CONFIG (INNOPAY) =====
 const INNOPAY_MID = 'pgisaweb1m';
