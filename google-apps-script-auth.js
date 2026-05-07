@@ -204,6 +204,14 @@ function findPassword(params) {
           subject: '[ISA 국제인공서핑협회] 비밀번호 안내',
           body: body
         });
+        var now = new Date().toLocaleString('ko-KR');
+        sendTelegram([
+          '🔑 *비밀번호 찾기 요청*',
+          '━━━━━━━━━━━━━━━━',
+          '👤 이름: ' + name,
+          '📧 이메일: ' + email,
+          '🕐 요청일시: ' + now
+        ].join('\n'));
         return respond({ status: 'success', message: '입력하신 이메일로 비밀번호를 발송했습니다.' });
       } catch(e) {
         return respond({ status: 'error', message: '이메일 발송 중 오류가 발생했습니다: ' + e.message });
