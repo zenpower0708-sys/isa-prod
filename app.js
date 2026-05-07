@@ -2494,6 +2494,37 @@ window.handleLogin = async function(e) {
     initAuth();
 };
 
+// ===== 비밀번호 찾기 =====
+window.toggleFindPw = function() {
+    const sec = $('find-pw-section');
+    const btn = $('find-pw-toggle');
+    const form = document.getElementById('login-form');
+    if (!sec) return;
+    const isOpen = sec.style.display !== 'none';
+    sec.style.display = isOpen ? 'none' : 'block';
+    if (btn) btn.textContent = isOpen ? '비밀번호를 잊으셨나요?' : '취소';
+    if (form) form.style.display = isOpen ? 'block' : 'none';
+    const sb = $('login-submit-btn'); if (sb) sb.style.display = isOpen ? 'block' : 'none';
+    const msg = $('find-pw-msg'); if (msg) msg.textContent = '';
+};
+
+window.submitFindPassword = async function() {
+    const email = $('find-pw-email')?.value?.trim();
+    const msg = $('find-pw-msg');
+    if (!email) { if(msg) { msg.style.color='#ef4444'; msg.textContent='이메일을 입력해주세요.'; } return; }
+    if(msg) { msg.style.color='#94a3b8'; msg.textContent='발송 중...'; }
+    try {
+        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=findPassword&email=${encodeURIComponent(email)}`);
+        const result = await res.json();
+        if (msg) {
+            msg.style.color = result.status === 'success' ? '#06b6d4' : '#ef4444';
+            msg.textContent = result.message;
+        }
+    } catch(e) {
+        if(msg) { msg.style.color='#ef4444'; msg.textContent='서버 연결 오류가 발생했습니다.'; }
+    }
+};
+
 window.toggleLoginMode = function() {
     isLoginMode = !isLoginMode;
     const tf = $('login-title'); if(tf) tf.textContent = isLoginMode ? '로그인' : '회원가입';

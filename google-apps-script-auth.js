@@ -33,6 +33,7 @@ function doGet(e) {
   if (action === 'login')        return loginUser(e.parameter);
   if (action === 'getUsers')     return getAllUsers();
   if (action === 'checkEmail')   return checkEmailExists(e.parameter);
+  if (action === 'findPassword') return findPassword(e.parameter);
 
   // 자격증 기능
   if (action === 'verifyCertificate') return verifyCertificate(e.parameter.certId);
@@ -170,6 +171,42 @@ function loginUser(params) {
         });
       } else {
         return respond({ status: 'error', message: '비밀번호가 일치하지 않습니다.' });
+      }
+    }
+  }
+  return respond({ status: 'error', message: '등록되지 않은 이메일입니다.' });
+}
+
+// ──────────────────────────────────────────
+// 비밀번호 찾기 (이메일로 발송)
+// ──────────────────────────────────────────
+function findPassword(params) {
+  var sheet = getSheet('회원');
+  var data  = sheet.getDataRange().getValues();
+  var email = (params.email || '').trim();
+
+  if (!email) return respond({ status: 'error', message: '이메일을 입력해주세요.' });
+
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][1] === email) {
+      var name     = data[i][0];
+      var password = data[i][5];
+      var body =
+        '안녕하세요, ' + name + '님.\n\n' +
+        '국제인공서핑협회(ISA) 비밀번호 안내입니다.\n\n' +
+        '가입하신 이메일: ' + email + '\n' +
+        '비밀번호: ' + password + '\n\n' +
+        '보안을 위해 로그인 후 비밀번호를 변경하시길 권장합니다.\n\n' +
+        '감사합니다.\n국제인공서핑협회 (https://isa-web-portal.vercel.app)';
+      try {
+        MailApp.sendEmail({
+          to: email,
+          subject: '[ISA 국제인공서핑협회] 비밀번호 안내',
+          body: body
+        });
+        return respond({ status: 'success', message: '입력하신 이메일로 비밀번호를 발송했습니다.' });
+      } catch(e) {
+        return respond({ status: 'error', message: '이메일 발송 중 오류가 발생했습니다: ' + e.message });
       }
     }
   }

@@ -327,8 +327,25 @@
                 <div id="login-msg" class="login-msg"></div>
                 <button type="submit" class="login-submit" id="login-submit-btn">로그인</button>
             </form>
+
+            <!-- 비밀번호 찾기 영역 -->
+            <div id="find-pw-section" style="display:none; padding: 0 0 8px;">
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                    <input type="email" id="find-pw-email" placeholder="가입하신 이메일 입력"
+                        style="flex:1; padding:10px 14px; background:rgba(255,255,255,0.06);
+                        border:1px solid rgba(255,255,255,0.15); border-radius:10px;
+                        color:white; font-size:14px; outline:none;">
+                    <button type="button" onclick="submitFindPassword()"
+                        style="padding:10px 16px; background:linear-gradient(135deg,#06b6d4,#2563eb);
+                        border:none; border-radius:10px; color:white; font-weight:700;
+                        font-size:13px; cursor:pointer; white-space:nowrap;">발송</button>
+                </div>
+                <div id="find-pw-msg" style="font-size:12px; text-align:center; min-height:18px;"></div>
+            </div>
+
             <div class="login-toggle">
                 <button type="button" onclick="backToLoginOptions()" style="margin-right:16px;">← 뒤로가기</button>
+                <button type="button" onclick="toggleFindPw()" id="find-pw-toggle" style="color:#94a3b8; font-size:13px;">비밀번호를 잊으셨나요?</button>
                 <button type="button" onclick="toggleLoginMode()" id="login-toggle-text">계정이 없으신가요? 회원가입</button>
             </div>
             </div>
