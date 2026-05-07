@@ -2448,9 +2448,6 @@ window.handleLogin = async function(e) {
                 });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    // 회원가입 성공 시 1,000P 부여 (로컬 스토리지 데이터에 명시)
-                    if (result.data) result.data.points = (result.data.points || 0) + 1000;
-                    
                     localStorage.setItem('isa_session_v1', JSON.stringify(result.data));
                     initAuth();
                     openWelcomeModal();
@@ -3600,7 +3597,7 @@ function showPointsToast(amount, reason) {
         _orig.call(this, user);
         if (user && sessionStorage.getItem('isa_signup_toast')) {
             sessionStorage.removeItem('isa_signup_toast');
-            setTimeout(() => showPointsToast(500, '가입 축하 포인트'), 400);
+            setTimeout(() => showPointsToast(1000, '가입 축하 포인트'), 400);
         }
     };
 })();

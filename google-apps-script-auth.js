@@ -89,7 +89,7 @@ function doPost(e) {
 }
 
 // ──────────────────────────────────────────
-// 회원가입 (가입 포인트 500P 자동 지급 + 텔레그램 알림)
+// 회원가입 (가입 포인트 1000P 자동 지급 + 텔레그램 알림)
 // ──────────────────────────────────────────
 function registerUser(data) {
   var sheet   = getSheet('회원');
@@ -113,8 +113,8 @@ function registerUser(data) {
   ]);
   try { sheet.autoResizeColumns(1, 7); } catch(e) {}
 
-  // 가입 축하 포인트 500P 자동 지급
-  addPointRecord(data.email, data.name || '', 500, '가입 축하 포인트', '완료');
+  // 가입 축하 포인트 1000P 자동 지급
+  addPointRecord(data.email, data.name || '', 1000, '가입 축하 포인트', '완료');
 
   // 텔레그램 알림
   sendTelegram([
@@ -124,7 +124,7 @@ function registerUser(data) {
     '📧 이메일: ' + (data.email || '-'),
     '📱 연락처: ' + (data.phone || '-'),
     '⚧ 성별: ' + (data.gender === 'M' ? '남성' : '여성'),
-    '🎁 가입 포인트 500P 지급 완료',
+    '🎁 가입 포인트 1000P 지급 완료',
     '🕐 가입일시: ' + now
   ].join('\n'));
 
@@ -138,7 +138,7 @@ function registerUser(data) {
       birth:  data.birth,
       gender: data.gender,
       joined: new Date().toISOString().slice(0, 10),
-      points: 500
+      points: 1000
     }
   });
 }
@@ -178,6 +178,46 @@ function loginUser(params) {
 }
 
 // ──────────────────────────────────────────
+// 기존 회원 보상 포인트 일괄 지급 (GAS 편집기에서 1회만 실행)
+// ──────────────────────────────────────────
+function giveExistingMembersBonus() {
+  var sheet   = getSheet('회원');
+  var members = sheet.getDataRange().getValues();
+  var count   = 0;
+
+  for (var i = 1; i < members.length; i++) {
+    var email = members[i][1];
+    var name  = members[i][0];
+    if (!email) continue;
+
+    // 이미 보상 포인트를 받았는지 확인
+    var pointSheet = getSheet('포인트내역');
+    var pointData  = pointSheet.getDataRange().getValues();
+    var alreadyGiven = false;
+    for (var j = 1; j < pointData.length; j++) {
+      if (pointData[j][0] === email && String(pointData[j][2]).indexOf('기존 회원 보상') !== -1) {
+        alreadyGiven = true;
+        break;
+      }
+    }
+    if (alreadyGiven) continue;
+
+    addPointRecord(email, name, 1500, '기존 회원 보상 포인트', '완료');
+    count++;
+    Logger.log('지급 완료: ' + name + ' (' + email + ') +1500P');
+  }
+
+  sendTelegram([
+    '🎁 *기존 회원 보상 포인트 일괄 지급 완료*',
+    '━━━━━━━━━━━━━━━━',
+    '👥 지급 인원: ' + count + '명',
+    '💰 지급 금액: 1,500P/인'
+  ].join('\n'));
+
+  Logger.log('총 ' + count + '명에게 1500P 지급 완료');
+}
+
+// ──────────────────────────────────────────
 // 비밀번호 찾기 (이메일로 발송)
 // ──────────────────────────────────────────
 function findPassword(params) {
@@ -201,6 +241,7 @@ function findPassword(params) {
       try {
         MailApp.sendEmail({
           to: email,
+          name: '국제인공서핑협회',
           subject: '[ISA 국제인공서핑협회] 비밀번호 안내',
           body: body
         });
