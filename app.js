@@ -2130,8 +2130,12 @@ function handleKakaoLogin() {
         alert('Kakao App Key가 설정되지 않았습니다.\napp.js의 KAKAO_APP_KEY를 설정해주세요.');
         return;
     }
+    // SDK 로드됐지만 아직 초기화 안 됐으면 여기서 바로 초기화
+    if (window.Kakao && !Kakao.isInitialized()) {
+        Kakao.init(KAKAO_APP_KEY);
+    }
     if (!window.Kakao || !Kakao.isInitialized()) {
-        alert('카카오 SDK 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+        alert('카카오 SDK를 불러오지 못했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
         return;
     }
     Kakao.Auth.login({
