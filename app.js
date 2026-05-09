@@ -20,7 +20,7 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk6Lh_5BiDrR
 // ===== SOCIAL LOGIN CONFIG =====
 // 아래 두 값을 발급받은 키로 교체하세요
 const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
-const KAKAO_APP_KEY    = 'YOUR_KAKAO_JAVASCRIPT_APP_KEY';
+const KAKAO_APP_KEY    = 'f9bf5788e94af1e570c1a8c814e13d1c';
 
 // ===== PG CONFIG (INNOPAY) =====
 const INNOPAY_MID = 'pgisaweb1m';
