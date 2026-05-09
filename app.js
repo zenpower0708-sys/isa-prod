@@ -17,6 +17,10 @@ let selectedDiscipline = 'Standing/Flow Board';
 let selectedLevel = null;
 // ===== CONFIG =====
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk6Lh_5BiDrRC2OuXcBBhtbCUzXVlr27MuTPW0_BJBlQBW-49t8wxD8O0DmLCLiAjkUw/exec';
+// ===== SOCIAL LOGIN CONFIG =====
+// 아래 두 값을 발급받은 키로 교체하세요
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+const KAKAO_APP_KEY    = 'YOUR_KAKAO_JAVASCRIPT_APP_KEY';
 
 // ===== PG CONFIG (INNOPAY) =====
 const INNOPAY_MID = 'pgisaweb1m';
@@ -2038,109 +2042,123 @@ function initAuth() {
     if (session) {
         updateAuthUI(session);
     }
-    
+
     // Google Identity Services 초기화
-    if (window.google) {
+    if (window.google && GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.includes('YOUR_')) {
         google.accounts.id.initialize({
-            client_id: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com", // 사용자의 클라이언트 ID로 교체 필요
+            client_id: GOOGLE_CLIENT_ID,
             callback: onGoogleSignIn
         });
     }
-}
 
-// 구글 로그인 핸들러
-function handleGoogleLogin() {
-    // 현재 Google Client ID가 없어 실제 구글 연동(OAuth)이 불가능하므로,
-    // 데모/테스트 목적으로 이메일 입력을 받아 소셜 로그인을 시뮬레이션합니다.
-    const mockEmail = prompt("구글 로그인을 진행합니다.\n연동할 구글 계정 이메일을 입력하세요:", "");
-    if (mockEmail && mockEmail.includes('@')) {
-        const socialData = {
-            action: 'socialLogin',
-            provider: 'google',
-            email: mockEmail,
-            name: mockEmail.split('@')[0]
-        };
-        
-        const msgEl = document.getElementById('login-msg');
-        if (msgEl) {
-            msgEl.textContent = "구글 계정 연동 중...";
-            msgEl.style.display = "block";
-            msgEl.className = "login-msg success";
+    // Kakao SDK 초기화
+    if (window.Kakao && KAKAO_APP_KEY && !KAKAO_APP_KEY.includes('YOUR_')) {
+        if (!Kakao.isInitialized()) {
+            Kakao.init(KAKAO_APP_KEY);
         }
-        
-        if (typeof GOOGLE_SCRIPT_URL !== 'undefined' && GOOGLE_SCRIPT_URL) {
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(socialData)
-            }).then(res => res.json()).then(result => {
-                if (result.status === 'success') {
-                    localStorage.setItem('isa_session_v1', JSON.stringify(result.data));
-                    initAuth();
-                    closeLoginModal();
-                    alert(`${result.data.name}님, 구글 계정으로 로그인되었습니다.`);
-                    if(typeof renderPage === 'function') renderPage('home'); // 화면 갱신
-                } else {
-                    alert("구글 로그인 실패: " + result.message);
-                }
-            }).catch(err => {
-                alert("구글 연동 중 오류가 발생했습니다.");
-            });
-        } else {
-            localStorage.setItem('isa_session_v1', JSON.stringify({ name: socialData.name, email: socialData.email }));
-            initAuth();
-            closeLoginModal();
-            alert(`${socialData.name}님, 구글 계정으로 로그인되었습니다. (테스트)`);
-        }
-    } else if (mockEmail) {
-        alert("유효한 이메일 형식을 입력해주세요.");
     }
 }
 
-function onGoogleSignIn(response) {
-    // decodeJwt는 아래에 정의
-    const payload = decodeJwt(response.credential);
-    console.log("Google User:", payload);
-    
-    const socialData = {
-        action: 'socialLogin',
-        provider: 'google',
-        email: payload.email,
-        name: payload.name,
-        picture: payload.picture
-    };
-    
-    showLoginMsg("구글 계정 확인 중...", "cyan");
-    
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // GAS의 한계로 no-cors 사용 시 응답을 못받으므로 실제로는 폼 전송이나 JSONP 방식을 쓰기도 함
-        body: JSON.stringify(socialData)
-    })
-    .then(() => {
-        // no-cors는 성공 여부를 알 수 없으므로, 별도의 확인 로직이 필요함
-        // 보통 GAS는 redirect를 하므로 처리가 까다로움. 
-        // 여기서는 기존 app.js의 callGAS 스타일을 따름 (JSONP 지원 시)
-        callGAS(socialData, (res) => {
-            if (res.status === 'success') {
-                saveSession(res.data);
-                updateAuthUI(res.data);
-                closeLoginModal();
-                alert(`${res.data.name}님, 구글 계정으로 로그인되었습니다.`);
-            } else {
-                showLoginMsg(res.message, "red");
+// ─────────────────────────────────────────────
+// 소셜 로그인 공통 처리
+// ─────────────────────────────────────────────
+function showLoginMsg(msg, type) {
+    const el = document.getElementById('login-msg');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.className = 'login-msg ' + (type === 'red' ? 'error' : 'success');
+}
+
+async function processSocialLogin(provider, email, name) {
+    showLoginMsg((provider === 'kakao' ? '카카오' : '구글') + ' 계정 확인 중...', 'success');
+    try {
+        const url = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=${provider}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
+        const res  = await fetch(url);
+        const json = await res.json();
+        if (json.status === 'success') {
+            localStorage.setItem('isa_session_v1', JSON.stringify(json.data));
+            initAuth();
+            closeLoginModal();
+        } else {
+            showLoginMsg(json.message || '로그인 실패', 'red');
+        }
+    } catch(e) {
+        showLoginMsg('서버 연결 오류가 발생했습니다.', 'red');
+        console.error('[processSocialLogin]', e);
+    }
+}
+
+// ─────────────────────────────────────────────
+// 구글 로그인
+// ─────────────────────────────────────────────
+function handleGoogleLogin() {
+    if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes('YOUR_')) {
+        alert('Google Client ID가 설정되지 않았습니다.\napp.js의 GOOGLE_CLIENT_ID를 설정해주세요.');
+        return;
+    }
+    if (!window.google || !window.google.accounts) {
+        alert('Google SDK 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'email profile openid',
+        callback: async (tokenResponse) => {
+            if (tokenResponse.error) {
+                showLoginMsg('Google 로그인 실패: ' + tokenResponse.error, 'red');
+                return;
             }
-        });
+            try {
+                const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                }).then(r => r.json());
+                await processSocialLogin('google', userInfo.email, userInfo.name || userInfo.email.split('@')[0]);
+            } catch(e) {
+                showLoginMsg('Google 정보 조회 오류가 발생했습니다.', 'red');
+            }
+        }
+    });
+    tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+// ─────────────────────────────────────────────
+// 카카오 로그인
+// ─────────────────────────────────────────────
+function handleKakaoLogin() {
+    if (!KAKAO_APP_KEY || KAKAO_APP_KEY.includes('YOUR_')) {
+        alert('Kakao App Key가 설정되지 않았습니다.\napp.js의 KAKAO_APP_KEY를 설정해주세요.');
+        return;
+    }
+    if (!window.Kakao || !Kakao.isInitialized()) {
+        alert('카카오 SDK 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+    Kakao.Auth.login({
+        success: function() {
+            Kakao.API.request({
+                url: '/v2/user/me',
+                success: async function(res) {
+                    const email = res.kakao_account?.email || ('kakao_' + res.id + '@kakao.user');
+                    const name  = res.kakao_account?.profile?.nickname || res.properties?.nickname || '카카오회원';
+                    await processSocialLogin('kakao', email, name);
+                },
+                fail: function(err) {
+                    showLoginMsg('카카오 정보 조회 실패', 'red');
+                    console.error('[Kakao API]', err);
+                }
+            });
+        },
+        fail: function(err) {
+            if (err.error !== 'access_denied') {
+                showLoginMsg('카카오 로그인에 실패했습니다.', 'red');
+            }
+            console.error('[Kakao login]', err);
+        }
     });
 }
 
-function decodeJwt(token) {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(jsonPayload);
-}
+// (구버전 mock 함수 제거 — 위의 실제 OAuth 구현으로 대체됨)
 
 function handleAppleLogin() {
     alert("애플 로그인은 현재 준비 중입니다. 구글 로그인 또는 이메일 로그인을 이용해 주세요.");
