@@ -16,7 +16,7 @@ let isLoginMode = true;
 let selectedDiscipline = 'Standing/Flow Board';
 let selectedLevel = null;
 // ===== CONFIG =====
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk6Lh_5BiDrRC2OuXcBBhtbCUzXVlr27MuTPW0_BJBlQBW-49t8wxD8O0DmLCLiAjkUw/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJzgz68HJuEEr4PyRvoFttKjgvUWblVLt4SqZsK3DwR3jllgwvTrKvt0wn2jDMstp4JQ/exec';
 // ===== SOCIAL LOGIN CONFIG =====
 const GOOGLE_CLIENT_ID  = '149618944785-t6f36b811rhmo7cbqtt66fbh4otpsju8.apps.googleusercontent.com';
 const KAKAO_APP_KEY     = 'f9bf5788e94af1e570c1a8c814e13d1c'; // JavaScript 키
