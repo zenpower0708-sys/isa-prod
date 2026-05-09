@@ -2039,6 +2039,7 @@ window.verifyInstructorCert = async function() {
 
 function initAuth() {
     const session = getSession();
+    updateNavbarAuth(session);  // 네비바 항상 갱신
     if (session) {
         updateAuthUI(session);
     }
@@ -2057,8 +2058,8 @@ function initAuth() {
             Kakao.init(KAKAO_APP_KEY);
         }
     }
-    
-    // 모바일 리다이렉트 로그인 체크
+
+    // 카카오 모바일 리다이렉트 콜백 처리
     checkKakaoRedirect();
 }
 
@@ -2421,10 +2422,7 @@ function renderEventContent(isKO) {
     return `<div class="quick-list">${events.map(e => `<div class="quick-item"><div class="date">${e.date}</div><div class="title">${e.title}</div></div>`).join('')}</div>`;
 }
 
-function initAuth() {
-    const user = getSession();
-    updateNavbarAuth(user);
-}
+// (중복 initAuth 제거 — 위의 통합 버전 사용)
 const SESSION_KEY  = 'isa_session_v1';
 const SESSION_DAYS = 30;
 
