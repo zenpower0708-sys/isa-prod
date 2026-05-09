@@ -19,7 +19,7 @@ let selectedLevel = null;
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk6Lh_5BiDrRC2OuXcBBhtbCUzXVlr27MuTPW0_BJBlQBW-49t8wxD8O0DmLCLiAjkUw/exec';
 // ===== SOCIAL LOGIN CONFIG =====
 // 아래 두 값을 발급받은 키로 교체하세요
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '149618944785-t6f36b811rhmo7cbqtt66fbh4otpsju8.apps.googleusercontent.com';
 const KAKAO_APP_KEY    = 'f9bf5788e94af1e570c1a8c814e13d1c';
 
 // ===== PG CONFIG (INNOPAY) =====
