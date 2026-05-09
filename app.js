@@ -18,9 +18,9 @@ let selectedLevel = null;
 // ===== CONFIG =====
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk6Lh_5BiDrRC2OuXcBBhtbCUzXVlr27MuTPW0_BJBlQBW-49t8wxD8O0DmLCLiAjkUw/exec';
 // ===== SOCIAL LOGIN CONFIG =====
-// 아래 두 값을 발급받은 키로 교체하세요
-const GOOGLE_CLIENT_ID = '149618944785-t6f36b811rhmo7cbqtt66fbh4otpsju8.apps.googleusercontent.com';
-const KAKAO_APP_KEY    = 'f9bf5788e94af1e570c1a8c814e13d1c';
+const GOOGLE_CLIENT_ID  = '149618944785-t6f36b811rhmo7cbqtt66fbh4otpsju8.apps.googleusercontent.com';
+const KAKAO_APP_KEY     = 'f9bf5788e94af1e570c1a8c814e13d1c'; // JavaScript 키
+const KAKAO_REDIRECT_URI = 'https://isa-web-portal.vercel.app';
 
 // ===== PG CONFIG (INNOPAY) =====
 const INNOPAY_MID = 'pgisaweb1m';
@@ -2057,6 +2057,9 @@ function initAuth() {
             Kakao.init(KAKAO_APP_KEY);
         }
     }
+    
+    // 모바일 리다이렉트 로그인 체크
+    checkKakaoRedirect();
 }
 
 // ─────────────────────────────────────────────
@@ -2125,12 +2128,10 @@ function handleGoogleLogin() {
 // ─────────────────────────────────────────────
 // 카카오 로그인
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// 카카오 로그인
+// ─────────────────────────────────────────────
 function handleKakaoLogin() {
-    if (!KAKAO_APP_KEY || KAKAO_APP_KEY.includes('YOUR_')) {
-        alert('Kakao App Key가 설정되지 않았습니다.\napp.js의 KAKAO_APP_KEY를 설정해주세요.');
-        return;
-    }
-    // SDK 로드됐지만 아직 초기화 안 됐으면 여기서 바로 초기화
     if (window.Kakao && !Kakao.isInitialized()) {
         Kakao.init(KAKAO_APP_KEY);
     }
@@ -2138,28 +2139,48 @@ function handleKakaoLogin() {
         alert('카카오 SDK를 불러오지 못했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
         return;
     }
-    Kakao.Auth.login({
-        success: function() {
-            Kakao.API.request({
-                url: '/v2/user/me',
-                success: async function(res) {
-                    const email = res.kakao_account?.email || ('kakao_' + res.id + '@kakao.user');
-                    const name  = res.kakao_account?.profile?.nickname || res.properties?.nickname || '카카오회원';
-                    await processSocialLogin('kakao', email, name);
-                },
-                fail: function(err) {
-                    showLoginMsg('카카오 정보 조회 실패', 'red');
-                    console.error('[Kakao API]', err);
-                }
-            });
-        },
-        fail: function(err) {
-            if (err.error !== 'access_denied') {
-                showLoginMsg('카카오 로그인에 실패했습니다.', 'red');
-            }
-            console.error('[Kakao login]', err);
-        }
+    // PC/모바일 모두 리다이렉트 방식으로 통일
+    Kakao.Auth.authorize({
+        redirectUri: 'https://isa-web-portal.vercel.app',
+        scope: 'profile_nickname,account_email'
     });
+}
+
+// 카카오 로그인 후 리다이렉트 콜백 처리 (code → GAS → 토큰 교환 → 로그인)
+async function checkKakaoRedirect() {
+    const params = new URLSearchParams(window.location.search);
+    const code  = params.get('code');
+    const error = params.get('error');
+
+    // URL 즉시 정리 (새로고침 시 중복 처리 방지)
+    if (code || error) {
+        window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+    }
+    if (error || !code) return;
+
+    // 로딩 표시
+    document.body.insertAdjacentHTML('beforeend',
+        '<div id="kakao-loading" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;">' +
+        '<div style="color:white;font-size:16px;text-align:center;">⏳<br>카카오 로그인 처리 중...</div></div>');
+
+    try {
+        const url = `${GOOGLE_SCRIPT_URL}?action=kakaoCallback&code=${encodeURIComponent(code)}&redirectUri=${encodeURIComponent('https://isa-web-portal.vercel.app')}`;
+        const res  = await fetch(url);
+        const json = await res.json();
+
+        if (json.status === 'success') {
+            saveSession(json.data);
+            initAuth();
+        } else {
+            alert('카카오 로그인 실패: ' + (json.message || '다시 시도해주세요.'));
+        }
+    } catch(e) {
+        console.error('[checkKakaoRedirect]', e);
+        alert('카카오 로그인 처리 중 오류가 발생했습니다.');
+    } finally {
+        const el = document.getElementById('kakao-loading');
+        if (el) el.remove();
+    }
 }
 
 // (구버전 mock 함수 제거 — 위의 실제 OAuth 구현으로 대체됨)

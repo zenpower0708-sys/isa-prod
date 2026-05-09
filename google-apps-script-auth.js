@@ -21,6 +21,9 @@ var TELEGRAM_CONFIG = {
   CHAT_ID: '-5170338263'
 };
 
+// === 카카오 REST API 키 ===
+var KAKAO_REST_API_KEY = '87d7c1a6d5dfa1a49189862d8cc43a8c';
+
 // === 코드 시작 ===
 
 // ──────────────────────────────────────────
@@ -30,10 +33,12 @@ function doGet(e) {
   var action = e.parameter.action;
 
   // 회원 기능
-  if (action === 'login')        return loginUser(e.parameter);
-  if (action === 'getUsers')     return getAllUsers();
-  if (action === 'checkEmail')   return checkEmailExists(e.parameter);
-  if (action === 'findPassword') return findPassword(e.parameter);
+  if (action === 'login')          return loginUser(e.parameter);
+  if (action === 'getUsers')       return getAllUsers();
+  if (action === 'checkEmail')     return checkEmailExists(e.parameter);
+  if (action === 'findPassword')   return findPassword(e.parameter);
+  if (action === 'kakaoCallback')  return kakaoCallback(e.parameter);
+  if (action === 'socialLogin')    return socialLoginGet(e.parameter);
 
   // 자격증 기능
   if (action === 'verifyCertificate') return verifyCertificate(e.parameter.certId);
@@ -260,6 +265,58 @@ function findPassword(params) {
     }
   }
   return respond({ status: 'error', message: '등록되지 않은 이메일입니다.' });
+}
+
+// ──────────────────────────────────────────
+// 카카오 인가 코드 → 토큰 교환 → 로그인
+// ──────────────────────────────────────────
+function kakaoCallback(params) {
+  var code        = params.code || '';
+  var redirectUri = params.redirectUri || 'https://isa-web-portal.vercel.app';
+
+  if (!code) return respond({ status: 'error', message: '인가 코드가 없습니다.' });
+
+  try {
+    // 1) 인가 코드 → 액세스 토큰
+    var tokenRes = UrlFetchApp.fetch('https://kauth.kakao.com/oauth/token', {
+      method: 'post',
+      contentType: 'application/x-www-form-urlencoded',
+      payload: 'grant_type=authorization_code' +
+               '&client_id=' + KAKAO_REST_API_KEY +
+               '&redirect_uri=' + encodeURIComponent(redirectUri) +
+               '&code=' + encodeURIComponent(code),
+      muteHttpExceptions: true
+    });
+    var tokenData = JSON.parse(tokenRes.getContentText());
+    if (!tokenData.access_token) {
+      return respond({ status: 'error', message: '카카오 토큰 발급 실패: ' + (tokenData.error_description || '') });
+    }
+
+    // 2) 액세스 토큰 → 사용자 정보
+    var userRes = UrlFetchApp.fetch('https://kapi.kakao.com/v2/user/me', {
+      headers: { 'Authorization': 'Bearer ' + tokenData.access_token },
+      muteHttpExceptions: true
+    });
+    var userData = JSON.parse(userRes.getContentText());
+
+    var email = (userData.kakao_account && userData.kakao_account.email)
+                ? userData.kakao_account.email
+                : 'kakao_' + userData.id + '@kakao.user';
+    var name  = (userData.kakao_account && userData.kakao_account.profile && userData.kakao_account.profile.nickname)
+                ? userData.kakao_account.profile.nickname
+                : (userData.properties ? (userData.properties.nickname || '카카오회원') : '카카오회원');
+
+    // 3) 기존 socialLogin 로직으로 처리
+    return socialLogin({ email: email, name: name, provider: 'kakao' });
+
+  } catch(e) {
+    return respond({ status: 'error', message: '카카오 처리 오류: ' + e.toString() });
+  }
+}
+
+// GET 방식 소셜 로그인 (구글 등)
+function socialLoginGet(params) {
+  return socialLogin({ email: params.email, name: params.name, provider: params.provider || 'unknown' });
 }
 
 // ──────────────────────────────────────────
