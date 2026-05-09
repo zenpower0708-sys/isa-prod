@@ -2077,7 +2077,7 @@ async function processSocialLogin(provider, email, name) {
         const res  = await fetch(url);
         const json = await res.json();
         if (json.status === 'success') {
-            localStorage.setItem('isa_session_v1', JSON.stringify(json.data));
+            saveSession(json.data);
             initAuth();
             closeLoginModal();
         } else {
@@ -2400,16 +2400,44 @@ function initAuth() {
     const user = getSession();
     updateNavbarAuth(user);
 }
-function getSession() { 
-    try { 
-        let user = JSON.parse(localStorage.getItem('isa_session_v1'));
-        if (user && user.name === '곽세영' && (user.points === undefined || user.points === 0)) {
-            user.points = 1000;
-            localStorage.setItem('isa_session_v1', JSON.stringify(user));
+const SESSION_KEY  = 'isa_session_v1';
+const SESSION_DAYS = 30;
+
+function isKeepLogin() {
+    const cb = document.getElementById('keep-login-check');
+    return cb ? cb.checked : true; // 기본값: 유지
+}
+
+function getSession() {
+    try {
+        // 1) localStorage (30일 유지) 확인
+        let raw = localStorage.getItem(SESSION_KEY);
+        if (raw) {
+            const user = JSON.parse(raw);
+            // 만료 체크
+            if (user.expiresAt && Date.now() > user.expiresAt) {
+                localStorage.removeItem(SESSION_KEY);
+                return null;
+            }
+            // 곽세영 포인트 픽스
+            if (user.name === '곽세영' && !user.points) {
+                user.points = 1000;
+                localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+            }
+            return user;
         }
-        return user;
-    } 
-    catch(e) { return null; }
+        // 2) sessionStorage (브라우저 닫으면 만료) 확인
+        raw = sessionStorage.getItem(SESSION_KEY);
+        if (raw) {
+            const user = JSON.parse(raw);
+            if (user.name === '곽세영' && !user.points) {
+                user.points = 1000;
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+            }
+            return user;
+        }
+        return null;
+    } catch(e) { return null; }
 }
 function updateNavbarAuth(user) {
     const btn = document.querySelector('.login-btn');
@@ -2452,7 +2480,7 @@ window.handleLogin = async function(e) {
         if (!GOOGLE_SCRIPT_URL) {
             // URL이 없으면 테스트용 로컬 저장만 수행
             console.warn('GOOGLE_SCRIPT_URL이 설정되지 않았습니다. 테스트 모드로 작동합니다.');
-            localStorage.setItem('isa_session_v1', JSON.stringify({ name, email }));
+            saveSession({ name, email });
             alert('회원가입 완료! (테스트 모드)');
         } else {
             // GAS로 전송
@@ -2466,7 +2494,7 @@ window.handleLogin = async function(e) {
                 });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    localStorage.setItem('isa_session_v1', JSON.stringify(result.data));
+                    saveSession(result.data);
                     initAuth();
                     openWelcomeModal();
                 } else {
@@ -2486,13 +2514,13 @@ window.handleLogin = async function(e) {
 
         if (!GOOGLE_SCRIPT_URL) {
             console.warn('GOOGLE_SCRIPT_URL이 설정되지 않았습니다. 테스트 모드로 작동합니다.');
-            localStorage.setItem('isa_session_v1', JSON.stringify({ name: email.split('@')[0], email }));
+            saveSession({ name: email.split('@')[0], email });
         } else {
             try {
                 const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&email=${email}&password=${password}`);
                 const result = await response.json();
                 if (result.status === 'success') {
-                    localStorage.setItem('isa_session_v1', JSON.stringify(result.data));
+                    saveSession(result.data);
                 } else {
                     alert('로그인 실패: ' + result.message);
                     return;
@@ -2575,7 +2603,8 @@ window.handleLogFiles = handleLogFiles;
 window.removeLogFile = removeLogFile;
 window.submitLogbook = submitLogbook;
 window.logoutUser = function() {
-    localStorage.removeItem('isa_session_v1');
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
     closeProfileModal();
     initAuth();
     alert(currentLang === 'KO' ? '로그아웃 되었습니다.' : 'Logged out successfully.');
@@ -3328,8 +3357,23 @@ async function handlePracticalSubmit(btn) {
 // ============================================================
 
 // 세션 저장 헬퍼
-function saveSession(data) {
-    localStorage.setItem('isa_session_v1', JSON.stringify(data));
+// persist: true=localStorage(30일), false=sessionStorage, undefined=기존저장소 유지 or 체크박스 참조
+function saveSession(data, persist) {
+    // persist 미지정 시: 이미 저장된 곳 유지, 없으면 체크박스 참조
+    if (persist === undefined) {
+        if (localStorage.getItem(SESSION_KEY))  persist = true;
+        else if (sessionStorage.getItem(SESSION_KEY)) persist = false;
+        else persist = isKeepLogin();
+    }
+    if (persist) {
+        const d = { ...data, expiresAt: data.expiresAt || (Date.now() + SESSION_DAYS * 86400000) };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(d));
+        sessionStorage.removeItem(SESSION_KEY);
+    } else {
+        const { expiresAt, ...clean } = data;
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(clean));
+        localStorage.removeItem(SESSION_KEY);
+    }
 }
 
 // ── 포인트 UI 전체 동기화 (네비바 + 프로필 배지 + 충전탭 잔액 한 번에) ──
