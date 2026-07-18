@@ -2054,17 +2054,6 @@ window.verifyInstructorCert = async function() {
 function initAuth() {
     const session = getSession();
     updateNavbarAuth(session);  // 네비바 항상 갱신
-    if (session) {
-        updateAuthUI(session);
-    }
-
-    // Google Identity Services 초기화
-    if (window.google && GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.includes('YOUR_')) {
-        google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: onGoogleSignIn
-        });
-    }
 
     // Kakao SDK 초기화
     if (window.Kakao && KAKAO_APP_KEY && !KAKAO_APP_KEY.includes('YOUR_')) {
@@ -2186,6 +2175,7 @@ async function checkKakaoRedirect() {
         if (json.status === 'success') {
             saveSession(json.data);
             initAuth();
+            closeLoginModal();
         } else {
             alert('카카오 로그인 실패: ' + (json.message || '다시 시도해주세요.'));
         }
