@@ -16,7 +16,7 @@ let isLoginMode = true;
 let selectedDiscipline = 'Standing/Flow Board';
 let selectedLevel = null;
 // ===== CONFIG =====
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJzgz68HJuEEr4PyRvoFttKjgvUWblVLt4SqZsK3DwR3jllgwvTrKvt0wn2jDMstp4JQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPfjonjiMrrvqZBh3RW38WzQ0bGpAZebTiSu5EyPY3433li5hXcVgp8Cxz8Vpt6VSLAw/exec';
 // ===== SOCIAL LOGIN CONFIG =====
 const GOOGLE_CLIENT_ID  = '149618944785-t6f36b811rhmo7cbqtt66fbh4otpsju8.apps.googleusercontent.com';
 const KAKAO_APP_KEY     = 'f9bf5788e94af1e570c1a8c814e13d1c'; // JavaScript 키
@@ -1892,14 +1892,7 @@ function accruePoints(email, name, amount, reason) {
 
 // ===== AUTH & MODALS =====
 function openLoginModal() { isLoginMode = true; const m = $('login-modal'); if(m) m.classList.add('open'); }
-function closeLoginModal(event) { 
-    if(event && event.target !== event.currentTarget) return;
-    if(!getSession()) {
-        alert(typeof currentLang !== 'undefined' && currentLang === 'EN' ? 'Login is required to view this site.' : '이 사이트의 모든 자료는 회원 가입 및 로그인을 해야만 볼 수 있습니다.');
-        return;
-    }
-    const m = $('login-modal'); if(m) m.classList.remove('open'); 
-}
+function closeLoginModal() { const m = $('login-modal'); if(m) m.classList.remove('open'); }
 function openQuickModal(type) { 
     const m = $('quick-modal'); if(!m) return;
     m.classList.add('open');
@@ -2047,16 +2040,8 @@ window.verifyInstructorCert = async function() {
 function initAuth() {
     const session = getSession();
     updateNavbarAuth(session);  // 네비바 항상 갱신
-    const closeBtn = document.querySelector('#login-modal .modal-close');
-    const appContent = document.getElementById('app-content');
     if (session) {
         updateAuthUI(session);
-        if(closeBtn) closeBtn.style.display = 'block';
-        if(appContent) appContent.style.display = 'block';
-    } else {
-        if(closeBtn) closeBtn.style.display = 'none';
-        if(appContent) appContent.style.display = 'none';
-        openLoginModal();
     }
 
     // Google Identity Services 초기화
@@ -2187,12 +2172,19 @@ async function checkKakaoRedirect() {
         if (json.status === 'success') {
             saveSession(json.data);
             initAuth();
+            if (typeof renderPage === 'function') renderPage(currentPage || '/');
         } else {
-            alert('카카오 로그인 실패: ' + (json.message || '다시 시도해주세요.'));
+            // 이미 로그인이 되어있다면 에러 메시지 무시
+            if (!getSession()) {
+                alert('카카오 로그인 실패: ' + (json.message || '다시 시도해주세요.'));
+            }
         }
     } catch(e) {
         console.error('[checkKakaoRedirect]', e);
-        alert('카카오 로그인 처리 중 오류가 발생했습니다.');
+        // 네트워크 끊김 등으로 인한 무해한 에러는 세션 확인 후 조용히 처리
+        if (!getSession()) {
+            alert('카카오 로그인 처리 중 오류가 발생했습니다.');
+        }
     } finally {
         const el = document.getElementById('kakao-loading');
         if (el) el.remove();

@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISA 대회 플랫폼</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #c8a44a;
+  --gold-light: #f0c96a;
+  --gold-dim: #7a6030;
+  --cyan: #00d4ff;
+  --cyan-dim: #004d5c;
+  --red: #e63946;
+  --green: #1d9e75;
+  --bg-deep: #04080f;
+  --bg-panel: #080d18;
+  --bg-card: #0d1525;
+  --bg-card2: #111b2e;
+  --border: rgba(200,164,74,0.18);
+  --border-bright: rgba(200,164,74,0.45);
+  --text-primary: #dde4f0;
+  --text-secondary: #7a8aaa;
+  --text-gold: #c8a44a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Corner brackets mixin */
+.corner-brackets {
+  position: relative;
+}
+.corner-brackets::before,
+.corner-brackets::after,
+.corner-brackets > .cb-inner::before,
+.corner-brackets > .cb-inner::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--gold);
+  border-style: solid;
+}
+.corner-brackets::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.corner-brackets::after  { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+.corner-brackets > .cb-inner::before { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+.corner-brackets > .cb-inner::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+/* ===================== TOP NAV ===================== */
+.topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 64px;
+  background: linear-gradient(180deg, rgba(8,13,24,0.98) 0%, rgba(8,13,24,0.92) 100%);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1a2040, #0d1525);
+  border: 1px solid var(--border-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+}
+.logo-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(200,164,74,0.12), transparent 60%);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+.logo-text .ko { font-size: 16px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+.logo-text .en { font-family: 'Orbitron', monospace; font-size: 8px; font-weight: 400; color: var(--text-gold); letter-spacing: 0.15em; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.nav-link {
+  padding: 6px 16px;
+  font-size: 11px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  text-transform: uppercase;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--gold-light);
+  border-bottom-color: var(--gold);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: rgba(230,57,70,0.12);
+  border: 1px solid rgba(230,57,70,0.35);
+  border-radius: 3px;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #e63946;
+  letter-spacing: 0.12em;
+}
+.live-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #e63946;
+  animation: pulse-red 1.4s ease-in-out infinite;
+}
+@keyframes pulse-red { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+.btn-register {
+  padding: 7px 18px;
+  background: linear-gradient(135deg, #c8a44a, #a07830);
+  border: none;
+  border-radius: 3px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a0e1a;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+}
+.btn-register:hover {
+  background: linear-gradient(135deg, #f0c96a, #c8a44a);
+  transform: translateY(-1px);
+}
+
+/* ===================== HERO / MAIN ===================== */
+.main-wrap {
+  display: grid;
+  grid-template-columns: 220px 1fr 300px;
+  grid-template-rows: auto;
+  min-height: calc(100vh - 64px);
+}
+
+/* LEFT SIDEBAR */
+.sidebar-left {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+}
+
+.sidebar-section {
+  padding: 0 16px;
+  margin-bottom: 24px;
+}
+
+.sidebar-heading {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--text-gold);
+  letter-spacing: 0.18em;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.sport-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  border: 1px solid transparent;
+}
+.sport-item:hover, .sport-item.active {
+  background: rgba(200,164,74,0.06);
+  border-color: var(--border);
+}
+.sport-item.active .sport-name { color: var(--gold-light); }
+
+.sport-icon {
+  width: 28px; height: 28px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.sport-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+.sport-count {
+  margin-left: auto;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: var(--text-gold);
+}
+
+.division-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 1px;
+}
+.division-item:hover { background: rgba(200,164,74,0.05); }
+.division-name {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+.division-pill {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-gold);
+}
+
+/* CENTER MAIN */
+.center-main {
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+/* HUD-style stat row */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--border-bright); }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.4;
+}
+
+.stat-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--text-secondary);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--gold-light);
+  line-height: 1;
+}
+.stat-sub {
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+.stat-live { color: #e63946; }
+
+/* Live matches */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-gold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::before {
+  content: '';
+  width: 3px; height: 14px;
+  background: var(--gold);
+  border-radius: 2px;
+}
+
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.match-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.match-card:hover { border-color: var(--border-bright); transform: translateY(-1px); }
+.match-card.live-card { border-color: rgba(230,57,70,0.3); }
+.match-card.live-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(230,57,70,0.04), transparent 50%);
+  pointer-events: none;
+}
+
+.match-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.match-type {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.match-status {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+.ms-live { background: rgba(230,57,70,0.15); color: #e63946; border: 1px solid rgba(230,57,70,0.3); }
+.ms-wait { background: rgba(200,164,74,0.12); color: var(--gold); border: 1px solid rgba(200,164,74,0.3); }
+.ms-done { background: rgba(29,158,117,0.12); color: var(--green); border: 1px solid rgba(29,158,117,0.3); }
+
+.match-players {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.player-side { }
+.player-side.right { text-align: right; }
+.player-nm {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.player-div-tag {
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.player-sc {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--cyan);
+  line-height: 1;
+  margin-top: 4px;
+}
+.player-sc.lead { color: var(--gold-light); }
+.vs-sep {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.water-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--cyan);
+  margin-top: 8px;
+  padding: 2px 7px;
+  background: rgba(0,212,255,0.06);
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 2px;
+}
+
+/* Bracket section */
+.bracket-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.bracket-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+}
+
+.bracket-round-col {
+  flex-shrink: 0;
+  width: 140px;
+}
+
+.round-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--text-gold);
+  letter-spacing: 0.12em;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.bracket-match {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  margin-right: 6px;
+}
+.bm-player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  font-size: 10px;
+}
+.bm-player + .bm-player { border-top: 1px solid var(--border); }
+.bm-name { color: var(--text-primary); }
+.bm-name.winner { color: var(--gold-light); font-weight: 700; }
+.bm-name.bye { color: var(--text-secondary); font-style: italic; }
+.bm-score {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  color: var(--cyan);
+  font-weight: 700;
+}
+.bm-score.winner { color: var(--gold-light); }
+
+.bracket-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  flex-shrink: 0;
+  opacity: 0.25;
+  font-size: 16px;
+  color: var(--gold);
+}
+
+/* LINEUP PANEL (right sidebar) */
+.sidebar-right {
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.panel-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+
+.panel-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-gold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.panel-title .pt-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.lineup-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.lineup-item.in-water {
+  background: rgba(230,57,70,0.08);
+  border-color: rgba(230,57,70,0.25);
+}
+.lineup-item.standby {
+  background: rgba(200,164,74,0.06);
+  border-color: rgba(200,164,74,0.18);
+}
+.lineup-item.ready {
+  background: rgba(0,212,255,0.04);
+  border-color: rgba(0,212,255,0.12);
+}
+
+.li-num {
+  width: 20px; height: 20px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.in-water .li-num { background: rgba(230,57,70,0.2); color: #e63946; }
+.standby .li-num { background: rgba(200,164,74,0.15); color: var(--gold-light); }
+.ready .li-num { background: rgba(0,212,255,0.1); color: var(--cyan); }
+.lineup-item:not(.in-water):not(.standby):not(.ready) .li-num { background: var(--bg-card2); color: var(--text-secondary); }
+
+.li-info { flex: 1; min-width: 0; }
+.li-names {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Rajdhani', sans-serif;
+}
+.li-div { font-size: 9px; color: var(--text-secondary); }
+
+.li-status {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+.in-water .li-status { color: #e63946; }
+.standby .li-status { color: var(--gold); }
+.ready .li-status { color: var(--cyan); }
+
+/* Score input panel */
+.score-entry {
+  margin-bottom: 8px;
+}
+.se-label {
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.se-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.score-field {
+  flex: 1;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 5px 8px;
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cyan);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 60px;
+}
+.score-field:focus { border-color: var(--gold); }
+.se-vs {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+.btn-confirm {
+  padding: 5px 12px;
+  background: linear-gradient(135deg, rgba(200,164,74,0.25), rgba(200,164,74,0.1));
+  border: 1px solid var(--gold-dim);
+  border-radius: 3px;
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--gold-light);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+.btn-confirm:hover {
+  background: linear-gradient(135deg, rgba(200,164,74,0.4), rgba(200,164,74,0.2));
+  border-color: var(--gold);
+}
+
+/* Notif panel */
+.notif-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.notif-item:last-child { border-bottom: none; padding-bottom: 0; }
+.ni-icon {
+  width: 18px; height: 18px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.ni-warn { background: rgba(200,164,74,0.15); color: var(--gold); }
+.ni-ok { background: rgba(29,158,117,0.15); color: var(--green); }
+.ni-info { background: rgba(0,212,255,0.1); color: var(--cyan); }
+.ni-text {
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.ni-text strong { color: var(--text-primary); font-weight: 600; }
+.ni-time {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  opacity: 0.6;
+}
+
+/* Clock in header */
+.nav-clock {
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-gold);
+  letter-spacing: 0.08em;
+}
+
+/* Registration form overlay concept */
+.form-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: var(--text-gold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.form-input {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+  font-family: 'Noto Sans KR', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--gold-dim); }
+.form-select {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.form-select option { background: var(--bg-card2); }
+
+.sport-checkboxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sport-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sport-check:hover { border-color: var(--border-bright); }
+.sport-check.checked {
+  border-color: rgba(200,164,74,0.45);
+  background: rgba(200,164,74,0.06);
+}
+.sport-check input { display: none; }
+.check-box {
+  width: 14px; height: 14px;
+  border: 1px solid var(--border-bright);
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  color: var(--gold);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.sport-check.checked .check-box {
+  background: rgba(200,164,74,0.2);
+  border-color: var(--gold);
+}
+.check-label { font-size: 11px; color: var(--text-secondary); }
+.sport-check.checked .check-label { color: var(--text-primary); }
+
+.limit-note {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  color: rgba(230,57,70,0.8);
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+  padding: 5px 10px;
+  background: rgba(230,57,70,0.06);
+  border: 1px solid rgba(230,57,70,0.15);
+  border-radius: 3px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #c8a44a 0%, #a07830 100%);
+  border: none;
+  border-radius: 3px;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #04080f;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+.btn-submit:hover {
+  background: linear-gradient(135deg, #f0c96a 0%, #c8a44a 100%);
+  transform: translateY(-1px);
+}
+
+/* Tab system */
+.tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.tab-btn {
+  padding: 8px 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.tab-btn:hover, .tab-btn.active {
+  color: var(--gold-light);
+  border-bottom-color: var(--gold);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Animations */
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.match-card { animation: fadeIn 0.4s ease both; }
+.match-card:nth-child(1){animation-delay:0.05s}
+.match-card:nth-child(2){animation-delay:0.1s}
+.match-card:nth-child(3){animation-delay:0.15s}
+.match-card:nth-child(4){animation-delay:0.2s}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+/* Responsive ticker */
+.ticker-bar {
+  background: rgba(200,164,74,0.06);
+  border-top: 1px solid var(--border);
+  padding: 6px 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+.ticker-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  padding-right: 12px;
+  border-right: 1px solid var(--border);
+}
+.ticker-content {
+  font-size: 10px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  animation: ticker-scroll 28s linear infinite;
+}
+.ticker-hl { color: var(--gold-light); font-weight: 600; }
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+</style>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ISA 서핑대회">
+<meta name="theme-color" content="#04080f">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTI1NDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDQwODBmIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJnbG93IiBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYzhhNDRhIiBzdG9wLW9wYWNpdHk9IjAuMyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjOGE0NGEiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBCYWNrZ3JvdW5kIC0tPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iODAiIGZpbGw9InVybCgjYmcpIi8+CiAgPCEtLSBHbG93IC0tPgogIDxlbGxpcHNlIGN4PSIyNTYiIGN5PSIyMjAiIHJ4PSIxODAiIHJ5PSIxNjAiIGZpbGw9InVybCgjZ2xvdykiLz4KICA8IS0tIE91dGVyIHJpbmcgLS0+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjQwIiByPSIxNzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2M4YTQ0YSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNDAiIHI9IjE1NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzhhNDRhIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1vcGFjaXR5PSIwLjMiLz4KICA8IS0tIFdhdmUgbGluZXMgKHN1cmYpIC0tPgogIDxwYXRoIGQ9Ik0xMTYgMjkwIFExNDYgMjcwIDE3NiAyOTAgUTIwNiAzMTAgMjM2IDI5MCBRMjY2IDI3MCAyOTYgMjkwIFEzMjYgMzEwIDM1NiAyOTAgUTM4NiAyNzAgMzk2IDI4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDBkNGZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1vcGFjaXR5PSIwLjciIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0xMjYgMzE2IFExNTYgMjk2IDE4NiAzMTYgUTIxNiAzMzYgMjQ2IDMxNiBRMjc2IDI5NiAzMDYgMzE2IFEzMzYgMzM2IDM2NiAzMTYgUTM4NiAzMDQgMzk2IDMwOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDBkNGZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1vcGFjaXR5PSIwLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gSVNBIHRleHQgLS0+CiAgPHRleHQgeD0iMjU2IiB5PSIyMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSInQXJpYWwgQmxhY2snLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjExMCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2M4YTQ0YSIgbGV0dGVyLXNwYWNpbmc9IjgiPklTQTwvdGV4dD4KICA8IS0tIFN1YnRpdGxlIC0tPgogIDx0ZXh0IHg9IjI1NiIgeT0iMjQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI0MDAiIGZpbGw9IiNjOGE0NGEiIG9wYWNpdHk9IjAuNyIgbGV0dGVyLXNwYWNpbmc9IjQiPlNVUkZJTkc8L3RleHQ+CiAgPCEtLSBCb3R0b20gdGV4dCAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjQzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjN2E4YWFhIiBsZXR0ZXItc3BhY2luZz0iMyI+SU5UTCDCtyBBUlRJRklDSUFMPC90ZXh0PgogIDwhLS0gQ29ybmVyIG1hcmtzIC0tPgogIDxwYXRoIGQ9Ik0xMDAgMTAwIEwxMDAgMTIwIE0xMDAgMTAwIEwxMjAgMTAwIiBzdHJva2U9IiNjOGE0NGEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik00MTIgMTAwIEw0MTIgMTIwIE00MTIgMTAwIEwzOTIgMTAwIiBzdHJva2U9IiNjOGE0NGEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik0xMDAgMzgwIEwxMDAgMzYwIE0xMDAgMzgwIEwxMjAgMzgwIiBzdHJva2U9IiNjOGE0NGEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik00MTIgMzgwIEw0MTIgMzYwIE00MTIgMzgwIEwzOTIgMzgwIiBzdHJva2U9IiNjOGE0NGEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgZmlsbD0ibm9uZSIvPgo8L3N2Zz4K">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTI1NDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDQwODBmIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJnbG93IiBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjYzhhNDRhIiBzdG9wLW9wYWNpdHk9IjAuMyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjOGE0NGEiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBCYWNrZ3JvdW5kIC0tPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iODAiIGZpbGw9InVybCgjYmcpIi8+CiAgPCEtLSBHbG93IC0tPgogIDxlbGxpcHNlIGN4PSIyNTYiIGN5PSIyMjAiIHJ4PSIxODAiIHJ5PSIxNjAiIGZpbGw9InVybCgjZ2xvdykiLz4KICA8IS0tIE91dGVyIHJpbmcgLS0+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjQwIiByPSIxNzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2M4YTQ0YSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNDAiIHI9IjE1NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzhhNDRhIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1vcGFjaXR5PSIwLjMiLz4KICA8IS0tIFdhdmUgbGluZXMgKHN1cmYpIC0tPgogIDxwYXRoIGQ9Ik0xMTYgMjkwIFExNDYgMjcwIDE3NiAyOTAgUTIwNiAzMTAgMjM2IDI5MCBRMjY2IDI3MCAyOTYgMjkwIFEzMjYgMzEwIDM1NiAyOTAgUTM4NiAyNzAgMzk2IDI4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDBkNGZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1vcGFjaXR5PSIwLjciIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0xMjYgMzE2IFExNTYgMjk2IDE4NiAzMTYgUTIxNiAzMzYgMjQ2IDMxNiBRMjc2IDI5NiAzMDYgMzE2IFEzMzYgMzM2IDM2NiAzMTYgUTM4NiAzMDQgMzk2IDMwOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDBkNGZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1vcGFjaXR5PSIwLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gSVNBIHRleHQgLS0+CiAgPHRleHQgeD0iMjU2IiB5PSIyMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSInQXJpYWwgQmxhY2snLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjExMCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2M4YTQ0YSIgbGV0dGVyLXNwYWNpbmc9IjgiPklTQTwvdGV4dD4KICA8IS0tIFN1YnRpdGxlIC0tPgogIDx0ZXh0IHg9IjI1NiIgeT0iMjQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI0MDAiIGZpbGw9IiNjOGE0NGEiIG9wYWNpdHk9IjAuNyIgbGV0dGVyLXNwYWNpbmc9IjQiPlNVUkZJTkc8L3RleHQ+CiAgPCEtLSBCb3R0b20gdGV4dCAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjQzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjN2E4YWFhIiBsZXR0ZXItc3BhY2luZz0iMyI+SU5UTCDCtyBBUlRJRklDSUFMPC90ZXh0PgogIDwhLS0gQ29ybmVyIG1hcmtzIC0tPgogIDxwYXRoIGQ9Ik0xMDAgMTAwIEwxMDAgMTIwIE0xMDAgMTAwIEwxMjAgMTAwIiBzdHJva2U9IiNjOGE0NGEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik00MTIgMTAwIEw0MTIgMTIwIE00MTIgMTAwIEwzOTIgMTAwIiBzdHJva2U9IiNjOGE0NGEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik0xMDAgMzgwIEwxMDAgMzYwIE0xMDAgMzgwIEwxMjAgMzgwIiBzdHJva2U9IiNjOGE0NGEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik00MTIgMzgwIEw0MTIgMzYwIE00MTIgMzgwIEwzOTIgMzgwIiBzdHJva2U9IiNjOGE0NGEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLW9wYWNpdHk9IjAuNSIgZmlsbD0ibm9uZSIvPgo8L3N2Zz4K">
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="nav-logo">
+    <div class="logo-icon">ISA</div>
+    <div class="logo-text">
+      <span class="ko">국제인공서핑협회</span>
+      <span class="en">INTL ARTIFICIAL SURFING ASSOC.</span>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <div class="nav-link active" onclick="showTab('dashboard')">대시보드</div>
+    <div class="nav-link" onclick="showTab('register')">참가신청</div>
+    <div class="nav-link" onclick="showTab('bracket')">대진표</div>
+    <div class="nav-link" onclick="showTab('scoreboard')">스코어보드</div>
+    <div class="nav-link" onclick="showTab('admin')">운영관리</div>
+  </div>
+
+  <div class="nav-right">
+    <div class="live-badge"><div class="dot"></div>LIVE</div>
+    <div class="nav-clock" id="navClock">--:--:--</div>
+    <button class="btn-register" onclick="showTab('register')">참가 신청</button>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-label">RESULTS</div>
+  <div class="ticker-content">
+    Standing/Flow 프로 준결승 —&nbsp;<span class="ticker-hl">최강파 9.6점 결승 진출</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+    Wake Surfing 마스터 준결승 —&nbsp;<span class="ticker-hl">최고령 8.1점 통과</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+    Body/Boogie 주니어 예선 —&nbsp;<span class="ticker-hl">강주니어 7.8점 준준결승 진출</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+    Wave Surfing 오픈 예선 진행 중&nbsp;&nbsp;·&nbsp;&nbsp;
+    Standing/Flow 프로 준결승 —&nbsp;<span class="ticker-hl">최강파 9.6점 결승 진출</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+    Wake Surfing 마스터 준결승 —&nbsp;<span class="ticker-hl">최고령 8.1점 통과</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+    Body/Boogie 주니어 예선 —&nbsp;<span class="ticker-hl">강주니어 7.8점 준준결승 진출</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+    Wave Surfing 오픈 예선 진행 중
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-wrap">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-left">
+    <div class="sidebar-section">
+      <div class="sidebar-heading">종목</div>
+      <div class="sport-item active" onclick="setActiveSport(this)">
+        <div class="sport-icon">🏄</div>
+        <div class="sport-name">Standing / Flow</div>
+        <div class="sport-count">38</div>
+      </div>
+      <div class="sport-item" onclick="setActiveSport(this)">
+        <div class="sport-icon">🌊</div>
+        <div class="sport-name">Body / Boogie</div>
+        <div class="sport-count">29</div>
+      </div>
+      <div class="sport-item" onclick="setActiveSport(this)">
+        <div class="sport-icon">🚤</div>
+        <div class="sport-name">Wake Surfing</div>
+        <div class="sport-count">34</div>
+      </div>
+      <div class="sport-item" onclick="setActiveSport(this)">
+        <div class="sport-icon">🌊</div>
+        <div class="sport-name">Wave Surfing</div>
+        <div class="sport-count">41</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">디비전</div>
+      <div class="division-item">
+        <div class="division-name">주니어 (만 18세↓)</div>
+        <div class="division-pill">JR</div>
+      </div>
+      <div class="division-item">
+        <div class="division-name">오픈 (만 19세↑)</div>
+        <div class="division-pill">OP</div>
+      </div>
+      <div class="division-item">
+        <div class="division-name">마스터 (만 50세↑)</div>
+        <div class="division-pill">MS</div>
+      </div>
+      <div class="division-item">
+        <div class="division-name">프로 (나이무관)</div>
+        <div class="division-pill">PRO</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">진행 현황</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;padding:5px 8px;background:var(--bg-card);border:1px solid var(--border);border-radius:3px">
+          <span style="color:var(--text-secondary)">진행 중</span>
+          <span style="font-family:'Orbitron',monospace;font-size:9px;color:#e63946;font-weight:700">8매치</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;padding:5px 8px;background:var(--bg-card);border:1px solid var(--border);border-radius:3px">
+          <span style="color:var(--text-secondary)">완료</span>
+          <span style="font-family:'Orbitron',monospace;font-size:9px;color:var(--green);font-weight:700">34매치</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;padding:5px 8px;background:var(--bg-card);border:1px solid var(--border);border-radius:3px">
+          <span style="color:var(--text-secondary)">대기</span>
+          <span style="font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);font-weight:700">26매치</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER -->
+  <main class="center-main">
+
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard" class="tab-content active">
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-label">총 참가자</div>
+          <div class="stat-value">142</div>
+          <div class="stat-sub">4종목 · 16 디비전</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">진행 매치</div>
+          <div class="stat-value stat-live">8</div>
+          <div class="stat-sub">워터 A·B·C·D 동시</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">완료 매치</div>
+          <div class="stat-value">34</div>
+          <div class="stat-sub">전체 68매치 중</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">대회 진행률</div>
+          <div class="stat-value">50<span style="font-size:14px">%</span></div>
+          <div class="stat-sub">예정 종료 17:30</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">LIVE MATCHES</div>
+        <div class="live-badge" style="font-size:8px"><div class="dot"></div>실시간</div>
+      </div>
+
+      <div class="match-grid">
+        <div class="match-card live-card">
+          <div class="match-meta">
+            <div class="match-type">Standing/Flow · 오픈 · 준결승</div>
+            <div class="match-status ms-live">LIVE</div>
+          </div>
+          <div class="match-players">
+            <div class="player-side">
+              <div class="player-nm">김서퍼</div>
+              <div class="player-div-tag">시드 #2</div>
+              <div class="player-sc lead">8.4</div>
+            </div>
+            <div class="vs-sep">VS</div>
+            <div class="player-side right">
+              <div class="player-nm">이파도</div>
+              <div class="player-div-tag">시드 #3</div>
+              <div class="player-sc">7.9</div>
+            </div>
+          </div>
+          <div class="water-tag">▶ WATER A</div>
+        </div>
+
+        <div class="match-card live-card">
+          <div class="match-meta">
+            <div class="match-type">Wake Surfing · 마스터 · 준결승</div>
+            <div class="match-status ms-live">LIVE</div>
+          </div>
+          <div class="match-players">
+            <div class="player-side">
+              <div class="player-nm">최고령</div>
+              <div class="player-div-tag">시드 #1</div>
+              <div class="player-sc lead">8.1</div>
+            </div>
+            <div class="vs-sep">VS</div>
+            <div class="player-side right">
+              <div class="player-nm">박파도</div>
+              <div class="player-div-tag">시드 #4</div>
+              <div class="player-sc">7.3</div>
+            </div>
+          </div>
+          <div class="water-tag">▶ WATER B</div>
+        </div>
+
+        <div class="match-card">
+          <div class="match-meta">
+            <div class="match-type">Body/Boogie · 주니어 · 예선</div>
+            <div class="match-status ms-wait">STANDBY</div>
+          </div>
+          <div class="match-players">
+            <div class="player-side">
+              <div class="player-nm">강주니어</div>
+              <div class="player-div-tag">시드 #3</div>
+              <div class="player-sc" style="color:var(--text-secondary)">—</div>
+            </div>
+            <div class="vs-sep">VS</div>
+            <div class="player-side right">
+              <div class="player-nm">윤파도</div>
+              <div class="player-div-tag">시드 #6</div>
+              <div class="player-sc" style="color:var(--text-secondary)">—</div>
+            </div>
+          </div>
+          <div class="water-tag" style="color:var(--gold);background:rgba(200,164,74,0.05);border-color:rgba(200,164,74,0.15)">◎ WATER C</div>
+        </div>
+
+        <div class="match-card">
+          <div class="match-meta">
+            <div class="match-type">Standing/Flow · 프로 · 준준결승</div>
+            <div class="match-status ms-done">DONE</div>
+          </div>
+          <div class="match-players">
+            <div class="player-side">
+              <div class="player-nm" style="color:var(--gold-light)">최강파</div>
+              <div class="player-div-tag">시드 #1</div>
+              <div class="player-sc lead">9.6</div>
+            </div>
+            <div class="vs-sep">VS</div>
+            <div class="player-side right">
+              <div class="player-nm">류프로</div>
+              <div class="player-div-tag">시드 #8</div>
+              <div class="player-sc">8.8</div>
+            </div>
+          </div>
+          <div class="water-tag" style="color:var(--green);background:rgba(29,158,117,0.05);border-color:rgba(29,158,117,0.2)">✓ WATER A · 완료</div>
+        </div>
+      </div>
+
+      <!-- Bracket preview -->
+      <div class="section-header"><div class="section-title">Standing/Flow · 오픈 브래킷</div></div>
+      <div class="bracket-wrap">
+        <div class="bracket-row">
+          <div class="bracket-round-col">
+            <div class="round-label">준준결승</div>
+            <div class="bracket-match">
+              <div class="bm-player"><span class="bm-name winner">김서퍼</span><span class="bm-score winner">8.4</span></div>
+              <div class="bm-player"><span class="bm-name">박파도</span><span class="bm-score">7.1</span></div>
+            </div>
+            <div class="bracket-match">
+              <div class="bm-player"><span class="bm-name winner">이파도</span><span class="bm-score winner">8.1</span></div>
+              <div class="bm-player"><span class="bm-name">정라이더</span><span class="bm-score">6.9</span></div>
+            </div>
+          </div>
+          <div class="bracket-connector">›</div>
+          <div class="bracket-round-col">
+            <div class="round-label">준결승</div>
+            <div class="bracket-match" style="border-color:rgba(230,57,70,0.3)">
+              <div class="bm-player"><span class="bm-name" style="color:var(--cyan)">김서퍼</span><span class="bm-score">→</span></div>
+              <div class="bm-player"><span class="bm-name" style="color:var(--cyan)">이파도</span><span class="bm-score">→</span></div>
+            </div>
+          </div>
+          <div class="bracket-connector">›</div>
+          <div class="bracket-round-col">
+            <div class="round-label">결승</div>
+            <div class="bracket-match" style="opacity:0.4">
+              <div class="bm-player"><span class="bm-name">준결 1위</span><span class="bm-score">—</span></div>
+              <div class="bm-player"><span class="bm-name">준결 2위</span><span class="bm-score">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTER TAB -->
+    <div id="tab-register" class="tab-content">
+      <div class="section-header">
+        <div class="section-title">참가 신청 — 2025 전국 인공서핑 선수권</div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">성명</div>
+            <input class="form-input" type="text" placeholder="이름 입력">
+          </div>
+          <div class="form-group">
+            <div class="form-label">생년월일</div>
+            <input class="form-input" type="date">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">연락처</div>
+            <input class="form-input" type="tel" placeholder="010-0000-0000">
+          </div>
+          <div class="form-group">
+            <div class="form-label">소속 / 팀</div>
+            <input class="form-input" type="text" placeholder="소속 입력 (없으면 개인)">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">이메일</div>
+            <input class="form-input" type="email" placeholder="이메일 주소">
+          </div>
+          <div class="form-group">
+            <div class="form-label">디비전 (자동 계산)</div>
+            <select class="form-select">
+              <option>생년월일 입력 시 자동 배정</option>
+              <option>주니어 (만 18세 이하)</option>
+              <option>오픈 (만 19세 이상)</option>
+              <option>마스터 (만 50세 이상)</option>
+              <option>프로 (나이 무관 — 별도 심사)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-label" style="margin-bottom:8px">참가 종목 선택 (최대 2종목)</div>
+        <div class="sport-checkboxes">
+          <label class="sport-check" onclick="toggleCheck(this)">
+            <input type="checkbox">
+            <div class="check-box">✓</div>
+            <div class="check-label">Standing / Flow Board</div>
+          </label>
+          <label class="sport-check" onclick="toggleCheck(this)">
+            <input type="checkbox">
+            <div class="check-box">✓</div>
+            <div class="check-label">Body / Boogie Board</div>
+          </label>
+          <label class="sport-check" onclick="toggleCheck(this)">
+            <input type="checkbox">
+            <div class="check-box">✓</div>
+            <div class="check-label">Wake Surfing</div>
+          </label>
+          <label class="sport-check" onclick="toggleCheck(this)">
+            <input type="checkbox">
+            <div class="check-box">✓</div>
+            <div class="check-label">Wave Surfing</div>
+          </label>
+        </div>
+        <div class="limit-note">⚠ 1인 최대 2종목 참가 가능 — 초과 선택 시 자동 차단</div>
+
+        <button class="btn-submit">신청 완료 및 결제</button>
+      </div>
+    </div>
+
+    <!-- BRACKET TAB -->
+    <div id="tab-bracket" class="tab-content">
+      <div class="section-header"><div class="section-title">전체 대진표</div></div>
+      <div class="tab-nav">
+        <button class="tab-btn active">Standing/Flow</button>
+        <button class="tab-btn">Body/Boogie</button>
+        <button class="tab-btn">Wake Surfing</button>
+        <button class="tab-btn">Wave Surfing</button>
+      </div>
+      <div class="bracket-wrap">
+        <div style="font-family:'Orbitron',monospace;font-size:9px;color:var(--text-secondary);margin-bottom:12px;letter-spacing:0.1em">STANDING/FLOW · 오픈 디비전 · 싱글 엘리미네이션</div>
+        <div class="bracket-row">
+          <div class="bracket-round-col">
+            <div class="round-label">예선 R1</div>
+            <div class="bracket-match"><div class="bm-player"><span class="bm-name winner">김서퍼</span><span class="bm-score winner">8.4</span></div><div class="bm-player"><span class="bm-name">박파도</span><span class="bm-score">7.1</span></div></div>
+            <div class="bracket-match"><div class="bm-player"><span class="bm-name winner">이파도</span><span class="bm-score winner">8.1</span></div><div class="bm-player"><span class="bm-name">정라이더</span><span class="bm-score">6.9</span></div></div>
+            <div class="bracket-match"><div class="bm-player"><span class="bm-name winner">박라이더</span><span class="bm-score winner">7.7</span></div><div class="bm-player"><span class="bm-name">오서퍼</span><span class="bm-score">6.5</span></div></div>
+            <div class="bracket-match"><div class="bm-player"><span class="bm-name winner">정파도</span><span class="bm-score winner">7.5</span></div><div class="bm-player"><span class="bm-name bye">BYE</span><span class="bm-score">—</span></div></div>
+          </div>
+          <div class="bracket-connector">›</div>
+          <div class="bracket-round-col">
+            <div class="round-label">준준결승</div>
+            <div class="bracket-match"><div class="bm-player"><span class="bm-name winner">김서퍼</span><span class="bm-score winner">8.4</span></div><div class="bm-player"><span class="bm-name">이파도</span><span class="bm-score">8.1</span></div></div>
+            <div class="bracket-match"><div class="bm-player"><span class="bm-name winner">박라이더</span><span class="bm-score winner">7.7</span></div><div class="bm-player"><span class="bm-name">정파도</span><span class="bm-score">7.5</span></div></div>
+          </div>
+          <div class="bracket-connector">›</div>
+          <div class="bracket-round-col">
+            <div class="round-label">준결승</div>
+            <div class="bracket-match" style="border-color:rgba(230,57,70,0.35)"><div class="bm-player"><span class="bm-name" style="color:var(--cyan)">김서퍼</span><span class="bm-score">진행</span></div><div class="bm-player"><span class="bm-name" style="color:var(--cyan)">이파도</span><span class="bm-score">진행</span></div></div>
+          </div>
+          <div class="bracket-connector">›</div>
+          <div class="bracket-round-col">
+            <div class="round-label">결승</div>
+            <div class="bracket-match" style="opacity:0.35"><div class="bm-player"><span class="bm-name">준결 1위</span><span class="bm-score">—</span></div><div class="bm-player"><span class="bm-name">준결 2위</span><span class="bm-score">—</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCOREBOARD TAB -->
+    <div id="tab-scoreboard" class="tab-content">
+      <div class="section-header"><div class="section-title">실시간 스코어보드</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="bracket-wrap">
+          <div style="font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);margin-bottom:10px;letter-spacing:0.1em">STANDING/FLOW · 오픈</div>
+          <table style="width:100%;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--border)">
+              <th style="font-family:'Orbitron',monospace;font-size:8px;color:var(--text-secondary);padding:4px 6px;text-align:left;letter-spacing:0.08em">RANK</th>
+              <th style="font-family:'Orbitron',monospace;font-size:8px;color:var(--text-secondary);padding:4px 6px;text-align:left">선수</th>
+              <th style="font-family:'Orbitron',monospace;font-size:8px;color:var(--text-secondary);padding:4px 6px;text-align:right">SCORE</th>
+              <th style="font-family:'Orbitron',monospace;font-size:8px;color:var(--text-secondary);padding:4px 6px;text-align:right">STATUS</th>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px;font-family:'Orbitron',monospace;font-size:10px;color:var(--gold)">01</td><td style="padding:6px;font-size:11px;color:var(--gold-light);font-weight:600">최강파</td><td style="padding:6px;font-family:'Orbitron',monospace;font-size:11px;color:var(--gold-light);text-align:right">9.6</td><td style="padding:6px;text-align:right"><span style="font-family:'Orbitron',monospace;font-size:8px;padding:1px 5px;background:rgba(29,158,117,0.15);color:var(--green);border:1px solid rgba(29,158,117,0.3);border-radius:2px">결승</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px;font-family:'Orbitron',monospace;font-size:10px;color:var(--text-secondary)">02</td><td style="padding:6px;font-size:11px;color:var(--cyan);font-weight:600">김서퍼</td><td style="padding:6px;font-family:'Orbitron',monospace;font-size:11px;color:var(--cyan);text-align:right">8.4</td><td style="padding:6px;text-align:right"><span style="font-family:'Orbitron',monospace;font-size:8px;padding:1px 5px;background:rgba(230,57,70,0.12);color:#e63946;border:1px solid rgba(230,57,70,0.3);border-radius:2px">진행중</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px;font-family:'Orbitron',monospace;font-size:10px;color:var(--text-secondary)">03</td><td style="padding:6px;font-size:11px">이파도</td><td style="padding:6px;font-family:'Orbitron',monospace;font-size:11px;color:var(--text-primary);text-align:right">7.9</td><td style="padding:6px;text-align:right"><span style="font-family:'Orbitron',monospace;font-size:8px;padding:1px 5px;background:rgba(230,57,70,0.12);color:#e63946;border:1px solid rgba(230,57,70,0.3);border-radius:2px">진행중</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px;font-family:'Orbitron',monospace;font-size:10px;color:var(--text-secondary)">04</td><td style="padding:6px;font-size:11px;color:var(--text-secondary)">박라이더</td><td style="padding:6px;font-family:'Orbitron',monospace;font-size:11px;color:var(--text-secondary);text-align:right">7.7</td><td style="padding:6px;text-align:right"><span style="font-family:'Orbitron',monospace;font-size:8px;padding:1px 5px;background:rgba(200,164,74,0.1);color:var(--gold);border:1px solid rgba(200,164,74,0.25);border-radius:2px">대기</span></td></tr>
+            <tr><td style="padding:6px;font-family:'Orbitron',monospace;font-size:10px;color:var(--text-secondary)">05</td><td style="padding:6px;font-size:11px;color:var(--text-secondary)">정파도</td><td style="padding:6px;font-family:'Orbitron',monospace;font-size:11px;color:var(--text-secondary);text-align:right">7.5</td><td style="padding:6px;text-align:right"><span style="font-family:'Orbitron',monospace;font-size:8px;padding:1px 5px;background:rgba(230,57,70,0.08);color:rgba(230,57,70,0.6);border:1px solid rgba(230,57,70,0.15);border-radius:2px">탈락</span></td></tr>
+          </table>
+        </div>
+        <div class="bracket-wrap">
+          <div style="font-family:'Orbitron',monospace;font-size:9px;color:var(--gold);margin-bottom:10px;letter-spacing:0.1em">WAKE SURFING · 마스터</div>
+          <table style="width:100%;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--border)">
+              <th style="font-family:'Orbitron',monospace;font-size:8px;color:var(--text-secondary);padding:4px 6px;text-align:left">RANK</th>
+              <th style="font-family:'Orbitron',monospace;font-size:8px;color:var(--text-secondary);padding:4px 6px;text-align:left">선수</th>
+              <th style="font-family:'Orbitron',monospace;font-size:8px;color:var(--text-secondary);padding:4px 6px;text-align:right">SCORE</th>
+              <th style="font-family:'Orbitron',monospace;font-size:8px;color:var(--text-secondary);padding:4px 6px;text-align:right">STATUS</th>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px;font-family:'Orbitron',monospace;font-size:10px;color:var(--gold)">01</td><td style="padding:6px;font-size:11px;color:var(--cyan);font-weight:600">최고령</td><td style="padding:6px;font-family:'Orbitron',monospace;font-size:11px;color:var(--cyan);text-align:right">8.1</td><td style="padding:6px;text-align:right"><span style="font-family:'Orbitron',monospace;font-size:8px;padding:1px 5px;background:rgba(230,57,70,0.12);color:#e63946;border:1px solid rgba(230,57,70,0.3);border-radius:2px">진행중</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px;font-family:'Orbitron',monospace;font-size:10px;color:var(--text-secondary)">02</td><td style="padding:6px;font-size:11px">박파도</td><td style="padding:6px;font-family:'Orbitron',monospace;font-size:11px;color:var(--text-primary);text-align:right">7.3</td><td style="padding:6px;text-align:right"><span style="font-family:'Orbitron',monospace;font-size:8px;padding:1px 5px;background:rgba(230,57,70,0.12);color:#e63946;border:1px solid rgba(230,57,70,0.3);border-radius:2px">진행중</span></td></tr>
+            <tr><td style="padding:6px;font-family:'Orbitron',monospace;font-size:10px;color:var(--text-secondary)">03</td><td style="padding:6px;font-size:11px;color:var(--text-secondary)">이마스터</td><td style="padding:6px;font-family:'Orbitron',monospace;font-size:11px;color:var(--text-secondary);text-align:right">6.8</td><td style="padding:6px;text-align:right"><span style="font-family:'Orbitron',monospace;font-size:8px;padding:1px 5px;background:rgba(230,57,70,0.08);color:rgba(230,57,70,0.6);border:1px solid rgba(230,57,70,0.15);border-radius:2px">탈락</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB -->
+    <div id="tab-admin" class="tab-content">
+      <div class="section-header"><div class="section-title">운영 관리 패널</div></div>
+      <div class="form-section">
+        <div class="form-label" style="margin-bottom:10px">점수 입력 — #M-041 · Standing/Flow 오픈 준결승</div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr auto;gap:10px;align-items:end;margin-bottom:14px">
+          <div class="form-group">
+            <div class="form-label">김서퍼</div>
+            <div class="score-entry">
+              <div class="se-row"><input class="score-field" value="8.4" style="width:100%"></div>
+            </div>
+          </div>
+          <div style="font-family:'Orbitron',monospace;font-size:12px;color:var(--text-secondary);padding-bottom:8px">VS</div>
+          <div class="form-group">
+            <div class="form-label">이파도</div>
+            <div class="score-entry">
+              <div class="se-row"><input class="score-field" placeholder="0.0" style="width:100%"></div>
+            </div>
+          </div>
+          <button class="btn-confirm" style="height:36px;padding:0 16px;font-size:10px">점수 확정</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px">
+          <textarea class="form-input" style="height:60px;resize:none;font-size:11px" placeholder="공지 내용 입력 (전체/종목별/개인 발송)..."></textarea>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn-confirm">전체 발송</button>
+            <button class="btn-confirm" style="border-color:rgba(0,212,255,0.3);color:var(--cyan);background:rgba(0,212,255,0.06)">종목별 발송</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-right">
+
+    <div class="panel-box">
+      <div class="panel-title"><div class="pt-dot"></div>Water A 라인업</div>
+      <div class="lineup-item in-water">
+        <div class="li-num">1</div>
+        <div class="li-info">
+          <div class="li-names">김서퍼 vs 이파도</div>
+          <div class="li-div">Standing · 오픈 · 준결승</div>
+        </div>
+        <div class="li-status">IN</div>
+      </div>
+      <div class="lineup-item standby">
+        <div class="li-num">2</div>
+        <div class="li-info">
+          <div class="li-names">박라이더 vs 정파도</div>
+          <div class="li-div">Standing · 오픈 · 준결승</div>
+        </div>
+        <div class="li-status">준비</div>
+      </div>
+      <div class="lineup-item ready">
+        <div class="li-num">3</div>
+        <div class="li-info">
+          <div class="li-names">류서프 vs 송웨이브</div>
+          <div class="li-div">Standing · 마스터 · 준결승</div>
+        </div>
+        <div class="li-status">대기</div>
+      </div>
+      <div class="lineup-item">
+        <div class="li-num">4</div>
+        <div class="li-info">
+          <div class="li-names">윤프로 vs 강라이더</div>
+          <div class="li-div">Standing · 프로 · 결승</div>
+        </div>
+        <div class="li-status" style="color:var(--text-secondary)">대기</div>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-title"><div class="pt-dot"></div>점수 입력</div>
+      <div class="score-entry">
+        <div class="se-label">M-041 · 김서퍼 vs 이파도</div>
+        <div class="se-row">
+          <input class="score-field" value="8.4">
+          <div class="se-vs">vs</div>
+          <input class="score-field" placeholder="—">
+          <button class="btn-confirm">확정</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-title"><div class="pt-dot"></div>최근 알림</div>
+      <div class="notif-item">
+        <div class="ni-icon ni-warn">!</div>
+        <div>
+          <div class="ni-text"><strong>박라이더</strong> 입수 준비 요청</div>
+          <div class="ni-time">방금</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="ni-icon ni-ok">✓</div>
+        <div>
+          <div class="ni-text"><strong>최강파</strong> 준결승 진출 확정 (9.6)</div>
+          <div class="ni-time">3분 전</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="ni-icon ni-info">i</div>
+        <div>
+          <div class="ni-text">Wave Surfing 오픈 예선 일정 변경 — Water D 15:00</div>
+          <div class="ni-time">11분 전</div>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="ni-icon ni-ok">✓</div>
+        <div>
+          <div class="ni-text"><strong>강주니어</strong> 준준결승 진출 (7.8)</div>
+          <div class="ni-time">18분 전</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<script>
+// Clock
+function tick() {
+  const n = new Date();
+  document.getElementById('navClock').textContent =
+    String(n.getHours()).padStart(2,'0') + ':' +
+    String(n.getMinutes()).padStart(2,'0') + ':' +
+    String(n.getSeconds()).padStart(2,'0');
+}
+tick(); setInterval(tick, 1000);
+
+// Tab switching
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const map = {dashboard:0, register:1, bracket:2, scoreboard:3, admin:4};
+  document.querySelectorAll('.nav-link')[map[name]]?.classList.add('active');
+}
+
+// Sport sidebar
+function setActiveSport(el) {
+  document.querySelectorAll('.sport-item').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Checkbox toggle (max 2)
+function toggleCheck(label) {
+  const checks = document.querySelectorAll('.sport-check.checked');
+  if (!label.classList.contains('checked') && checks.length >= 2) {
+    label.style.animation = 'shake 0.3s ease';
+    setTimeout(() => label.style.animation = '', 300);
+    return;
+  }
+  label.classList.toggle('checked');
+}
+</script>
+<style>
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}
+}
+</style>
+</body>
+</html>
