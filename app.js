@@ -1892,13 +1892,9 @@ function accruePoints(email, name, amount, reason) {
 
 // ===== AUTH & MODALS =====
 function openLoginModal() { isLoginMode = true; const m = $('login-modal'); if(m) m.classList.add('open'); }
-function closeLoginModal(event) { 
+function closeLoginModal(event) {
     if(event && event.target !== event.currentTarget) return;
-    if(!getSession()) {
-        alert(typeof currentLang !== 'undefined' && currentLang === 'EN' ? 'Login is required to view this site.' : '이 사이트의 모든 자료는 회원 가입 및 로그인을 해야만 볼 수 있습니다.');
-        return;
-    }
-    const m = $('login-modal'); if(m) m.classList.remove('open'); 
+    const m = $('login-modal'); if(m) m.classList.remove('open');
 }
 function openQuickModal(type) { 
     const m = $('quick-modal'); if(!m) return;
@@ -2047,16 +2043,8 @@ window.verifyInstructorCert = async function() {
 function initAuth() {
     const session = getSession();
     updateNavbarAuth(session);  // 네비바 항상 갱신
-    const closeBtn = document.querySelector('#login-modal .modal-close');
-    const appContent = document.getElementById('app-content');
     if (session) {
         updateAuthUI(session);
-        if(closeBtn) closeBtn.style.display = 'block';
-        if(appContent) appContent.style.display = 'block';
-    } else {
-        if(closeBtn) closeBtn.style.display = 'none';
-        if(appContent) appContent.style.display = 'none';
-        openLoginModal();
     }
 
     // Google Identity Services 초기화
