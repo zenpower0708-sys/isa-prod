@@ -2064,6 +2064,12 @@ function initAuth() {
 
     // 카카오 모바일 리다이렉트 콜백 처리
     checkKakaoRedirect();
+
+    // 회원 전용 페이지(스코어엘리트 등)에서 ?login=1 로 돌아온 경우 로그인 모달 자동 오픈
+    if (new URLSearchParams(window.location.search).get('login') === '1') {
+        window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+        if (!session) openLoginModal();
+    }
 }
 
 // ─────────────────────────────────────────────
@@ -3939,6 +3945,7 @@ function renderComments(comments) {
 }
 
 function openScoreEliteModal() {
+    if (!requireLogin()) return;
     const modal = document.createElement('div');
     modal.id = 'score-elite-modal';
     modal.className = 'modal-overlay open';
