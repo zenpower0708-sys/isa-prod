@@ -93,6 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function handleRoute() {
     const hash = window.location.hash.slice(1) || '/';
     const path = hash.split('/').filter(Boolean)[0] || '';
+    if (path !== '' && !requireLogin()) {
+        window.location.hash = '';
+        return;
+    }
     currentPage = path;
     selectedLevel = null;
     eduView = 'menu';
@@ -1892,11 +1896,17 @@ function accruePoints(email, name, amount, reason) {
 
 // ===== AUTH & MODALS =====
 function openLoginModal() { isLoginMode = true; const m = $('login-modal'); if(m) m.classList.add('open'); }
+function requireLogin() {
+    if (getSession()) return true;
+    openLoginModal();
+    return false;
+}
 function closeLoginModal(event) {
     if(event && event.target !== event.currentTarget) return;
     const m = $('login-modal'); if(m) m.classList.remove('open');
 }
-function openQuickModal(type) { 
+function openQuickModal(type) {
+    if (!requireLogin()) return;
     const m = $('quick-modal'); if(!m) return;
     m.classList.add('open');
     const isKO = currentLang === 'KO';
@@ -1928,6 +1938,7 @@ function closeQuickModal() { const m = $('quick-modal'); if(m) m.classList.remov
 let currentInstructorType = null; // 'coaching' | 'instructor'
 
 function openInstructorModal() {
+    if (!requireLogin()) return;
     const m = $('instructor-select-modal');
     if (m) m.classList.add('open');
 }
