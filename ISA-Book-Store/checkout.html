@@ -149,22 +149,38 @@
             <span>₩15,000</span>
           </div>
         </div>
+
+        <div class="payment-section" style="margin-bottom: 20px;">
+          <h3 style="font-size: 15px;">구매자 정보</h3>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <input id="buyer-name" type="text" placeholder="이름" style="width: 100%; box-sizing: border-box; padding: 12px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 10px; color: white; font-size: 14px;">
+            <input id="buyer-tel" type="tel" placeholder="연락처 (010-0000-0000)" style="width: 100%; box-sizing: border-box; padding: 12px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 10px; color: white; font-size: 14px;">
+            <input id="buyer-email" type="email" placeholder="이메일" style="width: 100%; box-sizing: border-box; padding: 12px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 10px; color: white; font-size: 14px;">
+          </div>
+        </div>
+
         <div class="total-row">
           <span>최종 결제 금액</span>
           <span>₩15,000</span>
         </div>
         <button class="btn-primary" onclick="completePurchase()" style="width: 100%; margin-top: 32px; border: none; font-size: 16px; cursor: pointer;">결제하기</button>
         <p style="font-size: 12px; color: var(--text-dim); text-align: center; margin-top: 16px;">
-          결제 완료 시 라이선스가 영구 유효하며,<br>디지털 상품 특성상 열람 시 환불이 어렵습니다.
+          결제 완료 시 라이선스가 결제일로부터 1년간 유효하며,<br>디지털 상품 특성상 열람 시 환불이 어렵습니다.
         </p>
       </div>
     </div>
 
+    <!-- Innopay PG SDK -->
+    <script src="https://pg.innopay.co.kr/tpay/js/innopay.js"></script>
     <script>
+      const INNOPAY_MID = 'pgisaweb1m';
+      const BOOK_PRICE = 15000;
+      const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+
       const urlParams = new URLSearchParams(window.location.search);
       const vol = urlParams.get('vol') || 'standing';
       const level = urlParams.get('level') || '4';
-      
+
       const bookData = {
         'standing': 'Standing/Flow Board',
         'body': 'Body/Boogie Board',
@@ -175,10 +191,75 @@
       const bookTitle = bookData[vol] || 'Standing/Flow Board';
       document.getElementById('order-item-title').innerText = `${bookTitle} (${level}급)`;
 
+      function purchaseKey(v, l) { return `isa_book_purchase_${v}_${l}`; }
+
       function completePurchase() {
-          alert('결제가 완료되었습니다. 교재 열람실로 이동합니다.');
-          window.location.href = `viewer.html?vol=${vol}&level=${level}`;
+          const buyerName = document.getElementById('buyer-name').value.trim();
+          const buyerTel = document.getElementById('buyer-tel').value.trim();
+          const buyerEmail = document.getElementById('buyer-email').value.trim();
+
+          if (!buyerName || !buyerTel || !buyerEmail) {
+              alert('구매자 정보(이름/연락처/이메일)를 모두 입력해주세요.');
+              return;
+          }
+          if (typeof innopay === 'undefined') {
+              alert('결제 모듈을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+              return;
+          }
+
+          const moid = 'ISABOOK' + Date.now();
+          localStorage.setItem('isa_book_pending_payment', JSON.stringify({
+              moid, vol, level, amount: BOOK_PRICE, buyerName, buyerTel, buyerEmail
+          }));
+
+          const params = {
+              PayMethod: 'CARD',
+              MID: INNOPAY_MID,
+              Moid: moid,
+              Amt: BOOK_PRICE,
+              GoodsName: `${bookTitle} (${level}급) E-PASS 교재`,
+              BuyerName: buyerName,
+              BuyerTel: buyerTel,
+              BuyerEmail: buyerEmail,
+              ResultCode: '0000',
+              ResultMsg: '결제 성공',
+              ReturnUrl: window.location.origin + window.location.pathname + `?vol=${vol}&level=${level}`
+          };
+
+          try {
+              innopay.goPay(params);
+          } catch (e) {
+              console.error('PG Error:', e);
+              alert('결제창 호출 중 오류가 발생했습니다.');
+          }
       }
+
+      // 결제 완료 후 PG가 ReturnUrl로 리다이렉트하면서 붙여주는 결과 파라미터 처리
+      (function handlePaymentReturn() {
+          const resCode = urlParams.get('ResultCode') || urlParams.get('resCode');
+          const tid = urlParams.get('TID') || urlParams.get('tid');
+          if (!resCode) return; // 결제 시도 전 최초 진입
+
+          const pending = JSON.parse(localStorage.getItem('isa_book_pending_payment') || 'null');
+          if (!pending) return;
+
+          if (resCode === '0000' && tid) {
+              localStorage.setItem(purchaseKey(pending.vol, pending.level), JSON.stringify({
+                  tid,
+                  paidAt: new Date().toISOString(),
+                  expiresAt: Date.now() + ONE_YEAR_MS,
+                  amount: pending.amount,
+                  buyerName: pending.buyerName,
+                  buyerEmail: pending.buyerEmail
+              }));
+              localStorage.removeItem('isa_book_pending_payment');
+              alert('결제가 완료되었습니다. 교재 열람실로 이동합니다.');
+              window.location.href = `viewer.html?vol=${pending.vol}&level=${pending.level}`;
+          } else {
+              localStorage.removeItem('isa_book_pending_payment');
+              alert('결제에 실패했습니다. 다시 시도해주세요.');
+          }
+      })();
     </script>
   </body>
 </html>

@@ -12,6 +12,34 @@ const bookTitles = {
 document.getElementById('header-title').innerText = `${bookTitles[vol]} 문제은행`;
 document.getElementById('header-level').innerText = `${level}급`;
 
+// ===== 결제 확인 (Payment Gate) =====
+function getPurchaseRecord() {
+    try {
+        return JSON.parse(localStorage.getItem(`isa_book_purchase_${vol}_${level}`) || 'null');
+    } catch (e) {
+        return null;
+    }
+}
+function isPurchaseValid(rec) {
+    return !!(rec && rec.tid && (!rec.expiresAt || Date.now() < rec.expiresAt));
+}
+const purchased = isPurchaseValid(getPurchaseRecord());
+
+if (!purchased) {
+    const selectScreen = document.getElementById('screen-select');
+    if (selectScreen) {
+        selectScreen.innerHTML = `
+            <h2>🔒 결제가 필요한 콘텐츠입니다</h2>
+            <p style="color:#64748b; margin-bottom:32px;">이 교재(${bookTitles[vol]} ${level}급)는 구매 후에만 학습 모드와 모의고사를 이용하실 수 있습니다.</p>
+            <a href="discipline.html?vol=${vol}" class="mode-card" style="display:inline-block; text-decoration:none; color:inherit;">
+                <div class="mode-icon">💳</div>
+                <h3>결제하러 가기</h3>
+                <p>₩15,000 · 결제 후 1년간 이용 가능</p>
+            </a>
+        `;
+    }
+}
+
 let allData = [];
 let currentQuestions = [];
 let currentIndex = 0;
@@ -52,6 +80,11 @@ function shuffle(array) {
 }
 
 window.startMode = (mode) => {
+    if (!purchased) {
+        alert('결제가 완료된 교재만 이용하실 수 있습니다.');
+        window.location.href = `discipline.html?vol=${vol}`;
+        return;
+    }
     currentMode = mode;
     document.getElementById('screen-select').style.display = 'none';
     document.getElementById('screen-question').style.display = 'block';
