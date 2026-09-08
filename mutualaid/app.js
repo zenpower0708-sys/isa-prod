@@ -592,7 +592,8 @@ function bindEvents(){
     else el.addEventListener('click',handleAction);
   });
   document.querySelectorAll('[data-field]').forEach(el=>{
-    el.addEventListener(el.type==='radio'?'change':'input', e=>{
+    const evtType = (el.type==='radio' || el.tagName==='SELECT') ? 'change' : 'input';
+    el.addEventListener(evtType, e=>{
       S[e.target.dataset.field] = e.target.type==='number'?Number(e.target.value):e.target.value;
       if(e.target.dataset.field==='hasCondition') render();
     });
@@ -731,7 +732,7 @@ async function submitClaim(){
 }
 
 function resetState(){
-  Object.assign(S,{screen:'plans',selectedPlan:null,agreeTerms:false,agreePrivacy:false,agreeAll:false,termsOpen:false,privacyOpen:false,name:'',phone:'',birth:'',gender:'M',email:'',address:'',emergencyName:'',emergencyPhone:'',hasCondition:'no',conditionDetail:'',hasOtherInsurance:'no',payMethod:'bank',certNumber:'',certDate:'',claimCertNumber:'',claimName:'',claimPhone:'',claimVerified:false,claimRecord:null,accidentDate:'',accidentTime:'',accidentLocation:'',accidentDesc:'',injuryPart:'',hospitalName:'',treatmentDate:'',treatmentDesc:'',totalMedical:0,nationalIns:0,selfPay:0,claimFiles:{diagnosis:null,receipt:null,detail:null,proof:null,id:null},claimAgree:false,claimNumber:'',loading:false});
+  Object.assign(S,{screen:'plans',selectedPlan:null,agreeTerms:false,agreePrivacy:false,agreeAll:false,termsOpen:false,privacyOpen:false,name:'',phone:'',birth:'',gender:'M',email:'',address:'',emergencyName:'',emergencyPhone:'',hasCondition:'no',conditionDetail:'',hasOtherInsurance:'no',payMethod:'bank',certNumber:'',certDate:'',claimCertNumber:'',claimName:'',claimPhone:'',claimVerified:false,claimRecord:null,accidentDate:'',accidentTime:'',accidentLocation:'',accidentDesc:'',injuryPart:'',hospitalName:'',treatmentDate:'',treatmentDesc:'',totalMedical:0,nationalIns:0,selfPay:0,claimFiles:{diagnosis:null,receipt:null,detail:null,facilityConfirm:null,accidentPhoto:null,id:null},sportType:'',entryMethod:'',facilityOperatorName:'',facilityOperatorPhone:'',witnessName:'',witnessPhone:'',witnessRole:'',claimAgree:false,claimNumber:'',loading:false});
 }
 
 render();
