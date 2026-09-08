@@ -183,13 +183,6 @@ function dashboardHTML(user) {
         <tbody>${historyRows}</tbody>
       </table>
     </div>
-  </div>
-
-  <!-- ⑤ 안내 -->
-  <div class="notice-box">
-    ※ 본 자산 현황은 협회 내부 관리 자료이며, 실제 자산과 일부 차이가 있을 수 있습니다.<br>
-    ※ 자산 변동 사항은 관리자가 config.js 파일을 수정하여 업데이트합니다.<br>
-    ※ 문의: info@isa-surfing.org
   </div>`;
 }
 
