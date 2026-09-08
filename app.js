@@ -198,6 +198,9 @@ function renderHomePage() {
                 <a href="/mutualaid/" target="_blank" class="hero-btn-insurance">
                     <span>🏥 공제회</span>
                 </a>
+                <a href="/assets/" target="_blank" class="hero-btn-asset">
+                    <span>🏛️ 자산현황</span>
+                </a>
             </div>
         </div>
         <div class="hero-stat wave glass-panel animate-bounce">

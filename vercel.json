@@ -1,6 +1,10 @@
 {
   "name": "isa-web-portal",
   "version": 2,
+  "rewrites": [
+    { "source": "/assets", "destination": "/assets/index.html" },
+    { "source": "/assets/", "destination": "/assets/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
