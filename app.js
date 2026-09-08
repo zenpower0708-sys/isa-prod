@@ -87,6 +87,23 @@ document.addEventListener('DOMContentLoaded', () => {
     handleRoute();
     updateLangUI();
     initAuth();
+
+    // /assets/ 등 외부 페이지에서 ?openLogin=1 파라미터로 접근 시 로그인 모달 자동 오픈
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('openLogin') === '1' || urlParams.get('login') === '1') {
+        const redirectTo = urlParams.get('redirect') || '/assets/';
+        const cleanUrl = window.location.pathname + window.location.hash;
+        history.replaceState(null, '', cleanUrl);
+
+        if (getSession()) {
+            window.location.href = redirectTo;
+        } else {
+            sessionStorage.setItem('isa_login_redirect', redirectTo);
+            setTimeout(() => {
+                openLoginModal();
+            }, 100);
+        }
+    }
 });
 
 // ===== ROUTING =====
@@ -1911,6 +1928,15 @@ function closeLoginModal(event) {
     if(event && event.target !== event.currentTarget) return;
     const m = $('login-modal'); if(m) m.classList.remove('open');
 }
+function checkLoginRedirect() {
+    const redirectTo = sessionStorage.getItem('isa_login_redirect');
+    if (redirectTo) {
+        sessionStorage.removeItem('isa_login_redirect');
+        window.location.href = redirectTo;
+        return true;
+    }
+    return false;
+}
 function openQuickModal(type) {
     if (!requireLogin()) return;
     const m = $('quick-modal'); if(!m) return;
@@ -2099,6 +2125,7 @@ async function processSocialLogin(provider, email, name) {
             saveSession(json.data);
             initAuth();
             closeLoginModal();
+            checkLoginRedirect();
         } else {
             showLoginMsg(json.message || '로그인 실패', 'red');
         }
@@ -2188,6 +2215,7 @@ async function checkKakaoRedirect() {
             saveSession(json.data);
             initAuth();
             closeLoginModal();
+            checkLoginRedirect();
         } else {
             alert('카카오 로그인 실패: ' + (json.message || '다시 시도해주세요.'));
         }
@@ -2574,6 +2602,7 @@ window.handleLogin = async function(e) {
     
     closeLoginModal();
     initAuth();
+    checkLoginRedirect();
 };
 
 // ===== 비밀번호 찾기 =====
