@@ -429,6 +429,17 @@ input, select, textarea { font-family: inherit; }
 }
 .hero-btn-score:hover { background: rgba(250,204,21,0.15); border-color: #facc15; box-shadow: 0 0 20px rgba(250,204,21,0.2); }
 .hero-btn-score span { transform: skewX(10deg); display: flex; align-items: center; gap: 8px; }
+.hero-btn-insurance {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 16px 28px; background: rgba(6,182,212,0.08);
+    border: 1px solid rgba(6,182,212,0.4); color: #22d3ee;
+    font-weight: 700; font-size: 15px; border-radius: 4px;
+    transform: skewX(-10deg); transition: all 0.3s; cursor: pointer;
+    text-decoration: none;
+}
+.hero-btn-insurance:hover { background: rgba(6,182,212,0.18); border-color: #22d3ee; box-shadow: 0 0 20px rgba(6,182,212,0.25); }
+.hero-btn-insurance span { transform: skewX(10deg); display: flex; align-items: center; gap: 8px; }
+
 
 .hero-stat {
     position: absolute; z-index: 10;

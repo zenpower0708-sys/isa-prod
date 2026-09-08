@@ -195,6 +195,9 @@ function renderHomePage() {
                 <button class="hero-btn-score" onclick="openScoreEliteModal()">
                     <span>📊 스코어엘리트(기술측정앱)</span>
                 </button>
+                <a href="/mutualaid/" target="_blank" class="hero-btn-insurance">
+                    <span>🏥 공제회</span>
+                </a>
             </div>
         </div>
         <div class="hero-stat wave glass-panel animate-bounce">
