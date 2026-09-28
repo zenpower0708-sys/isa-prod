@@ -190,7 +190,7 @@ function updateLangUI() {
     safeSet('footer-ins-terms', t.common.footer.insTerms);
 }
 
-// ===== HOMEPAGE (CLAUDE VERSION) =====
+// ===== HOMEPAGE (REDESIGNED - 2단 레이아웃) =====
 function renderHomePage() {
     if (typeof LANG === 'undefined') return '';
     const t = LANG[currentLang];
@@ -198,64 +198,171 @@ function renderHomePage() {
     const isKO = currentLang === 'KO';
     
     return `
+    <!-- 공지 배너 -->
+    <div class="notice-strip">
+        <span class="strip-badge">${isKO ? '공지' : 'NOTICE'}</span>
+        <span>${isKO ? '2025 ISA 인공서핑 자격증 시험이 진행 중입니다. 지금 신청하세요!' : '2025 ISA Indoor Surfing Certification is now open. Apply now!'}</span>
+        <a href="#/cert">${isKO ? '신청하기 →' : 'Apply →'}</a>
+    </div>
+
+    <!-- 히어로 섹션 (2단 레이아웃) -->
     <section class="hero page-enter">
         <div class="hero-bg"></div>
         <div class="hero-noise"></div>
         <div class="hero-grid"></div>
         <div class="hero-content">
-            <div class="hero-tag"><span>${t.hero.tag}</span></div>
-            <h2 class="hero-title game-font">${t.hero.title}</h2>
-            <p class="hero-subtitle">${t.hero.subtitle}</p>
-            <div class="hero-buttons">
-                <a href="#/cert" class="hero-btn-primary"><span>${t.hero.cta} →</span></a>
-                <a href="#/intro" class="hero-btn-secondary"><span>▶ ${t.hero.watch}</span></a>
-                <button class="hero-btn-score" onclick="openScoreEliteModal()">
-                    <span>📊 스코어엘리트(기술측정앱)</span>
-                </button>
-                <a href="/mutualaid/" target="_blank" class="hero-btn-insurance">
-                    <span>🏥 공제회</span>
-                </a>
-                <a href="/assets/" target="_blank" class="hero-btn-asset">
-                    <span>🏛️ 자산현황</span>
-                </a>
+            <!-- 왼쪽: 텍스트 -->
+            <div class="hero-text">
+                <div class="hero-tag"><span>🏄 ${isKO ? '국제 공인 자격증 플랫폼' : 'International Certified Platform'}</span></div>
+                <h2 class="hero-title">
+                    ${isKO 
+                        ? `인공서핑으로<br><span class="highlight">새로운 물결</span>을<br>만드세요` 
+                        : `Ride the<br><span class="highlight">New Wave</span><br>of Indoor Surfing`}
+                </h2>
+                <p class="hero-subtitle">
+                    ${isKO 
+                        ? '국제인공서핑협회(ISA)의 공인 자격증으로 전문 선수·강사의 길을 열어보세요.'
+                        : 'Open the path to professional athlete or instructor with ISA official certification.'}
+                </p>
+                <!-- 특징 배지 -->
+                <div class="hero-badges">
+                    <span class="hero-badge"><span class="dot"></span>${isKO ? '4개 종목' : '4 Disciplines'}</span>
+                    <span class="hero-badge"><span class="dot"></span>${isKO ? '4개 급수' : '4 Levels'}</span>
+                    <span class="hero-badge"><span class="dot"></span>${isKO ? '디지털 자격증' : 'Digital Certificate'}</span>
+                    <span class="hero-badge"><span class="dot"></span>${isKO ? '정부 공인' : 'Gov. Certified'}</span>
+                </div>
+                <!-- CTA 버튼 3개 -->
+                <div class="hero-buttons">
+                    <a href="#/cert" class="hero-btn-primary">
+                        <span>🏆 ${isKO ? '자격증 신청하기' : 'Apply for Certificate'} →</span>
+                    </a>
+                    <a href="#/intro" class="hero-btn-secondary">
+                        <span>🎬 ${isKO ? '종목 소개' : 'View Disciplines'}</span>
+                    </a>
+                    <a href="https://pf.kakao.com/_xgxmxfFG" target="_blank" class="hero-btn-score" style="text-decoration:none;">
+                        <span>💬 ${isKO ? '카카오 문의' : 'Kakao Chat'}</span>
+                    </a>
+                </div>
+                <!-- 파도/수온 스탯 -->
+                <div class="hero-stats-bar">
+                    <div class="hero-stat-item">
+                        <span class="value" id="wave-height-val">${weather.wave}M</span>
+                        <span class="label">${t.hero.waveHeight} (양양)</span>
+                    </div>
+                    <div class="hero-stat-item">
+                        <span class="value" id="water-temp-val">${weather.temp}°C</span>
+                        <span class="label">${t.hero.waterTemp} (양양)</span>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="hero-stat wave glass-panel animate-bounce">
-            <div class="hero-stat-label">${t.hero.waveHeight} <span style="font-size:10px; opacity:0.7;">(양양)</span></div>
-            <div class="hero-stat-value game-font" id="wave-height-val">${weather.wave} M</div>
-        </div>
-        <div class="hero-stat temp glass-panel animate-pulse">
-            <div class="hero-stat-label">${t.hero.waterTemp} <span style="font-size:10px; opacity:0.7;">(양양)</span></div>
-            <div class="hero-stat-value game-font" id="water-temp-val">${weather.temp}°C</div>
+            <!-- 오른쪽: 비주얼 패널 -->
+            <div class="hero-visual">
+                <div class="hero-visual-frame">
+                    <div class="hero-visual-placeholder">
+                        <div style="font-size:64px;margin-bottom:12px;">🏄</div>
+                        <div style="font-size:16px;color:rgba(255,255,255,0.5);font-weight:600;">${isKO ? '인공서핑 4대 종목' : '4 Indoor Surf Disciplines'}</div>
+                        <div style="display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+                            ${['Standing/Flow','Body/Boogie','Wake Surfing','Wave Surfing'].map(d=>
+                                `<span style="font-size:11px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:999px;padding:4px 12px;color:#94a3b8;">${d}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- 퀵서비스 카드 섹션 -->
-    <div class="home-quick-section">
-        <div class="home-quick-title">
-            <h3>${isKO ? '빠른 서비스' : 'QUICK SERVICES'}</h3>
-            <p>${isKO ? '회원 및 자격증 신청자를 위한 빠른 조회 서비스' : 'Quick lookup services for members and applicants'}</p>
+    <!-- 핵심 서비스 카드 섹션 -->
+    <div class="services-section">
+        <div style="max-width:1100px;margin:0 auto;text-align:center;margin-bottom:40px;">
+            <span class="services-section .section-label" style="display:inline-block;font-size:12px;font-weight:700;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;background:var(--cyan-light);padding:4px 14px;border-radius:999px;margin-bottom:12px;">ISA SERVICES</span>
+            <h2 style="font-size:clamp(24px,4vw,36px);font-weight:800;color:var(--navy);margin-bottom:8px;">
+                ${isKO ? 'ISA 핵심 서비스' : 'ISA Core Services'}
+            </h2>
+            <p style="font-size:15px;color:var(--text-dim);">
+                ${isKO ? '국제인공서핑협회의 모든 서비스를 한눈에 확인하세요' : 'Explore all services from ISA at a glance'}
+            </p>
         </div>
-        <div class="home-quick-grid">
-            <div class="home-quick-card" onclick="openQuickModal('appcheck')" id="hqc-appcheck">
-                <div class="hqc-icon">📋</div>
-                <div class="hqc-label">${isKO ? '접수증 확인' : 'Registration Check'}</div>
-                <div class="hqc-sub">${isKO ? '자격증 접수 상태확인' : 'Check application status'}</div>
+        <div class="services-grid" style="max-width:1100px;margin:0 auto;">
+            <div class="service-card" onclick="renderPage('cert')">
+                <div class="service-card-icon">🏆</div>
+                <h3>${isKO ? '자격증 신청' : 'Certificate'}</h3>
+                <p>${isKO ? '4개 종목 · 4개 급수 자격증 신청 및 취득' : 'Apply & get certified in 4 disciplines & 4 levels'}</p>
+                <div class="service-card-arrow">${isKO ? '신청하기' : 'Apply'} →</div>
             </div>
-            <div class="home-quick-card" onclick="openQuickModal('certcheck')" id="hqc-certcheck">
-                <div class="hqc-icon">🏅</div>
-                <div class="hqc-label">${isKO ? '자격증 조회' : 'Certificate Lookup'}</div>
-                <div class="hqc-sub">${isKO ? '취득 자격증 조회' : 'View your certificates'}</div>
+            <div class="service-card" onclick="renderPage('map')">
+                <div class="service-card-icon">📹</div>
+                <h3>${isKO ? '실기평가' : 'Practical Eval'}</h3>
+                <p>${isKO ? '종목별 급수 기술 요구사항 확인' : 'Check level skill requirements per discipline'}</p>
+                <div class="service-card-arrow">${isKO ? '확인하기' : 'View'} →</div>
             </div>
-            <div class="home-quick-card" onclick="openQuickModal('notice')" id="hqc-notice">
-                <div class="hqc-icon">📢</div>
-                <div class="hqc-label">${isKO ? '공지사항' : 'Notices'}</div>
-                <div class="hqc-sub">${isKO ? '협회 공지 및 소식' : 'Association updates'}</div>
+            <div class="service-card" onclick="renderPage('edu')">
+                <div class="service-card-icon">📚</div>
+                <h3>${isKO ? '교육센터' : 'Education'}</h3>
+                <p>${isKO ? 'AI 오디오 가이드 · 강사 배정' : 'AI audio guide & instructor matching'}</p>
+                <div class="service-card-arrow">${isKO ? '입장하기' : 'Enter'} →</div>
             </div>
-            <div class="home-quick-card" onclick="openQuickModal('event')" id="hqc-event">
-                <div class="hqc-icon">🎉</div>
-                <div class="hqc-label">${isKO ? '이벤트' : 'Events'}</div>
-                <div class="hqc-sub">${isKO ? '진행 중인 이벤트' : 'Current events'}</div>
+            <div class="service-card" onclick="openScoreEliteModal()">
+                <div class="service-card-icon">📊</div>
+                <h3>${isKO ? '스코어엘리트' : 'ScoreElite'}</h3>
+                <p>${isKO ? '기술 측정 앱 · 회원 전용' : 'Skill measurement app · Members only'}</p>
+                <div class="service-card-arrow">${isKO ? '이용하기' : 'Use'} →</div>
+            </div>
+            <a href="/mutualaid/" target="_blank" class="service-card">
+                <div class="service-card-icon">🛡️</div>
+                <h3>${isKO ? '안전공제회' : 'Insurance'}</h3>
+                <p>${isKO ? 'ISA 안전 보험 가입 · 사고 보장' : 'ISA safety insurance enrollment & coverage'}</p>
+                <div class="service-card-arrow">${isKO ? '가입하기' : 'Enroll'} →</div>
+            </a>
+            <a href="/shop/" target="_blank" class="service-card">
+                <div class="service-card-icon">🏪</div>
+                <h3>${isKO ? '장비스토어' : 'Shop'}</h3>
+                <p>${isKO ? 'ISA 공식 장비 · 쿠팡 제휴 혜택' : 'Official ISA gear & partner benefits'}</p>
+                <div class="service-card-arrow">${isKO ? '쇼핑하기' : 'Shop'} →</div>
+            </a>
+            <div class="service-card" onclick="renderPage('board')">
+                <div class="service-card-icon">📢</div>
+                <h3>${isKO ? '게시판' : 'Board'}</h3>
+                <p>${isKO ? '공지사항 · 이벤트 · 협회 소식' : 'Notices · Events · Association news'}</p>
+                <div class="service-card-arrow">${isKO ? '보러가기' : 'View'} →</div>
+            </div>
+            <a href="/assets/" target="_blank" class="service-card">
+                <div class="service-card-icon">🏛️</div>
+                <h3>${isKO ? '자산현황' : 'Assets'}</h3>
+                <p>${isKO ? 'ISA 협회 자산 현황 공개' : 'ISA association asset transparency'}</p>
+                <div class="service-card-arrow">${isKO ? '확인하기' : 'View'} →</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 빠른 서비스 (접수확인/자격증조회/공지/이벤트) -->
+    <div class="home-quick-section" style="background:#f1f5f9;padding:40px 24px;">
+        <div style="max-width:1100px;margin:0 auto;">
+            <div class="home-quick-title" style="margin-bottom:24px;">
+                <h3 style="font-size:20px;font-weight:800;color:var(--navy);">${isKO ? '빠른 서비스' : 'QUICK SERVICES'}</h3>
+                <p style="font-size:14px;color:var(--text-dim);margin-top:4px;">${isKO ? '회원 및 자격증 신청자를 위한 빠른 조회 서비스' : 'Quick lookup services for members and applicants'}</p>
+            </div>
+            <div class="home-quick-grid">
+                <div class="home-quick-card" onclick="openQuickModal('appcheck')" id="hqc-appcheck">
+                    <div class="hqc-icon">📋</div>
+                    <div class="hqc-label">${isKO ? '접수증 확인' : 'Registration Check'}</div>
+                    <div class="hqc-sub">${isKO ? '자격증 접수 상태확인' : 'Check application status'}</div>
+                </div>
+                <div class="home-quick-card" onclick="openQuickModal('certcheck')" id="hqc-certcheck">
+                    <div class="hqc-icon">🏅</div>
+                    <div class="hqc-label">${isKO ? '자격증 조회' : 'Certificate Lookup'}</div>
+                    <div class="hqc-sub">${isKO ? '취득 자격증 조회' : 'View your certificates'}</div>
+                </div>
+                <div class="home-quick-card" onclick="openQuickModal('notice')" id="hqc-notice">
+                    <div class="hqc-icon">📢</div>
+                    <div class="hqc-label">${isKO ? '공지사항' : 'Notices'}</div>
+                    <div class="hqc-sub">${isKO ? '협회 공지 및 소식' : 'Association updates'}</div>
+                </div>
+                <div class="home-quick-card" onclick="openQuickModal('event')" id="hqc-event">
+                    <div class="hqc-icon">🎉</div>
+                    <div class="hqc-label">${isKO ? '이벤트' : 'Events'}</div>
+                    <div class="hqc-sub">${isKO ? '진행 중인 이벤트' : 'Current events'}</div>
+                </div>
             </div>
         </div>
     </div>`;
