@@ -255,15 +255,17 @@ function renderHomePage() {
                     </div>
                 </div>
             </div>
-            <!-- 오른쪽: 비주얼 패널 -->
+            <!-- 오른쪽: 비주얼 패널 (공식 플로우보드 비주얼) -->
             <div class="hero-visual">
-                <div class="hero-visual-frame">
-                    <div class="hero-visual-placeholder">
-                        <div style="font-size:64px;margin-bottom:12px;">🏄</div>
-                        <div style="font-size:16px;color:rgba(255,255,255,0.5);font-weight:600;">${isKO ? '인공서핑 4대 종목' : '4 Indoor Surf Disciplines'}</div>
-                        <div style="display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+                <div class="hero-visual-frame" style="position:relative; overflow:hidden; border-radius:20px; border:1.5px solid rgba(14,165,233,0.35); box-shadow:0 20px 60px rgba(0,0,0,0.45); background:#020617; aspect-ratio:16/10;">
+                    <img src="images/flowboard_indoor_edm_official.jpg?v=20260928v9" alt="ISA 인공서핑 공식 비주얼" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                    
+                    <!-- 하단 반투명 오버레이 배지 (4대 종목 안내) -->
+                    <div style="position:absolute; bottom:0; left:0; right:0; padding:28px 20px 16px; background:linear-gradient(to top, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.6) 65%, transparent 100%); display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none;">
+                        <div style="font-size:14px; color:#ffffff; font-weight:800; letter-spacing:0.5px; text-shadow:0 2px 8px rgba(0,0,0,0.8);">${isKO ? '인공서핑 4대 종목' : '4 Indoor Surf Disciplines'}</div>
+                        <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; pointer-events:auto;">
                             ${['Standing/Flow','Body/Boogie','Wake Surfing','Wave Surfing'].map(d=>
-                                `<span style="font-size:11px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:999px;padding:4px 12px;color:#94a3b8;">${d}</span>`
+                                `<span style="font-size:11px; background:rgba(15,23,42,0.75); backdrop-filter:blur(8px); border:1px solid rgba(14,165,233,0.4); border-radius:999px; padding:4px 12px; color:#e0f2fe; font-weight:700; box-shadow:0 2px 6px rgba(0,0,0,0.3);">${d}</span>`
                             ).join('')}
                         </div>
                     </div>
