@@ -52,7 +52,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260928v6">
+    <link rel="stylesheet" href="styles.css?v=20260928v7">
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Kakao JavaScript SDK -->
@@ -84,7 +84,11 @@
         <div class="nav-container">
             <a href="#/" class="nav-logo" id="nav-logo-link">
                 <div class="logo-emblem-wrap">
-                    <img src="images/isa-emblem.png" alt="ISA" class="logo-emblem-img">
+                    <video class="logo-emblem-video" autoplay loop muted playsinline poster="images/isa-emblem.png">
+                        <source src="images/isa_logo_video2.mp4?v=20260928v7" type="video/mp4">
+                        <source src="images/isa_logo_video.mp4?v=20260928v7" type="video/mp4">
+                        <img src="images/isa-emblem.png" alt="ISA" class="logo-emblem-img">
+                    </video>
                     <span class="logo-initial">ISA</span>
                 </div>
                 <div class="logo-text">
@@ -181,7 +185,19 @@
     <footer id="main-footer">
         <div class="footer-grid">
             <div class="footer-col">
-                <h3 class="footer-title game-font" id="footer-org">한국인공서핑협회</h3>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div style="width:44px; height:44px; border-radius:12px; overflow:hidden; border:1.5px solid rgba(6,182,212,0.35); background:#020617; flex-shrink:0; box-shadow:0 4px 12px rgba(6,182,212,0.2);">
+                        <video autoplay loop muted playsinline poster="images/isa-emblem.png" style="width:100%; height:100%; object-fit:cover; display:block;">
+                            <source src="images/isa_logo_video2.mp4?v=20260928v7" type="video/mp4">
+                            <source src="images/isa_logo_video.mp4?v=20260928v7" type="video/mp4">
+                            <img src="images/isa-emblem.png" alt="ISA" style="width:100%; height:100%; object-fit:contain;">
+                        </video>
+                    </div>
+                    <div>
+                        <h3 class="footer-title game-font" id="footer-org" style="margin:0; font-size:16px;">국제인공서핑협회</h3>
+                        <p style="margin:2px 0 0; font-size:10px; color:var(--cyan); letter-spacing:1px; font-weight:700;">INTL ARTIFICIAL SURFING ASSOC.</p>
+                    </div>
+                </div>
                 <p>International Artificial Indoor Surfing Association</p>
                 <p>Registration No: 509 82 61742 | 대표자 곽세영</p>
             </div>
@@ -213,10 +229,11 @@
 
             <!-- Modal Header (로고 엠블럼 + 타이틀 + 서브텍스트) -->
             <div style="text-align:center; margin-bottom:18px;">
-                <div style="width:68px; height:68px; border-radius:18px; overflow:hidden; border:1px solid #bfdbfe; background:#000000; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; box-shadow:0 4px 16px rgba(0,0,0,0.12);">
+                <div style="width:72px; height:72px; border-radius:20px; overflow:hidden; border:2px solid rgba(14,165,233,0.35); background:#020617; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; box-shadow:0 6px 20px rgba(14,165,233,0.25);">
                     <video autoplay loop muted playsinline poster="images/isa-emblem.png" style="width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;">
-                        <source src="images/isa_logo_video.mp4" type="video/mp4">
-                        <source src="images/%EC%98%81%EC%83%81/%ED%98%91%ED%92%8C%EB%A1%9C%EA%B3%A0%EC%98%81%EC%83%81.mp4" type="video/mp4">
+                        <source src="images/isa_logo_video2.mp4?v=20260928v7" type="video/mp4">
+                        <source src="images/isa_logo_video.mp4?v=20260928v7" type="video/mp4">
+                        <source src="images/%EC%98%81%EC%83%81/%ED%98%91%ED%92%8C%EB%A1%9C%EA%B3%A0%EC%98%81%EC%83%812.mp4" type="video/mp4">
                         <img src="images/isa-emblem.png" alt="ISA 협회 로고" style="width:100%; height:100%; object-fit:contain; display:block;">
                     </video>
                 </div>
@@ -343,9 +360,15 @@
     <div class="modal-overlay" id="social-extra-modal">
         <div class="modal-box login-box" style="max-width:440px;" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeSocialExtraModal()">✕</button>
-            <div class="modal-header" style="border-bottom:1px solid var(--border); padding:20px 24px;">
+            <div class="modal-header" style="border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; border-radius:10px; overflow:hidden; border:1.5px solid rgba(14,165,233,0.35); background:#020617; flex-shrink:0;">
+                    <video autoplay loop muted playsinline poster="images/isa-emblem.png" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        <source src="images/isa_logo_video2.mp4?v=20260928v7" type="video/mp4">
+                        <source src="images/isa_logo_video.mp4?v=20260928v7" type="video/mp4">
+                    </video>
+                </div>
                 <div class="modal-title" style="font-size:18px; font-weight:800; color:var(--navy);">
-                    <span>📋 회원 필수 정보 입력</span>
+                    <span>회원 필수 정보 입력</span>
                 </div>
             </div>
             <div style="padding:24px 28px 28px; overflow-y:auto; max-height:calc(85vh - 70px);">
@@ -741,8 +764,14 @@
     <div class="modal-overlay" id="instructor-auth-modal" onclick="closeInstructorAuthModal(event)">
         <div class="modal-box instructor-box" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeInstructorAuthModal()">✕</button>
-            <div class="modal-header">
-                <h2 id="instructor-auth-title" class="game-font" style="color:var(--cyan);font-size:22px;">강사 전용 인증</h2>
+            <div class="modal-header" style="display:flex; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; border-radius:10px; overflow:hidden; border:1px solid rgba(6,182,212,0.4); background:#020617; flex-shrink:0;">
+                    <video autoplay loop muted playsinline poster="images/isa-emblem.png" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        <source src="images/isa_logo_video2.mp4?v=20260928v7" type="video/mp4">
+                        <source src="images/isa_logo_video.mp4?v=20260928v7" type="video/mp4">
+                    </video>
+                </div>
+                <h2 id="instructor-auth-title" class="game-font" style="color:var(--cyan);font-size:22px;margin:0;">강사 전용 인증</h2>
             </div>
             <div style="padding:16px 24px 0;">
                 <p id="instructor-auth-desc" style="color:#e2e8f0;font-size:14px;line-height:1.6;margin:0;"></p>
@@ -773,7 +802,7 @@
 
     <script src="data.js?v=20260430v1"></script>
     <script src="ai-manager.js?v=20260430v1"></script>
-    <script src="app.js?v=20260928v6"></script>
+    <script src="app.js?v=20260928v7"></script>
     <script>
         let currentLoginMethod = 'email';
         function showEmailLogin() {
