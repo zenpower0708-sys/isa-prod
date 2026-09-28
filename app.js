@@ -460,106 +460,109 @@ function renderCertDetail(t, cd) {
                             };
                             const req = (skillReqMap[selectedDiscipline] || {})[selectedLevel];
                             if (!req) return '';
-                            const skillTags = req.skills.map(sk => `<span style="font-size:11px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);border-radius:6px;padding:3px 10px;color:#7dd3fc;">${sk}</span>`).join('');
+                            const skillTags = req.skills.map(sk => `<span style="font-size:12px;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:6px;padding:4px 10px;color:#0369a1;font-weight:700;">${sk}</span>`).join('');
                             return `
-                            <div style="background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.25);border-radius:8px;padding:14px;margin-bottom:4px;">
-                                <p style="color:#67e8f9;font-size:12px;font-weight:700;margin:0 0 10px;">📋 ${selectedLevel}급 기술 요구사항 <span style="font-weight:400;color:#94a3b8;">(공통 규정: 1분~2분 이내 원테이크, 입/퇴수 전후 5초 포함)</span></p>
+                            <div style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:10px;padding:16px;margin-bottom:8px;">
+                                <p style="color:#0369a1;font-size:13px;font-weight:800;margin:0 0 10px;">📋 ${selectedLevel}급 기술 요구사항 <span style="font-weight:600;color:#64748b;">(공통 규정: 1분~2분 이내 원테이크, 입/퇴수 전후 5초 포함)</span></p>
                                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:${req.details ? '10px' : '0'};">${skillTags}</div>
-                                ${req.details ? `<p style="font-size:11px;color:#64748b;line-height:1.6;margin:0;">${req.details}</p>` : ''}
+                                ${req.details ? `<p style="font-size:12px;color:#334155;line-height:1.6;margin:0;font-weight:500;">${req.details}</p>` : ''}
                             </div>`;
                         })()}
 
                         ${selectedLevel === 1 ? `
-                            <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:12px;margin-bottom:4px;">
-                                <p style="color:#f87171;font-size:12px;margin:0;font-weight:700;line-height:1.6;">🚨 1급 필수 안내<br><span style="font-weight:400;">1급은 코칭 능력·심판·강사 자격 실기 평가를 위해 기술 시연 영상과 강습 영상 총 <strong>2개</strong>를 제출해야 합니다.</span></p>
+                            <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:14px;margin-bottom:8px;">
+                                <p style="color:#b91c1c;font-size:13px;margin:0;font-weight:800;line-height:1.6;">🚨 1급 필수 안내<br><span style="font-weight:500;color:#450a0a;">1급은 코칭 능력·심판·강사 자격 실기 평가를 위해 기술 시연 영상과 강습 영상 총 <strong>2개</strong>를 제출해야 합니다.</span></p>
                             </div>
-                            <label style="color:white;font-size:12px;margin-bottom:-4px;">📹 1. 기술 영상 (1분~2분 이내 원테이크)</label>
+                            <label style="color:#0f172a;font-size:13px;font-weight:700;margin-bottom:-2px;display:block;">📹 1. 기술 영상 (1분~2분 이내 원테이크)</label>
                             <input type="text" id="youtube-url-tech" placeholder="기술 영상 YouTube 링크 입력" 
-                                   style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:4px;color:white;font-size:13px;margin-top:4px;">
-                            <label style="color:#a78bfa;font-size:12px;margin-top:6px;margin-bottom:-4px;display:block;">📹 2. 강습 영상 (3분~5분 이내 · 코칭 능력/심판/강사 자격 실기 평가용)</label>
+                                   style="width:100%;padding:11px 14px;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:8px;color:#0f172a;font-size:13px;margin-top:4px;">
+                            <label style="color:#6d28d9;font-size:13px;font-weight:700;margin-top:10px;margin-bottom:-2px;display:block;">📹 2. 강습 영상 (3분~5분 이내 · 코칭 능력/심판/강사 자격 실기 평가용)</label>
                             <input type="text" id="youtube-url-coach" placeholder="강습 영상 YouTube 링크 입력 (3분~5분 이내)" 
-                                   style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid rgba(167,139,250,0.4);border-radius:4px;color:white;font-size:13px;margin-top:4px;">
-                            <p style="font-size:11px;color:#a78bfa;margin-top:-4px;">※ 강습 영상은 실제 코칭 장면이 포함된 3분~5분 이내 영상이어야 합니다.</p>
+                                   style="width:100%;padding:11px 14px;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:8px;color:#0f172a;font-size:13px;margin-top:4px;">
+                            <p style="font-size:11px;color:#6d28d9;margin-top:4px;font-weight:600;">※ 강습 영상은 실제 코칭 장면이 포함된 3분~5분 이내 영상이어야 합니다.</p>
                         ` : `
-                            <label style="color:white;font-size:12px;margin-bottom:-4px;">📹 실기 평가 영상 (1분~2분 이내 원테이크)</label>
+                            <label style="color:#0f172a;font-size:13px;font-weight:700;margin-bottom:-2px;display:block;">📹 실기 평가 영상 (1분~2분 이내 원테이크)</label>
                             <input type="text" id="youtube-url" placeholder="YouTube 링크 (URL) 입력" 
-                                   style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:4px;color:white;font-size:13px;margin-top:4px;">
+                                   style="width:100%;padding:11px 14px;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:8px;color:#0f172a;font-size:13px;margin-top:4px;">
                         `}
-                        <div style="border:1px solid var(--border);border-radius:6px;padding:12px;background:rgba(0,0,0,0.2);">
-                            <p style="font-size:12px;color:#94a3b8;margin:0 0 8px;font-weight:700;">📸 본인 사진 첨부 <span style="color:#64748b;font-weight:400;">(자격증 발급용, 선택)</span></p>
+                        <div style="border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;background:#f8fafc;margin-top:4px;">
+                            <p style="font-size:13px;color:#0f172a;margin:0 0 10px;font-weight:800;">📸 본인 사진 첨부 <span style="color:#64748b;font-weight:500;">(자격증 발급용, 선택)</span></p>
                             <input type="file" id="cert-photo-input" accept="image/*"
                                 style="display:none;" onchange="previewCertPhoto(this)">
-                            <div style="display:flex;gap:8px;align-items:center;">
+                            <div style="display:flex;gap:10px;align-items:center;">
                                 <button onclick="document.getElementById('cert-photo-input').click()"
-                                    style="padding:8px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
-                                    border-radius:4px;color:#94a3b8;font-size:12px;cursor:pointer;">
+                                    style="padding:9px 16px;background:#ffffff;border:1.5px solid #cbd5e1;
+                                    border-radius:8px;color:#0f172a;font-size:13px;cursor:pointer;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
                                     📂 사진 선택
                                 </button>
-                                <span id="cert-photo-name" style="font-size:12px;color:#64748b;">선택된 파일 없음</span>
+                                <span id="cert-photo-name" style="font-size:12px;color:#64748b;font-weight:600;">선택된 파일 없음</span>
                             </div>
-                            <img id="cert-photo-preview" style="display:none;margin-top:8px;width:80px;height:100px;object-fit:cover;border-radius:4px;border:1px solid rgba(6,182,212,0.4);">
+                            <img id="cert-photo-preview" style="display:none;margin-top:10px;width:80px;height:100px;object-fit:cover;border-radius:6px;border:1.5px solid #0284c7;">
                         </div>
-                        <button class="action-btn" style="background:var(--cyan); color:black; border:none; padding:8px; font-weight:800; border-radius:4px; cursor:pointer"
+                        <button class="action-btn" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; border:none; padding:12px; font-weight:800; border-radius:8px; cursor:pointer; font-size:14px; box-shadow:0 3px 10px rgba(2,132,199,0.25); margin-top:6px;"
                                 onclick="handlePracticalSubmit(this)">🎬 영상 제출하기</button>
-                        <p style="font-size:11px;color:var(--cyan)">※ 영상을 '일부 공개'로 설정한 후 링크를 제출해 주세요.</p>
+                        <p style="font-size:12px;color:#0284c7;font-weight:600;margin:0;">※ 영상을 '일부 공개'로 설정한 후 링크를 제출해 주세요.</p>
                     </div>
                 ` : ''}
                 ${s.status === 'training-upload' ? `
-                    <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
-                        <div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:14px;">
-                            <p style="color:#fde68a;font-size:12px;margin:0 0 10px;font-weight:700;">⏱️ ${isKO ? '급수별 최소 실습 이수 시간 (응시 자격 조건)' : 'Minimum Training Hours Required'}</p>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+                    <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px;">
+                        <div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(245,158,11,0.08);">
+                            <p style="color:#92400e;font-size:14px;margin:0 0 12px;font-weight:800;">⏱️ ${isKO ? '급수별 최소 실습 이수 시간 (응시 자격 조건)' : 'Minimum Training Hours Required'}</p>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
                                 ${[{lv:4,h:10},{lv:3,h:20},{lv:2,h:30},{lv:1,h:50}].map(r => `
-                                <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:6px;
-                                    background:${selectedLevel===r.lv ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)'};
-                                    border:1px solid ${selectedLevel===r.lv ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.06)'};
-                                    opacity:${selectedLevel===r.lv ? '1' : '0.5'};">
-                                    <span style="font-size:11px;color:${selectedLevel===r.lv ? '#fde68a' : '#94a3b8'};font-weight:${selectedLevel===r.lv ? '700' : '400'};">
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;
+                                    background:${selectedLevel===r.lv ? '#fef3c7' : '#ffffff'};
+                                    border:${selectedLevel===r.lv ? '2px solid #f59e0b' : '1px solid #e2e8f0'};
+                                    box-shadow:${selectedLevel===r.lv ? '0 2px 8px rgba(245,158,11,0.2)' : 'none'};">
+                                    <span style="font-size:13px;color:${selectedLevel===r.lv ? '#92400e' : '#475569'};font-weight:${selectedLevel===r.lv ? '800' : '600'};">
                                         ${selectedLevel===r.lv ? '▶ ' : ''}강사 ${r.lv}급
                                     </span>
-                                    <span style="font-size:12px;color:${selectedLevel===r.lv ? '#fbbf24' : '#64748b'};font-weight:700;margin-left:auto;">
+                                    <span style="font-size:13px;color:${selectedLevel===r.lv ? '#b45309' : '#0f172a'};font-weight:800;">
                                         ${r.h}시간 이상
                                     </span>
                                 </div>`).join('')}
                             </div>
-                            <p style="color:#92400e;font-size:11px;margin:0;line-height:1.6;background:rgba(0,0,0,0.2);padding:8px;border-radius:4px;">
+                            <p style="color:#78350f;font-size:12px;margin:0;line-height:1.7;background:#fef3c7;border:1px solid #fde68a;padding:10px 12px;border-radius:8px;font-weight:600;">
                                 ${isKO
                                     ? `※ 각 급수별로 정해진 현장 실습(안전교육 및 기술동작 교습법 등) 시간을 수료해야만 해당 등급의 자격시험에 응시할 수 있습니다.`
                                     : `※ You must complete the required field training hours (safety education, technique instruction, etc.) for your level before applying for the qualification exam.`}
                             </p>
                         </div>
-                        <div style="background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.2);border-radius:8px;padding:14px;">
-                            <p style="color:#7dd3fc;font-size:12px;margin:0 0 6px;font-weight:700;">📎 실습 이수 증빙 자료 첨부</p>
-                            <p style="color:#64748b;font-size:11px;margin:0 0 10px;line-height:1.6;">강사 확인 서명지, 이수 확인서, 수강 사진 등 증빙 서류를 첨부해주세요.<br>이미지(JPG/PNG) 또는 PDF · 최대 5개 · 각 10MB 이하</p>
+                        <div style="background:#f0f9ff;border:1.5px solid #7dd3fc;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(2,132,199,0.08);">
+                            <p style="color:#0369a1;font-size:14px;margin:0 0 8px;font-weight:800;">📎 실습 이수 증빙 자료 첨부</p>
+                            <p style="color:#334155;font-size:12px;margin:0 0 12px;line-height:1.6;font-weight:500;">
+                                강사 확인 서명지, 이수 확인서, 수강 사진 등 증빙 서류를 첨부해주세요.<br>
+                                <span style="color:#64748b;">이미지(JPG/PNG) 또는 PDF · 최대 5개 · 각 10MB 이하</span>
+                            </p>
                             <input type="file" id="training-proof-input" multiple accept="image/*,.pdf"
                                 style="display:none;" onchange="previewTrainingProof(this)">
-                            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+                            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
                                 <button onclick="document.getElementById('training-proof-input').click()"
-                                    style="padding:8px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#94a3b8;font-size:12px;cursor:pointer;">
+                                    style="padding:9px 16px;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:8px;color:#0f172a;font-size:13px;cursor:pointer;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
                                     📂 파일 선택
                                 </button>
-                                <span id="training-proof-count" style="font-size:11px;color:#475569;">선택된 파일 없음</span>
+                                <span id="training-proof-count" style="font-size:12px;color:#64748b;font-weight:600;">선택된 파일 없음</span>
                             </div>
-                            <div id="training-proof-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+                            <div id="training-proof-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;"></div>
                             <button onclick="submitTrainingProof(this)"
-                                style="width:100%;padding:10px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.4);border-radius:6px;color:#06b6d4;font-size:13px;cursor:pointer;font-weight:700;">
+                                style="width:100%;padding:12px;background:linear-gradient(135deg, #0284c7, #0369a1);border:none;border-radius:8px;color:#ffffff;font-size:14px;cursor:pointer;font-weight:800;box-shadow:0 3px 10px rgba(2,132,199,0.25);">
                                 📎 실습 이수 증빙 제출하기
                             </button>
                         </div>
                     </div>
                 ` : ''}
                 ${idx === 3 ? `
-                    <div style="margin-top:12px; padding:14px; background:rgba(212,175,55,0.07); border:1px solid rgba(212,175,55,0.25); border-radius:10px;">
-                        <p style="font-size:12px; color:#d4af37; font-weight:700; margin:0 0 8px;">🏆 디지털 자격증 발급 절차</p>
-                        <ol style="font-size:12px; color:#94a3b8; margin:0; padding-left:16px; line-height:2;">
+                    <div style="margin-top:12px; padding:16px; background:#fefce8; border:1.5px solid #fef08a; border-radius:12px;">
+                        <p style="font-size:14px; color:#854d0e; font-weight:800; margin:0 0 10px;">🏆 디지털 자격증 발급 절차</p>
+                        <ol style="font-size:13px; color:#334155; margin:0; padding-left:18px; line-height:2; font-weight:600;">
                             <li>실기 평가 영상 제출 (Step 3)</li>
                             <li>관리자 심사 및 합격 처리</li>
                             <li>PDF 자격증 자동 생성</li>
                             <li>등록 이메일로 자동 발송 📧</li>
                         </ol>
-                        <div style="margin-top:10px; padding:10px; background:rgba(6,182,212,0.06); border-radius:6px; border:1px solid rgba(6,182,212,0.15);">
-                            <p style="font-size:11px; color:#64748b; margin:0;">
-                                ✅ 합격 후 <strong style="color:#06b6d4;">등록하신 이메일</strong>로 QR코드가 포함된 디지털 자격증 PDF가 자동 발송됩니다.
+                        <div style="margin-top:10px; padding:10px 12px; background:#ffffff; border-radius:8px; border:1px solid #fde047;">
+                            <p style="font-size:12px; color:#713f12; margin:0; font-weight:600;">
+                                ✅ 합격 후 <strong style="color:#0284c7;">등록하신 이메일</strong>로 QR코드가 포함된 디지털 자격증 PDF가 자동 발송됩니다.
                             </p>
                         </div>
                     </div>
@@ -573,43 +576,43 @@ function renderCertDetail(t, cd) {
         <div class="content-container">
             <button class="back-btn" onclick="selectedLevel=null;renderPage('cert')">← ${isKO ? '목록으로' : 'Back to List'}</button>
             <div class="cert-detail-grid">
-                <div class="glass-panel" style="padding:24px">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+                <div class="glass-panel" style="padding:28px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #f1f5f9;padding-bottom:16px;">
                         <div>
-                            <h3 class="game-font" style="color:white; font-size:20px">${selectedDiscipline}</h3>
-                            <p style="color:var(--cyan);font-weight:700">Level ${selectedLevel} ${t.cert.processTitle}</p>
+                            <h3 class="game-font" style="color:#0f172a; font-size:22px; font-weight:900; margin:0 0 4px;">${selectedDiscipline}</h3>
+                            <p style="color:#0284c7; font-weight:800; font-size:15px; margin:0;">Level ${selectedLevel} ${t.cert.processTitle}</p>
                         </div>
-                        <span style="padding:4px 12px;background:rgba(234,179,8,0.2);color:#facc15;border-radius:4px">${isKO ? '진행 중' : 'In Progress'}</span>
+                        <span style="padding:6px 14px; background:#fef3c7; color:#b45309; font-weight:800; font-size:13px; border-radius:6px; border:1px solid #fde68a;">${isKO ? '진행 중' : 'In Progress'}</span>
                     </div>
                     <div class="process-steps">${stepsHTML}</div>
                 </div>
                 
                 <div class="fee-panel glass-panel">
-                    <h3 style="color:white;margin-bottom:16px">${t.cert.examFee}</h3>
+                    <h3 style="color:#0f172a; font-size:18px; font-weight:800; margin-bottom:16px;">${t.cert.examFee}</h3>
 
                     <!-- 강사 선택 동적 폼 -->
-                    <div style="margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; border: 1px solid rgba(6,182,212,0.2);">
-                        <h4 style="color: white; font-size: 14px; margin-bottom: 12px; display: flex; justify-content: space-between;">
+                    <div style="margin-bottom: 20px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1.5px solid #e2e8f0;">
+                        <h4 style="color: #0f172a; font-size: 14px; font-weight: 800; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
                             ${isKO ? '강습 방식 선택' : 'Instruction Type'}
-                            <span style="font-size: 11px; color: var(--cyan); background: rgba(6,182,212,0.1); padding: 2px 6px; border-radius: 4px; font-weight: normal;">
+                            <span style="font-size: 11px; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; font-weight: 700; border: 1px solid #bae6fd;">
                                 ${isKO ? '강사 지원금 환급 대상' : 'Eligible for Rebate'}
                             </span>
                         </h4>
                         <div style="display: flex; gap: 16px; margin-bottom: 12px;">
-                            <label style="color: #cbd5e1; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                                <input type="radio" name="instructorType" value="self" checked onchange="document.getElementById('instructor-fields').style.display='none'" style="accent-color: var(--cyan);">
+                            <label style="color: #334155; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="instructorType" value="self" checked onchange="document.getElementById('instructor-fields').style.display='none'" style="accent-color: #0284c7;">
                                 ${isKO ? '독학' : 'Self-taught'}
                             </label>
-                            <label style="color: #cbd5e1; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                                <input type="radio" name="instructorType" value="instructor" onchange="document.getElementById('instructor-fields').style.display='flex'" style="accent-color: var(--cyan);">
+                            <label style="color: #334155; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="instructorType" value="instructor" onchange="document.getElementById('instructor-fields').style.display='flex'" style="accent-color: #0284c7;">
                                 ${isKO ? '전담 강사 있음' : 'With Instructor'}
                             </label>
                         </div>
                         <div id="instructor-fields" style="display: none; flex-direction: column; gap: 10px;">
-                            <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">${isKO ? '※ 정식 자격증 보유 강사에게 강습을 받은 경우, 해당 강사에게 협회 차원의 강습료가 별도 지급됩니다.' : '※ If trained by a certified instructor, they will receive an instruction fee from the association.'}</p>
-                            <input type="text" id="inst-name" placeholder="${isKO ? '강사 이름 (Name)' : 'Instructor Name'}" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 6px; color: white;">
-                            <input type="text" id="inst-cert" placeholder="${isKO ? '강사 자격증 번호 (Cert No.)' : 'Certification No.'}" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 6px; color: white;">
-                            <input type="tel" id="inst-phone" placeholder="${isKO ? '강사 연락처 (Phone)' : 'Contact Number'}" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 6px; color: white;">
+                            <p style="font-size: 11px; color: #64748b; margin-bottom: 4px; line-height: 1.5;">${isKO ? '※ 정식 자격증 보유 강사에게 강습을 받은 경우, 해당 강사에게 협회 차원의 강습료가 별도 지급됩니다.' : '※ If trained by a certified instructor, they will receive an instruction fee from the association.'}</p>
+                            <input type="text" id="inst-name" placeholder="${isKO ? '강사 이름 (Name)' : 'Instructor Name'}" style="width: 100%; padding: 10px 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; color: #0f172a; font-size: 13px;">
+                            <input type="text" id="inst-cert" placeholder="${isKO ? '강사 자격증 번호 (Cert No.)' : 'Certification No.'}" style="width: 100%; padding: 10px 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; color: #0f172a; font-size: 13px;">
+                            <input type="tel" id="inst-phone" placeholder="${isKO ? '강사 연락처 (Phone)' : 'Contact Number'}" style="width: 100%; padding: 10px 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; color: #0f172a; font-size: 13px;">
                         </div>
                     </div>
 
@@ -642,37 +645,37 @@ function renderCertDetail(t, cd) {
 
                     </div>
 
-                    <div class="row" style="display:flex; justify-content:space-between; margin-bottom:8px; color:var(--text-dim);"><span>${isKO ? '인적사항 및 서류 심사' : 'Document Review'}</span><span style="color:white;">Included</span></div>
-                    <div class="row" style="display:flex; justify-content:space-between; margin-bottom:16px; color:var(--text-dim);"><span>${isKO ? '발급 수수료' : 'Issuance Fee'}</span><span style="color:white;">Included</span></div>
-                    <div style="height:1px; background:var(--border); margin-bottom:16px;"></div>
+                    <div class="row" style="display:flex; justify-content:space-between; margin-bottom:8px; color:#475569; font-weight:500;"><span>${isKO ? '인적사항 및 서류 심사' : 'Document Review'}</span><span style="color:#0f172a; font-weight:700;">Included</span></div>
+                    <div class="row" style="display:flex; justify-content:space-between; margin-bottom:16px; color:#475569; font-weight:500;"><span>${isKO ? '발급 수수료' : 'Issuance Fee'}</span><span style="color:#0f172a; font-weight:700;">Included</span></div>
+                    <div style="height:1px; background:#e2e8f0; margin-bottom:16px;"></div>
 
-                    <div class="fee-total" style="display:flex; justify-content:space-between; align-items:center; font-size:20px; font-weight:bold; color:var(--cyan);">
+                    <div class="fee-total" style="display:flex; justify-content:space-between; align-items:center; font-size:22px; font-weight:900; color:#0284c7;">
                         <span>Total</span>
                         <span>₩${feePrice.toLocaleString()}</span>
                     </div>
-                    <div style="margin-top:8px; padding:8px 12px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:12px; color:#22c55e; font-weight:700;">🎁 ${isKO ? '적립 예정 포인트 (1%)' : 'Expected Points (1%)'}</span>
-                        <span style="font-size:13px; color:#22c55e; font-weight:800;">+${(feePrice * 0.01).toLocaleString()}P</span>
+                    <div style="margin-top:8px; padding:10px 14px; background:#f0fdf4; border:1px solid #86efac; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:12px; color:#15803d; font-weight:700;">🎁 ${isKO ? '적립 예정 포인트 (1%)' : 'Expected Points (1%)'}</span>
+                        <span style="font-size:13px; color:#166534; font-weight:800;">+${(feePrice * 0.01).toLocaleString()}P</span>
                     </div>
-                    <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">${isKO ? '* 실기 이수시간(이용료) 별도' : '* Practice fee not included'}</p>
+                    <p style="font-size:11px; color:#64748b; margin-top:8px;">${isKO ? '* 실기 이수시간(이용료) 별도' : '* Practice fee not included'}</p>
 
                     <!-- 실습 이수 시간 안내 -->
                     ${(() => {
                         const reqHours = {4:10, 3:20, 2:30, 1:50}[selectedLevel] || 0;
                         return `
-                        <div style="margin-top:16px;padding:14px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.3);border-radius:10px;">
-                            <p style="font-size:12px;color:#fde68a;font-weight:700;margin:0 0 8px;">⏱️ ${isKO ? '응시 자격 조건 : 최소 실습 이수 시간' : 'Eligibility : Minimum Training Hours'}</p>
-                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                                <span style="font-size:22px;font-weight:900;color:#fbbf24;">${reqHours}시간</span>
-                                <span style="font-size:12px;color:#94a3b8;line-height:1.5;">${isKO ? `강사 ${selectedLevel}급 응시를 위해<br>현장 실습 <strong style="color:#fde68a">${reqHours}시간 이상</strong> 수료 필요` : `${reqHours}+ hours of field training<br>required for Level ${selectedLevel} exam`}</span>
+                        <div style="margin-top:16px;padding:16px;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;">
+                            <p style="font-size:13px;color:#92400e;font-weight:800;margin:0 0 10px;">⏱️ ${isKO ? '응시 자격 조건 : 최소 실습 이수 시간' : 'Eligibility : Minimum Training Hours'}</p>
+                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                                <span style="font-size:24px;font-weight:900;color:#b45309;">${reqHours}시간</span>
+                                <span style="font-size:12px;color:#475569;line-height:1.5;font-weight:500;">${isKO ? `강사 ${selectedLevel}급 응시를 위해<br>현장 실습 <strong style="color:#92400e;font-weight:800;">${reqHours}시간 이상</strong> 수료 필요` : `${reqHours}+ hours of field training<br>required for Level ${selectedLevel} exam`}</span>
                             </div>
                             <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                 ${[{lv:4,h:10},{lv:3,h:20},{lv:2,h:30},{lv:1,h:50}].map(r=>`
-                                <span style="font-size:10px;padding:2px 8px;border-radius:12px;
-                                    background:${selectedLevel===r.lv?'rgba(245,158,11,0.25)':'rgba(255,255,255,0.04)'};
-                                    border:1px solid ${selectedLevel===r.lv?'rgba(245,158,11,0.6)':'rgba(255,255,255,0.08)'};
-                                    color:${selectedLevel===r.lv?'#fbbf24':'#475569'};
-                                    font-weight:${selectedLevel===r.lv?'700':'400'};">
+                                <span style="font-size:11px;padding:3px 10px;border-radius:12px;
+                                    background:${selectedLevel===r.lv?'#fef3c7':'#ffffff'};
+                                    border:1px solid ${selectedLevel===r.lv?'#f59e0b':'#e2e8f0'};
+                                    color:${selectedLevel===r.lv?'#92400e':'#64748b'};
+                                    font-weight:${selectedLevel===r.lv?'800':'600'};">
                                     ${r.lv}급 ${r.h}h+
                                 </span>`).join('')}
                             </div>
@@ -681,48 +684,48 @@ function renderCertDetail(t, cd) {
 
                     <!-- 결제 전 동의 체크박스 -->
                     <div class="cert-agree-box" style="margin-top:16px">
-                        <p style="font-size:12px;color:var(--text-dark);margin-bottom:10px;font-weight:700">${isKO ? '📌 결제 전 필수 동의사항' : '📌 Required Agreements Before Payment'}</p>
+                        <p style="font-size:13px;color:#0f172a;margin-bottom:10px;font-weight:800">${isKO ? '📌 결제 전 필수 동의사항' : '📌 Required Agreements Before Payment'}</p>
                         <label class="cert-agree-item">
-                            <input type="checkbox" id="agree-training-hours" style="accent-color:#f59e0b;width:16px;height:16px;flex-shrink:0">
-                            <span>${isKO
-                                ? `강사 ${selectedLevel}급 응시 자격인 최소 실습 이수 시간(<strong style="color:#fbbf24">${{4:10,3:20,2:30,1:50}[selectedLevel]}시간 이상</strong>)을 충족하였음을 확인하였습니다.`
-                                : `I confirm that I have completed the minimum required training hours (<strong style="color:#fbbf24">${{4:10,3:20,2:30,1:50}[selectedLevel]}h+</strong>) for Level ${selectedLevel}.`
+                            <input type="checkbox" id="agree-training-hours" style="accent-color:#0284c7;width:16px;height:16px;flex-shrink:0">
+                            <span style="color:#334155;font-size:13px;font-weight:500;">${isKO
+                                ? `강사 ${selectedLevel}급 응시 자격인 최소 실습 이수 시간(<strong style="color:#b45309">${{4:10,3:20,2:30,1:50}[selectedLevel]}시간 이상</strong>)을 충족하였음을 확인하였습니다.`
+                                : `I confirm that I have completed the minimum required training hours (<strong style="color:#b45309">${{4:10,3:20,2:30,1:50}[selectedLevel]}h+</strong>) for Level ${selectedLevel}.`
                             }</span>
                             <span class="required-badge">${isKO ? '필수' : 'Required'}</span>
                         </label>
                         <label class="cert-agree-item">
                             <input type="checkbox" id="agree-no-refund" style="accent-color:#ef4444;width:16px;height:16px;flex-shrink:0">
-                            <span>${isKO ? '결제 후 환불이 불가함을 확인하였습니다.' : 'I understand that no refunds are available after payment.'}</span>
+                            <span style="color:#334155;font-size:13px;font-weight:500;">${isKO ? '결제 후 환불이 불가함을 확인하였습니다.' : 'I understand that no refunds are available after payment.'}</span>
                             <span class="required-badge">${isKO ? '필수' : 'Required'}</span>
                         </label>
                         <label class="cert-agree-item">
                             <input type="checkbox" id="agree-48hr" style="accent-color:#f59e0b;width:16px;height:16px;flex-shrink:0">
-                            <span>${isKO ? '결제 후 48시간 이내 필기시험 응시를 확인하였습니다.' : 'I understand I must take the written exam within 48 hours of payment.'}</span>
+                            <span style="color:#334155;font-size:13px;font-weight:500;">${isKO ? '결제 후 48시간 이내 필기시험 응시를 확인하였습니다.' : 'I understand I must take the written exam within 48 hours of payment.'}</span>
                             <span class="required-badge">${isKO ? '필수' : 'Required'}</span>
                         </label>
                         <label class="cert-agree-item">
-                            <input type="checkbox" id="agree-1year" style="accent-color:#a855f7;width:16px;height:16px;flex-shrink:0">
-                            <span>${isKO ? '실기평가 업로드 기한(필기 응시일 기준 1년)을 확인하였습니다.' : 'I understand the practical evaluation upload deadline (1 year from written exam date).'}</span>
+                            <input type="checkbox" id="agree-1year" style="accent-color:#0284c7;width:16px;height:16px;flex-shrink:0">
+                            <span style="color:#334155;font-size:13px;font-weight:500;">${isKO ? '실기평가 업로드 기한(필기 응시일 기준 1년)을 확인하였습니다.' : 'I understand the practical evaluation upload deadline (1 year from written exam date).'}</span>
                             <span class="required-badge">${isKO ? '필수' : 'Required'}</span>
                         </label>
                     </div>
                     
                     <!-- 결제 수단 선택 -->
-                    <div style="margin-top:20px; background:rgba(0,0,0,0.3); padding:16px; border-radius:8px; border:1px solid rgba(6,182,212,0.2);">
-                        <h4 style="color:white; font-size:14px; margin-bottom:12px;">${isKO ? '결제 수단 선택' : 'Select Payment Method'}</h4>
+                    <div style="margin-top:20px; background:#f8fafc; padding:16px; border-radius:10px; border:1.5px solid #e2e8f0;">
+                        <h4 style="color:#0f172a; font-size:14px; font-weight:800; margin-bottom:12px;">${isKO ? '결제 수단 선택' : 'Select Payment Method'}</h4>
                         <div style="display:flex; gap:12px;">
-                            <label style="flex:1; cursor:pointer; display:flex; align-items:center; gap:8px; padding:10px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:6px; color:#cbd5e1; font-size:13px;">
-                                <input type="radio" name="cert-pay-method" value="card" checked onclick="document.getElementById('cert-bank-info').style.display='none'" style="accent-color:var(--cyan);">
+                            <label style="flex:1; cursor:pointer; display:flex; align-items:center; gap:8px; padding:12px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; color:#0f172a; font-size:13px; font-weight:700; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                                <input type="radio" name="cert-pay-method" value="card" checked onclick="document.getElementById('cert-bank-info').style.display='none'" style="accent-color:#0284c7;">
                                 💳 ${isKO ? '카드' : 'Card'}
                             </label>
-                            <label style="flex:1; cursor:pointer; display:flex; align-items:center; gap:8px; padding:10px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:6px; color:#cbd5e1; font-size:13px;">
-                                <input type="radio" name="cert-pay-method" value="bank" onclick="document.getElementById('cert-bank-info').style.display='block'" style="accent-color:var(--cyan);">
+                            <label style="flex:1; cursor:pointer; display:flex; align-items:center; gap:8px; padding:12px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; color:#0f172a; font-size:13px; font-weight:700; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                                <input type="radio" name="cert-pay-method" value="bank" onclick="document.getElementById('cert-bank-info').style.display='block'" style="accent-color:#0284c7;">
                                 🏦 ${isKO ? '무통장' : 'Bank'}
                             </label>
                         </div>
-                        <div id="cert-bank-info" style="display:none; margin-top:12px; padding:12px; background:rgba(6,182,212,0.1); border:1px solid var(--cyan); border-radius:8px;">
-                            <p style="font-size:13px; color:white; margin-bottom:4px; font-weight:700;">토스뱅크 1000-7587-9085</p>
-                            <p style="font-size:11px; color:var(--text-dim);">예금주: 곽세영 (국제인공서핑협회)</p>
+                        <div id="cert-bank-info" style="display:none; margin-top:12px; padding:14px; background:#f0f9ff; border:1.5px solid #0284c7; border-radius:8px;">
+                            <p style="font-size:14px; color:#0369a1; margin-bottom:4px; font-weight:800;">토스뱅크 1000-7587-9085</p>
+                            <p style="font-size:12px; color:#475569; margin:0; font-weight:600;">예금주: 곽세영 (국제인공서핑협회)</p>
                         </div>
                     </div>
 
