@@ -343,25 +343,25 @@ function renderHomePage() {
                 <p style="font-size:14px;color:var(--text-dim);margin-top:4px;">${isKO ? '회원 및 자격증 신청자를 위한 빠른 조회 서비스' : 'Quick lookup services for members and applicants'}</p>
             </div>
             <div class="home-quick-grid">
-                <div class="home-quick-card" onclick="openQuickModal('appcheck')" id="hqc-appcheck">
-                    <div class="hqc-icon">📋</div>
-                    <div class="hqc-label">${isKO ? '접수증 확인' : 'Registration Check'}</div>
-                    <div class="hqc-sub">${isKO ? '자격증 접수 상태확인' : 'Check application status'}</div>
+                <div class="home-quick-card" onclick="openQuickModal('appcheck')" id="hqc-appcheck" style="background:#1e293b; border:1px solid rgba(255,255,255,0.18); border-radius:14px; padding:20px 12px; text-align:center; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.25);">
+                    <div class="hqc-icon" style="font-size:28px; width:54px; height:54px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; background:#e0f2fe; margin-bottom:10px;">📋</div>
+                    <div class="hqc-label" style="font-size:15px; font-weight:800; color:#ffffff !important; margin-bottom:4px; letter-spacing:-0.3px;">${isKO ? '접수증 확인' : 'Registration Check'}</div>
+                    <div class="hqc-sub" style="font-size:12px; font-weight:600; color:#93c5fd !important; line-height:1.3;">${isKO ? '자격증 접수 상태확인' : 'Check application status'}</div>
                 </div>
-                <div class="home-quick-card" onclick="openQuickModal('certcheck')" id="hqc-certcheck">
-                    <div class="hqc-icon">🏅</div>
-                    <div class="hqc-label">${isKO ? '자격증 조회' : 'Certificate Lookup'}</div>
-                    <div class="hqc-sub">${isKO ? '취득 자격증 조회' : 'View your certificates'}</div>
+                <div class="home-quick-card" onclick="openQuickModal('certcheck')" id="hqc-certcheck" style="background:#1e293b; border:1px solid rgba(255,255,255,0.18); border-radius:14px; padding:20px 12px; text-align:center; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.25);">
+                    <div class="hqc-icon" style="font-size:28px; width:54px; height:54px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; background:#e0f2fe; margin-bottom:10px;">🏅</div>
+                    <div class="hqc-label" style="font-size:15px; font-weight:800; color:#ffffff !important; margin-bottom:4px; letter-spacing:-0.3px;">${isKO ? '자격증 조회' : 'Certificate Lookup'}</div>
+                    <div class="hqc-sub" style="font-size:12px; font-weight:600; color:#93c5fd !important; line-height:1.3;">${isKO ? '취득 자격증 조회' : 'View your certificates'}</div>
                 </div>
-                <div class="home-quick-card" onclick="openQuickModal('notice')" id="hqc-notice">
-                    <div class="hqc-icon">📢</div>
-                    <div class="hqc-label">${isKO ? '공지사항' : 'Notices'}</div>
-                    <div class="hqc-sub">${isKO ? '협회 공지 및 소식' : 'Association updates'}</div>
+                <div class="home-quick-card" onclick="openQuickModal('notice')" id="hqc-notice" style="background:#1e293b; border:1px solid rgba(255,255,255,0.18); border-radius:14px; padding:20px 12px; text-align:center; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.25);">
+                    <div class="hqc-icon" style="font-size:28px; width:54px; height:54px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; background:#e0f2fe; margin-bottom:10px;">📢</div>
+                    <div class="hqc-label" style="font-size:15px; font-weight:800; color:#ffffff !important; margin-bottom:4px; letter-spacing:-0.3px;">${isKO ? '공지사항' : 'Notices'}</div>
+                    <div class="hqc-sub" style="font-size:12px; font-weight:600; color:#93c5fd !important; line-height:1.3;">${isKO ? '협회 공지 및 소식' : 'Association updates'}</div>
                 </div>
-                <div class="home-quick-card" onclick="openQuickModal('event')" id="hqc-event">
-                    <div class="hqc-icon">🎉</div>
-                    <div class="hqc-label">${isKO ? '이벤트' : 'Events'}</div>
-                    <div class="hqc-sub">${isKO ? '진행 중인 이벤트' : 'Current events'}</div>
+                <div class="home-quick-card" onclick="openQuickModal('event')" id="hqc-event" style="background:#1e293b; border:1px solid rgba(255,255,255,0.18); border-radius:14px; padding:20px 12px; text-align:center; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.25);">
+                    <div class="hqc-icon" style="font-size:28px; width:54px; height:54px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; background:#e0f2fe; margin-bottom:10px;">🎉</div>
+                    <div class="hqc-label" style="font-size:15px; font-weight:800; color:#ffffff !important; margin-bottom:4px; letter-spacing:-0.3px;">${isKO ? '이벤트' : 'Events'}</div>
+                    <div class="hqc-sub" style="font-size:12px; font-weight:600; color:#93c5fd !important; line-height:1.3;">${isKO ? '진행 중인 이벤트' : 'Current events'}</div>
                 </div>
             </div>
         </div>
@@ -2222,22 +2222,245 @@ function showLoginMsg(msg, type) {
     el.className = 'login-msg ' + (type === 'red' ? 'error' : 'success');
 }
 
+// ─────────────────────────────────────────────
+// 간편로그인 추가 필수 정보 (실명/연락처/성별/지역) 입력 모달 제어
+// ─────────────────────────────────────────────
+let pendingSocialData = null;
+
+function openSocialExtraModal(provider, email, defaultName, existingData) {
+    closeLoginModal();
+    const modal = document.getElementById('social-extra-modal');
+    if (!modal) return;
+
+    pendingSocialData = { provider, email, defaultName, existingData };
+
+    // 프로바이더 배지 설정
+    const badge = document.getElementById('extra-provider-badge');
+    if (badge) {
+        if (provider === 'kakao') {
+            badge.textContent = '카카오 계정';
+            badge.style.background = '#FEE500';
+            badge.style.color = '#3C1E1E';
+            badge.style.border = 'none';
+        } else if (provider === 'naver') {
+            badge.textContent = '네이버 계정';
+            badge.style.background = '#03C75A';
+            badge.style.color = '#ffffff';
+            badge.style.border = 'none';
+        } else {
+            badge.textContent = '구글 계정';
+            badge.style.background = '#ffffff';
+            badge.style.color = '#3c4043';
+            badge.style.border = '1px solid #dadce0';
+        }
+    }
+
+    const emailEl = document.getElementById('extra-account-email');
+    if (emailEl) emailEl.textContent = email;
+
+    const pInput = document.getElementById('extra-provider');
+    if (pInput) pInput.value = provider;
+
+    const eInput = document.getElementById('extra-email');
+    if (eInput) eInput.value = email;
+
+    // 기본값 자동 채우기
+    const nameInput = document.getElementById('extra-name');
+    if (nameInput) {
+        const existName = (existingData && existingData.name) || defaultName || '';
+        nameInput.value = existName;
+    }
+
+    const phoneInput = document.getElementById('extra-phone');
+    if (phoneInput) {
+        phoneInput.value = (existingData && existingData.phone) || '';
+    }
+
+    const genderSelect = document.getElementById('extra-gender');
+    if (genderSelect) {
+        genderSelect.value = (existingData && existingData.gender) || '';
+    }
+
+    const regionSelect = document.getElementById('extra-region');
+    if (regionSelect) {
+        regionSelect.value = (existingData && existingData.region) || '';
+    }
+
+    const msg = document.getElementById('extra-msg');
+    if (msg) {
+        msg.style.display = 'none';
+        msg.textContent = '';
+    }
+
+    const submitBtn = document.getElementById('extra-submit-btn');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '정보 저장 및 로그인 완료 →';
+    }
+
+    modal.classList.add('open');
+}
+
+function closeSocialExtraModal() {
+    const modal = document.getElementById('social-extra-modal');
+    if (modal) modal.classList.remove('open');
+    pendingSocialData = null;
+}
+
+// 휴대폰 번호 자동 하이픈 포맷팅
+window.formatExtraPhone = function(target) {
+    if (!target) return;
+    let num = target.value.replace(/[^0-9]/g, '');
+    let res = '';
+    if (num.length < 4) {
+        res = num;
+    } else if (num.length < 7) {
+        res = num.substr(0, 3) + '-' + num.substr(3);
+    } else if (num.length < 11) {
+        res = num.substr(0, 3) + '-' + num.substr(3, 3) + '-' + num.substr(6);
+    } else {
+        res = num.substr(0, 3) + '-' + num.substr(3, 4) + '-' + num.substr(7, 4);
+    }
+    target.value = res;
+};
+
+// 추가 정보 입력 후 최종 로그인 및 구글 시트 저장 처리
+window.handleSocialExtraSubmit = async function(e) {
+    e.preventDefault();
+    const provider = document.getElementById('extra-provider')?.value || (pendingSocialData && pendingSocialData.provider) || 'unknown';
+    const email    = document.getElementById('extra-email')?.value || (pendingSocialData && pendingSocialData.email) || '';
+    const name     = document.getElementById('extra-name')?.value?.trim();
+    const phone    = document.getElementById('extra-phone')?.value?.trim();
+    const gender   = document.getElementById('extra-gender')?.value;
+    const region   = document.getElementById('extra-region')?.value;
+    const agree    = document.getElementById('extra-agree')?.checked;
+    const msgEl    = document.getElementById('extra-msg');
+    const submitBtn = document.getElementById('extra-submit-btn');
+
+    const showExtraMsg = (text, type = 'red') => {
+        if (!msgEl) return;
+        msgEl.textContent = text;
+        msgEl.style.display = 'block';
+        msgEl.className = 'login-msg ' + (type === 'red' ? 'error' : 'success');
+    };
+
+    if (!name || name.length < 2) {
+        showExtraMsg('정확한 실명(2자 이상)을 입력해주세요.', 'red');
+        document.getElementById('extra-name')?.focus();
+        return;
+    }
+    if (!phone || phone.replace(/[^0-9]/g, '').length < 10) {
+        showExtraMsg('올바른 휴대폰 번호를 입력해주세요.', 'red');
+        document.getElementById('extra-phone')?.focus();
+        return;
+    }
+    if (!gender) {
+        showExtraMsg('성별을 선택해주세요.', 'red');
+        document.getElementById('extra-gender')?.focus();
+        return;
+    }
+    if (!region) {
+        showExtraMsg('거주 지역을 선택해주세요.', 'red');
+        document.getElementById('extra-region')?.focus();
+        return;
+    }
+    if (!agree) {
+        showExtraMsg('약관 및 개인정보 수집에 동의해주세요.', 'red');
+        return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '구글 시트 저장 및 로그인 처리 중...';
+    }
+    showExtraMsg('회원 정보를 안전하게 저장하고 있습니다...', 'success');
+
+    try {
+        let returnData = null;
+        if (GOOGLE_SCRIPT_URL) {
+            // 1) GET & POST 방식으로 구글 시트 회원 DB에 실명, 연락처, 성별, 지역 전송
+            const queryUrl = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=${encodeURIComponent(provider)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&gender=${encodeURIComponent(gender)}&region=${encodeURIComponent(region)}`;
+            
+            try {
+                const res = await fetch(queryUrl);
+                const json = await res.json();
+                if (json && json.status === 'success') {
+                    returnData = json.data;
+                }
+            } catch(fetchErr) {
+                console.warn('[socialLogin query fetch]', fetchErr);
+            }
+
+            // POST fallback으로도 회원 정보 보장
+            try {
+                await callGAS({
+                    action: 'socialLogin',
+                    provider: provider,
+                    email: email,
+                    name: name,
+                    phone: phone,
+                    gender: gender,
+                    region: region
+                });
+            } catch(gasErr) {
+                console.warn('[socialLogin callGAS]', gasErr);
+            }
+        }
+
+        // 세션 데이터 구성 및 저장
+        const sessionUser = {
+            name: name,
+            email: email,
+            phone: phone,
+            gender: gender,
+            region: region,
+            provider: provider,
+            points: (returnData && returnData.points) || 500,
+            joined: (returnData && returnData.joined) || new Date().toISOString().slice(0, 10)
+        };
+
+        saveSession(sessionUser);
+        initAuth();
+        closeSocialExtraModal();
+        checkLoginRedirect();
+
+        // 성공 환영 알림
+        setTimeout(() => {
+            alert(`환영합니다, ${name}님!\n회원 정보(실명/연락처/지역)가 정상 등록되었습니다.`);
+        }, 200);
+
+    } catch(err) {
+        console.error('[handleSocialExtraSubmit error]', err);
+        showExtraMsg('서버 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'red');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '정보 저장 및 로그인 완료 →';
+        }
+    }
+};
+
 async function processSocialLogin(provider, email, name) {
     showLoginMsg((provider === 'kakao' ? '카카오' : '구글') + ' 계정 확인 중...', 'success');
     try {
-        const url = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=${provider}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
-        const res  = await fetch(url);
-        const json = await res.json();
-        if (json.status === 'success') {
-            saveSession(json.data);
-            initAuth();
-            closeLoginModal();
-            checkLoginRedirect();
-        } else {
-            showLoginMsg(json.message || '로그인 실패', 'red');
+        // 기존 회원 여부 사전 확인 (GAS 조회)
+        let existingUser = null;
+        if (GOOGLE_SCRIPT_URL) {
+            try {
+                const url = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=${provider}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
+                const res  = await fetch(url);
+                const json = await res.json();
+                if (json.status === 'success' && json.data) {
+                    existingUser = json.data;
+                }
+            } catch(e) {}
         }
+
+        // 로그인 모달 닫고 추가 필수 정보 입력 팝업 띄우기
+        closeLoginModal();
+        openSocialExtraModal(provider, email, name, existingUser);
+
     } catch(e) {
-        showLoginMsg('서버 연결 오류가 발생했습니다.', 'red');
+        showLoginMsg('계정 확인 중 오류가 발생했습니다.', 'red');
         console.error('[processSocialLogin]', e);
     }
 }
@@ -2278,9 +2501,6 @@ function handleGoogleLogin() {
 // ─────────────────────────────────────────────
 // 카카오 로그인
 // ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-// 카카오 로그인
-// ─────────────────────────────────────────────
 function handleKakaoLogin() {
     if (window.Kakao && !Kakao.isInitialized()) {
         Kakao.init(KAKAO_APP_KEY);
@@ -2311,18 +2531,17 @@ async function checkKakaoRedirect() {
     // 로딩 표시
     document.body.insertAdjacentHTML('beforeend',
         '<div id="kakao-loading" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;">' +
-        '<div style="color:white;font-size:16px;text-align:center;">⏳<br>카카오 로그인 처리 중...</div></div>');
+        '<div style="color:white;font-size:16px;text-align:center;">⏳<br>카카오 로그인 확인 중...</div></div>');
 
     try {
         const url = `${GOOGLE_SCRIPT_URL}?action=kakaoCallback&code=${encodeURIComponent(code)}&redirectUri=${encodeURIComponent('https://isa-web-portal.vercel.app')}`;
         const res  = await fetch(url);
         const json = await res.json();
 
-        if (json.status === 'success') {
-            saveSession(json.data);
-            initAuth();
-            closeLoginModal();
-            checkLoginRedirect();
+        if (json.status === 'success' && json.data) {
+            const userData = json.data;
+            // 카카오 로그인 성공 후 추가 필수 정보 모달 띄우기
+            openSocialExtraModal('kakao', userData.email, userData.name, userData);
         } else {
             alert('카카오 로그인 실패: ' + (json.message || '다시 시도해주세요.'));
         }
@@ -2337,8 +2556,19 @@ async function checkKakaoRedirect() {
 
 // (구버전 mock 함수 제거 — 위의 실제 OAuth 구현으로 대체됨)
 
+function handleNaverLogin() {
+    const inputEmail = prompt('네이버 계정 이메일을 입력해주세요:', '');
+    if (!inputEmail || !inputEmail.trim()) return;
+    const email = inputEmail.trim();
+    if (!email.includes('@')) {
+        alert('올바른 이메일 형식을 입력해주세요.');
+        return;
+    }
+    openSocialExtraModal('naver', email, email.split('@')[0], null);
+}
+
 function handleAppleLogin() {
-    alert("애플 로그인은 현재 준비 중입니다. 구글 로그인 또는 이메일 로그인을 이용해 주세요.");
+    alert("애플 로그인은 현재 준비 중입니다. 카카오, 네이버 또는 구글 로그인을 이용해 주세요.");
 }
 
 function renderAppCheckContent(isKO) {
@@ -3582,6 +3812,7 @@ function openProfileModal() {
     const ph = document.getElementById('profile-phone');
     const bi = document.getElementById('profile-birth');
     const ge = document.getElementById('profile-gender');
+    const re = document.getElementById('profile-region');
     const jo = document.getElementById('profile-joined');
 
     if (nm) nm.textContent = user.name;
@@ -3589,6 +3820,7 @@ function openProfileModal() {
     if (ph) ph.textContent = user.phone || '-';
     if (bi) bi.textContent = user.birth || '-';
     if (ge) ge.textContent = user.gender === 'M' ? (currentLang === 'KO' ? '남성' : 'Male') : (currentLang === 'KO' ? '여성' : 'Female');
+    if (re) re.textContent = user.region || '-';
     if (jo) jo.textContent = user.joined || '-';
 
     // 포인트 즉시 표시 (캐시)

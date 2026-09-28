@@ -32,6 +32,7 @@ function doGet(e) {
 
   // 회원 기능
   if (action === 'login')        return loginUser(e.parameter);
+  if (action === 'socialLogin')  return socialLogin(e.parameter);
   if (action === 'getUsers')     return getAllUsers();
   if (action === 'checkEmail')   return checkEmailExists(e.parameter);
 
@@ -101,7 +102,25 @@ function registerUser(data) {
 
   for (var i = 1; i < allData.length; i++) {
     if (allData[i][1] === data.email) {
-      return respond({ status: 'error', message: '이미 등록된 이메일입니다.' });
+      // 이미 존재하는 회원이면 최신 정보로 업데이트
+      if (data.name)   sheet.getRange(i + 1, 1).setValue(data.name);
+      if (data.phone)  sheet.getRange(i + 1, 3).setValue(data.phone);
+      if (data.gender) sheet.getRange(i + 1, 5).setValue(data.gender === 'M' ? '남성' : (data.gender === 'F' ? '여성' : data.gender));
+      if (data.region) sheet.getRange(i + 1, 8).setValue(data.region);
+      return respond({
+        status: 'success',
+        message: '회원 정보 업데이트 완료',
+        data: {
+          name:   data.name   || allData[i][0],
+          email:  data.email,
+          phone:  data.phone  || allData[i][2],
+          birth:  String(allData[i][3]),
+          gender: data.gender || (allData[i][4] === '남성' ? 'M' : 'F'),
+          region: data.region || allData[i][7] || '',
+          joined: String(allData[i][6]),
+          points: getTotalPoints(data.email)
+        }
+      });
     }
   }
 
@@ -111,23 +130,26 @@ function registerUser(data) {
     data.email    || '',
     data.phone    || '',
     data.birth    || '',
-    data.gender === 'M' ? '남성' : '여성',
+    data.gender === 'M' ? '남성' : (data.gender === 'F' ? '여성' : (data.gender || '')),
     data.password || '',
-    now
+    now,
+    data.region   || '',
+    data.provider || 'email'
   ]);
-  try { sheet.autoResizeColumns(1, 7); } catch(e) {}
+  try { sheet.autoResizeColumns(1, 9); } catch(e) {}
 
   // 가입 축하 포인트 500P 자동 지급
   addPointRecord(data.email, data.name || '', 500, '가입 축하 포인트', '완료');
 
   // 텔레그램 알림
   sendTelegram([
-    '🆕 *신규 회원 가입*',
+    '🆕 *신규 회원 가입 (' + (data.provider || '일반') + ')*',
     '━━━━━━━━━━━━━━━━',
-    '👤 이름: '   + (data.name  || '-'),
-    '📧 이메일: ' + (data.email || '-'),
-    '📱 연락처: ' + (data.phone || '-'),
-    '⚧ 성별: '   + (data.gender === 'M' ? '남성' : '여성'),
+    '👤 실명: '   + (data.name   || '-'),
+    '📧 이메일: ' + (data.email  || '-'),
+    '📱 연락처: ' + (data.phone  || '-'),
+    '⚧ 성별: '   + (data.gender === 'M' ? '남성' : (data.gender === 'F' ? '여성' : '-')),
+    '📍 지역: '   + (data.region || '-'),
     '🎁 가입 포인트 500P 지급 완료',
     '🕐 가입일시: ' + now
   ].join('\n'));
@@ -141,6 +163,7 @@ function registerUser(data) {
       phone:  data.phone,
       birth:  data.birth,
       gender: data.gender,
+      region: data.region || '',
       joined: new Date().toISOString().slice(0, 10),
       points: 500
     }
@@ -169,6 +192,7 @@ function loginUser(params) {
             phone:  data[i][2],
             birth:  String(data[i][3]),
             gender: data[i][4] === '남성' ? 'M' : 'F',
+            region: data[i][7] || '',
             joined: String(data[i][6]),
             points: points
           }
@@ -192,23 +216,40 @@ function socialLogin(data) {
 
   for (var i = 1; i < allData.length; i++) {
     if (allData[i][1] === email) {
+      // 전달된 추가 정보(실명, 전화번호, 성별, 지역)가 있으면 시트 갱신
+      if (data.name)   sheet.getRange(i + 1, 1).setValue(data.name);
+      if (data.phone)  sheet.getRange(i + 1, 3).setValue(data.phone);
+      if (data.gender) sheet.getRange(i + 1, 5).setValue(data.gender === 'M' ? '남성' : (data.gender === 'F' ? '여성' : data.gender));
+      if (data.region) sheet.getRange(i + 1, 8).setValue(data.region);
+
       return respond({
         status: 'success',
         message: '로그인 성공 (' + provider + ')',
         data: {
-          name:   allData[i][0],
+          name:   data.name   || allData[i][0],
           email:  allData[i][1],
-          phone:  allData[i][2],
+          phone:  data.phone  || allData[i][2],
           birth:  String(allData[i][3]),
-          gender: allData[i][4] === '남성' ? 'M' : 'F',
+          gender: data.gender || (allData[i][4] === '남성' ? 'M' : 'F'),
+          region: data.region || allData[i][7] || '',
           joined: String(allData[i][6]),
           points: getTotalPoints(email)
         }
       });
     }
   }
-  // 신규 소셜 회원 자동 가입
-  return registerUser({ name: data.name, email: email, phone: '', birth: '', gender: '', password: '', provider: provider });
+
+  // 신규 소셜 회원 등록
+  return registerUser({
+    name:     data.name || '',
+    email:    email,
+    phone:    data.phone || '',
+    birth:    data.birth || '',
+    gender:   data.gender || '',
+    region:   data.region || '',
+    password: '',
+    provider: provider
+  });
 }
 
 // ──────────────────────────────────────────
