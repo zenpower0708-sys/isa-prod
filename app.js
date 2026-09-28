@@ -2223,40 +2223,52 @@ function showLoginMsg(msg, type) {
 }
 
 // ─────────────────────────────────────────────
-// 간편로그인 추가 필수 정보 (실명/연락처/성별/지역) 입력 모달 제어
+// 간편로그인 순서 개선 (2번 사이트 방식):
+// 1. 소셜 로그인 버튼 클릭 시 '회원 필수 정보 입력 팝업'이 먼저 뜸
+// 2. 실명, 휴대폰 번호, 성별, 지역 입력 후 [로그인 완료] 클릭 시 마무리 소셜 인증 진행
 // ─────────────────────────────────────────────
 let pendingSocialData = null;
 
-function openSocialExtraModal(provider, email, defaultName, existingData) {
+function openSocialExtraModal(provider, email = '', defaultName = '', existingData = null) {
     closeLoginModal();
     const modal = document.getElementById('social-extra-modal');
     if (!modal) return;
 
     pendingSocialData = { provider, email, defaultName, existingData };
 
-    // 프로바이더 배지 설정
+    // 프로바이더 배지 및 헤더 설정
     const badge = document.getElementById('extra-provider-badge');
-    if (badge) {
-        if (provider === 'kakao') {
+    const emailEl = document.getElementById('extra-account-email');
+    const submitBtn = document.getElementById('extra-submit-btn');
+
+    if (provider === 'kakao') {
+        if (badge) {
             badge.textContent = '카카오 계정';
             badge.style.background = '#FEE500';
             badge.style.color = '#3C1E1E';
             badge.style.border = 'none';
-        } else if (provider === 'naver') {
+        }
+        if (emailEl) emailEl.textContent = email || '카카오 계정 연동 가입 / 로그인';
+        if (submitBtn) submitBtn.textContent = '카카오 계정으로 로그인 완료 →';
+    } else if (provider === 'naver') {
+        if (badge) {
             badge.textContent = '네이버 계정';
             badge.style.background = '#03C75A';
             badge.style.color = '#ffffff';
             badge.style.border = 'none';
-        } else {
+        }
+        if (emailEl) emailEl.textContent = email || '네이버 아이디 연동 가입 / 로그인';
+        if (submitBtn) submitBtn.textContent = '네이버 아이디로 로그인 완료 →';
+    } else {
+        if (badge) {
             badge.textContent = '구글 계정';
             badge.style.background = '#ffffff';
             badge.style.color = '#3c4043';
             badge.style.border = '1px solid #dadce0';
         }
+        if (emailEl) emailEl.textContent = email || '구글 계정 연동 가입 / 로그인';
+        if (submitBtn) submitBtn.textContent = '구글 계정으로 로그인 완료 →';
     }
-
-    const emailEl = document.getElementById('extra-account-email');
-    if (emailEl) emailEl.textContent = email;
 
     const pInput = document.getElementById('extra-provider');
     if (pInput) pInput.value = provider;
@@ -2292,10 +2304,8 @@ function openSocialExtraModal(provider, email, defaultName, existingData) {
         msg.textContent = '';
     }
 
-    const submitBtn = document.getElementById('extra-submit-btn');
     if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = '정보 저장 및 로그인 완료 →';
     }
 
     modal.classList.add('open');
@@ -2324,11 +2334,11 @@ window.formatExtraPhone = function(target) {
     target.value = res;
 };
 
-// 추가 정보 입력 후 최종 로그인 및 구글 시트 저장 처리
+// 1번 사진 창에서 정보 입력 후 버튼 클릭 시 처리
 window.handleSocialExtraSubmit = async function(e) {
     e.preventDefault();
-    const provider = document.getElementById('extra-provider')?.value || (pendingSocialData && pendingSocialData.provider) || 'unknown';
-    const email    = document.getElementById('extra-email')?.value || (pendingSocialData && pendingSocialData.email) || '';
+    const provider = document.getElementById('extra-provider')?.value || (pendingSocialData && pendingSocialData.provider) || 'google';
+    let email      = document.getElementById('extra-email')?.value || (pendingSocialData && pendingSocialData.email) || '';
     const name     = document.getElementById('extra-name')?.value?.trim();
     const phone    = document.getElementById('extra-phone')?.value?.trim();
     const gender   = document.getElementById('extra-gender')?.value;
@@ -2369,108 +2379,45 @@ window.handleSocialExtraSubmit = async function(e) {
         return;
     }
 
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = '구글 시트 저장 및 로그인 처리 중...';
-    }
-    showExtraMsg('회원 정보를 안전하게 저장하고 있습니다...', 'success');
+    const pendingUser = { name, phone, gender, region, provider };
 
-    try {
-        let returnData = null;
-        if (GOOGLE_SCRIPT_URL) {
-            // 1) GET & POST 방식으로 구글 시트 회원 DB에 실명, 연락처, 성별, 지역 전송
-            const queryUrl = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=${encodeURIComponent(provider)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&gender=${encodeURIComponent(gender)}&region=${encodeURIComponent(region)}`;
-            
-            try {
-                const res = await fetch(queryUrl);
-                const json = await res.json();
-                if (json && json.status === 'success') {
-                    returnData = json.data;
-                }
-            } catch(fetchErr) {
-                console.warn('[socialLogin query fetch]', fetchErr);
+    // 이메일이 아직 없으면, 마무리 소셜 로그인(인증창) 실행!
+    if (!email) {
+        if (provider === 'google') {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Google 계정 확인 중...';
             }
-
-            // POST fallback으로도 회원 정보 보장
-            try {
-                await callGAS({
-                    action: 'socialLogin',
-                    provider: provider,
-                    email: email,
-                    name: name,
-                    phone: phone,
-                    gender: gender,
-                    region: region
-                });
-            } catch(gasErr) {
-                console.warn('[socialLogin callGAS]', gasErr);
+            showExtraMsg('Google 계정 인증을 진행합니다...', 'success');
+            finishGoogleLoginAfterExtra(pendingUser);
+            return;
+        } else if (provider === 'kakao') {
+            // 카카오의 경우 입력 정보를 세션에 보관 후 카카오 인증 리다이렉트 실행
+            sessionStorage.setItem('pending_social_info', JSON.stringify(pendingUser));
+            if (window.Kakao && !Kakao.isInitialized()) Kakao.init(KAKAO_APP_KEY);
+            Kakao.Auth.authorize({
+                redirectUri: 'https://isa-web-portal.vercel.app',
+                scope: 'profile_nickname,account_email'
+            });
+            return;
+        } else if (provider === 'naver') {
+            const inputEmail = prompt('네이버 아이디 또는 이메일을 입력해주세요:', '@naver.com');
+            if (!inputEmail || !inputEmail.includes('@')) {
+                showExtraMsg('올바른 네이버 이메일을 입력해주세요.', 'red');
+                return;
             }
-        }
-
-        // 세션 데이터 구성 및 저장
-        const sessionUser = {
-            name: name,
-            email: email,
-            phone: phone,
-            gender: gender,
-            region: region,
-            provider: provider,
-            points: (returnData && returnData.points) || 500,
-            joined: (returnData && returnData.joined) || new Date().toISOString().slice(0, 10)
-        };
-
-        saveSession(sessionUser);
-        initAuth();
-        closeSocialExtraModal();
-        checkLoginRedirect();
-
-        // 성공 환영 알림
-        setTimeout(() => {
-            alert(`환영합니다, ${name}님!\n회원 정보(실명/연락처/지역)가 정상 등록되었습니다.`);
-        }, 200);
-
-    } catch(err) {
-        console.error('[handleSocialExtraSubmit error]', err);
-        showExtraMsg('서버 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'red');
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = '정보 저장 및 로그인 완료 →';
+            email = inputEmail.trim();
         }
     }
+
+    // 이메일이 확보된 경우 최종 저장 처리
+    await completeSocialRegistration(email, pendingUser);
 };
 
-async function processSocialLogin(provider, email, name) {
-    showLoginMsg((provider === 'kakao' ? '카카오' : '구글') + ' 계정 확인 중...', 'success');
-    try {
-        // 기존 회원 여부 사전 확인 (GAS 조회)
-        let existingUser = null;
-        if (GOOGLE_SCRIPT_URL) {
-            try {
-                const url = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=${provider}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
-                const res  = await fetch(url);
-                const json = await res.json();
-                if (json.status === 'success' && json.data) {
-                    existingUser = json.data;
-                }
-            } catch(e) {}
-        }
-
-        // 로그인 모달 닫고 추가 필수 정보 입력 팝업 띄우기
-        closeLoginModal();
-        openSocialExtraModal(provider, email, name, existingUser);
-
-    } catch(e) {
-        showLoginMsg('계정 확인 중 오류가 발생했습니다.', 'red');
-        console.error('[processSocialLogin]', e);
-    }
-}
-
-// ─────────────────────────────────────────────
-// 구글 로그인
-// ─────────────────────────────────────────────
-function handleGoogleLogin() {
+// 마무리 구글 로그인 실행 함수
+function finishGoogleLoginAfterExtra(pendingUser) {
     if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes('YOUR_')) {
-        alert('Google Client ID가 설정되지 않았습니다.\napp.js의 GOOGLE_CLIENT_ID를 설정해주세요.');
+        alert('Google Client ID가 설정되지 않았습니다.');
         return;
     }
     if (!window.google || !window.google.accounts) {
@@ -2482,56 +2429,130 @@ function handleGoogleLogin() {
         scope: 'email profile openid',
         callback: async (tokenResponse) => {
             if (tokenResponse.error) {
-                showLoginMsg('Google 로그인 실패: ' + tokenResponse.error, 'red');
+                const msgEl = document.getElementById('extra-msg');
+                if (msgEl) {
+                    msgEl.textContent = 'Google 로그인 취소 또는 실패: ' + tokenResponse.error;
+                    msgEl.style.display = 'block';
+                    msgEl.className = 'login-msg error';
+                }
+                const submitBtn = document.getElementById('extra-submit-btn');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '구글 계정으로 로그인 완료 →';
+                }
                 return;
             }
             try {
                 const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                     headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
                 }).then(r => r.json());
-                await processSocialLogin('google', userInfo.email, userInfo.name || userInfo.email.split('@')[0]);
+                
+                await completeSocialRegistration(userInfo.email, pendingUser);
             } catch(e) {
-                showLoginMsg('Google 정보 조회 오류가 발생했습니다.', 'red');
+                console.error('[finishGoogleLoginAfterExtra]', e);
+                alert('Google 계정 정보를 가져오는 중 오류가 발생했습니다.');
             }
         }
     });
-    tokenClient.requestAccessToken({ prompt: 'consent' });
+    tokenClient.requestAccessToken({ prompt: 'select_account' });
+}
+
+// 구글 시트에 회원정보 최종 저장 및 세션 완료 공통 함수
+async function completeSocialRegistration(email, user) {
+    const submitBtn = document.getElementById('extra-submit-btn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '구글 시트 저장 및 로그인 완료 중...';
+    }
+
+    try {
+        let returnData = null;
+        if (GOOGLE_SCRIPT_URL) {
+            const queryUrl = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=${encodeURIComponent(user.provider)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(user.name)}&phone=${encodeURIComponent(user.phone)}&gender=${encodeURIComponent(user.gender)}&region=${encodeURIComponent(user.region)}`;
+            
+            try {
+                const res = await fetch(queryUrl);
+                const json = await res.json();
+                if (json && json.status === 'success') {
+                    returnData = json.data;
+                }
+            } catch(fetchErr) {}
+
+            try {
+                await callGAS({
+                    action: 'socialLogin',
+                    provider: user.provider,
+                    email: email,
+                    name: user.name,
+                    phone: user.phone,
+                    gender: user.gender,
+                    region: user.region
+                });
+            } catch(gasErr) {}
+        }
+
+        const sessionUser = {
+            name: user.name,
+            email: email,
+            phone: user.phone,
+            gender: user.gender,
+            region: user.region,
+            provider: user.provider,
+            points: (returnData && returnData.points) || 500,
+            joined: (returnData && returnData.joined) || new Date().toISOString().slice(0, 10)
+        };
+
+        saveSession(sessionUser);
+        initAuth();
+        closeSocialExtraModal();
+        checkLoginRedirect();
+
+        setTimeout(() => {
+            alert(`환영합니다, ${user.name}님!\n${user.provider === 'kakao' ? '카카오' : (user.provider === 'naver' ? '네이버' : '구글')} 계정으로 로그인이 완료되었습니다.`);
+        }, 200);
+
+    } catch(err) {
+        console.error('[completeSocialRegistration error]', err);
+        alert('회원 정보 저장 중 오류가 발생했습니다.');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '정보 저장 및 로그인 완료 →';
+        }
+    }
 }
 
 // ─────────────────────────────────────────────
-// 카카오 로그인
+// 메인 로그인 창 버튼 클릭 핸들러 (1번 사진 창 먼저 오픈)
 // ─────────────────────────────────────────────
+function handleGoogleLogin() {
+    // 2번 사이트 순서: 구글 버튼 누르면 1번 사진 창이 먼저 뜸!
+    openSocialExtraModal('google');
+}
+
 function handleKakaoLogin() {
-    if (window.Kakao && !Kakao.isInitialized()) {
-        Kakao.init(KAKAO_APP_KEY);
-    }
-    if (!window.Kakao || !Kakao.isInitialized()) {
-        alert('카카오 SDK를 불러오지 못했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
-        return;
-    }
-    // PC/모바일 모두 리다이렉트 방식으로 통일
-    Kakao.Auth.authorize({
-        redirectUri: 'https://isa-web-portal.vercel.app',
-        scope: 'profile_nickname,account_email'
-    });
+    // 2번 사이트 순서: 카카오 버튼 누르면 1번 사진 창이 먼저 뜸!
+    openSocialExtraModal('kakao');
 }
 
-// 카카오 로그인 후 리다이렉트 콜백 처리 (code → GAS → 토큰 교환 → 로그인)
+function handleNaverLogin() {
+    // 2번 사이트 순서: 네이버 버튼 누르면 1번 사진 창이 먼저 뜸!
+    openSocialExtraModal('naver');
+}
+
+// 카카오 로그인 후 리다이렉트 콜백 처리 (사전에 저장해둔 실명/연락처/지역과 결합)
 async function checkKakaoRedirect() {
     const params = new URLSearchParams(window.location.search);
     const code  = params.get('code');
     const error = params.get('error');
 
-    // URL 즉시 정리 (새로고침 시 중복 처리 방지)
     if (code || error) {
         window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
     }
     if (error || !code) return;
 
-    // 로딩 표시
     document.body.insertAdjacentHTML('beforeend',
         '<div id="kakao-loading" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;">' +
-        '<div style="color:white;font-size:16px;text-align:center;">⏳<br>카카오 로그인 확인 중...</div></div>');
+        '<div style="color:white;font-size:16px;text-align:center;">⏳<br>카카오 로그인 마무리 중...</div></div>');
 
     try {
         const url = `${GOOGLE_SCRIPT_URL}?action=kakaoCallback&code=${encodeURIComponent(code)}&redirectUri=${encodeURIComponent('https://isa-web-portal.vercel.app')}`;
@@ -2539,9 +2560,17 @@ async function checkKakaoRedirect() {
         const json = await res.json();
 
         if (json.status === 'success' && json.data) {
-            const userData = json.data;
-            // 카카오 로그인 성공 후 추가 필수 정보 모달 띄우기
-            openSocialExtraModal('kakao', userData.email, userData.name, userData);
+            const kakaoData = json.data;
+            // 사전에 입력받은 회원정보가 sessionStorage에 있는지 확인
+            const pendingStr = sessionStorage.getItem('pending_social_info');
+            sessionStorage.removeItem('pending_social_info');
+            
+            if (pendingStr) {
+                const pendingUser = JSON.parse(pendingStr);
+                await completeSocialRegistration(kakaoData.email, pendingUser);
+            } else {
+                openSocialExtraModal('kakao', kakaoData.email, kakaoData.name, kakaoData);
+            }
         } else {
             alert('카카오 로그인 실패: ' + (json.message || '다시 시도해주세요.'));
         }
@@ -2552,19 +2581,6 @@ async function checkKakaoRedirect() {
         const el = document.getElementById('kakao-loading');
         if (el) el.remove();
     }
-}
-
-// (구버전 mock 함수 제거 — 위의 실제 OAuth 구현으로 대체됨)
-
-function handleNaverLogin() {
-    const inputEmail = prompt('네이버 계정 이메일을 입력해주세요:', '');
-    if (!inputEmail || !inputEmail.trim()) return;
-    const email = inputEmail.trim();
-    if (!email.includes('@')) {
-        alert('올바른 이메일 형식을 입력해주세요.');
-        return;
-    }
-    openSocialExtraModal('naver', email, email.split('@')[0], null);
 }
 
 function handleAppleLogin() {
