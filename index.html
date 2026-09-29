@@ -52,7 +52,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260928v8">
+    <link rel="stylesheet" href="styles.css?v=20260929v1">
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Kakao JavaScript SDK -->
@@ -693,6 +693,46 @@
     </div>
 
 
+    <!-- ISA 공식 로고송 BGM 플레이어 (Ride The Infinite Wave) -->
+    <audio id="isa-bgm" preload="auto" loop>
+        <source src="audio/ride_the_infinite_wave.mp3?v=20260929v1" type="audio/mp3">
+        <source src="images/ride_the_infinite_wave.mp3?v=20260929v1" type="audio/mp3">
+    </audio>
+
+    <div class="isa-bgm-widget" id="isa-bgm-widget" title="ISA 공식 협회로고송: Ride The Infinite Wave">
+        <div class="isa-bgm-disc" id="isa-bgm-disc" onclick="toggleBGM()">
+            <img src="images/ride_the_infinite_wave_cover.jpeg?v=20260929v1" alt="협회로고송 커버">
+        </div>
+        <div class="isa-bgm-info" onclick="toggleBGM()">
+            <div class="isa-bgm-tag">
+                <span>🎵 협회 공식 로고송</span>
+                <div class="isa-bgm-eq">
+                    <span class="isa-bgm-eq-bar"></span>
+                    <span class="isa-bgm-eq-bar"></span>
+                    <span class="isa-bgm-eq-bar"></span>
+                    <span class="isa-bgm-eq-bar"></span>
+                </div>
+            </div>
+            <div class="isa-bgm-title" id="isa-bgm-status-text">Ride The Infinite Wave</div>
+        </div>
+        <button class="isa-bgm-btn" id="isa-bgm-btn" onclick="toggleBGM()" title="재생 / 일시정지">
+            <svg id="isa-bgm-icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <svg id="isa-bgm-icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+        </button>
+        <button class="isa-bgm-mute-btn" onclick="toggleBGMMute(event)" title="음소거 토글">
+            <svg id="isa-bgm-mute-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+        </button>
+    </div>
+
     <!-- AI Chat Assistant Interface -->
     <div id="ai-chat-btn" onclick="toggleAIChat()" title="ISA AI 비서에게 문의하기">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -802,7 +842,7 @@
 
     <script src="data.js?v=20260430v1"></script>
     <script src="ai-manager.js?v=20260430v1"></script>
-    <script src="app.js?v=20260928v9"></script>
+    <script src="app.js?v=20260929v1"></script>
     <script>
         let currentLoginMethod = 'email';
         function showEmailLogin() {

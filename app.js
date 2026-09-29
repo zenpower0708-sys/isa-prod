@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     handleRoute();
     updateLangUI();
     initAuth();
+    initBGM();
 
     // /assets/ 등 외부 페이지에서 ?openLogin=1 파라미터로 접근 시 로그인 모달 자동 오픈
     const urlParams = new URLSearchParams(window.location.search);
@@ -105,6 +106,99 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// ─────────────────────────────────────────────
+// ISA 공식 로고송 BGM 제어 시스템 (Ride The Infinite Wave)
+// ─────────────────────────────────────────────
+let isBGMPlaying = false;
+let isBGMMuted = false;
+
+window.initBGM = function() {
+    const audio = document.getElementById('isa-bgm');
+    if (!audio) return;
+    audio.volume = 0.35; // 편안하고 웅장한 배경음악 적정 음량
+
+    const updateUI = (playing) => {
+        isBGMPlaying = playing;
+        const disc = document.getElementById('isa-bgm-disc');
+        const playIcon = document.getElementById('isa-bgm-icon-play');
+        const pauseIcon = document.getElementById('isa-bgm-icon-pause');
+        const statusText = document.getElementById('isa-bgm-status-text');
+
+        if (disc) disc.classList.toggle('playing', playing);
+        if (playIcon) playIcon.style.display = playing ? 'none' : 'block';
+        if (pauseIcon) pauseIcon.style.display = playing ? 'block' : 'none';
+        if (statusText) statusText.title = playing ? '음악 재생 중' : '음악 일시정지됨';
+    };
+
+    // 브라우저 정책 대응: 자동 재생 시도 및 사용자 인터랙션 리스너 등록
+    const tryPlay = () => {
+        const promise = audio.play();
+        if (promise !== undefined) {
+            promise.then(() => {
+                updateUI(true);
+            }).catch(() => {
+                updateUI(false);
+                const playOnFirstTouch = () => {
+                    if (!isBGMPlaying) {
+                        audio.play().then(() => {
+                            updateUI(true);
+                        }).catch(e => console.log('BGM interaction play:', e));
+                    }
+                    window.removeEventListener('click', playOnFirstTouch);
+                    window.removeEventListener('touchstart', playOnFirstTouch);
+                    window.removeEventListener('keydown', playOnFirstTouch);
+                };
+                window.addEventListener('click', playOnFirstTouch, { once: true });
+                window.addEventListener('touchstart', playOnFirstTouch, { once: true });
+                window.addEventListener('keydown', playOnFirstTouch, { once: true });
+            });
+        }
+    };
+
+    tryPlay();
+
+    audio.onplay = () => updateUI(true);
+    audio.onpause = () => updateUI(false);
+    audio.onended = () => {
+        audio.currentTime = 0;
+        audio.play().catch(()=>{});
+    };
+};
+
+window.toggleBGM = function() {
+    const audio = document.getElementById('isa-bgm');
+    if (!audio) return;
+    if (audio.paused) {
+        audio.play().then(() => {
+            isBGMPlaying = true;
+        }).catch(err => {
+            console.error('[toggleBGM] play error', err);
+        });
+    } else {
+        audio.pause();
+        isBGMPlaying = false;
+    }
+};
+
+window.toggleBGMMute = function(e) {
+    if (e) e.stopPropagation();
+    const audio = document.getElementById('isa-bgm');
+    const muteIcon = document.getElementById('isa-bgm-mute-icon');
+    if (!audio) return;
+    audio.muted = !audio.muted;
+    isBGMMuted = audio.muted;
+
+    if (muteIcon) {
+        if (audio.muted) {
+            muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+            muteIcon.style.stroke = '#ef4444';
+        } else {
+            muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>';
+            muteIcon.style.stroke = 'currentColor';
+        }
+    }
+};
 
 // ===== ROUTING =====
 function handleRoute() {
