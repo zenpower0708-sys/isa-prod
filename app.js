@@ -350,11 +350,13 @@ function renderHomePage() {
             <!-- 왼쪽: 텍스트 -->
             <div class="hero-text">
                 <div class="hero-tag"><span>🏄 ${isKO ? '국제 공인 자격증 플랫폼' : 'International Certified Platform'}</span></div>
-                <h2 class="hero-title">
-                    ${isKO 
-                        ? `인공서핑으로<br><span class="highlight">새로운 물결</span>을<br>만드세요` 
-                        : `Ride the<br><span class="highlight">New Wave</span><br>of Indoor Surfing`}
-                </h2>
+                <div class="hero-title-video-container" title="인공서핑으로 새로운 물결을 만드세요">
+                    <video autoplay loop muted playsinline class="hero-title-video" poster="images/main_title_poster.jpg">
+                        <source src="images/main_title_video.mp4?v=20260929v1" type="video/mp4">
+                        <source src="images/영상/main_title_video.mp4?v=20260929v1" type="video/mp4">
+                    </video>
+                    <h2 class="sr-only">${isKO ? '인공서핑으로 새로운 물결을 만드세요' : 'Ride the New Wave of Indoor Surfing'}</h2>
+                </div>
                 <p class="hero-subtitle">
                     ${isKO 
                         ? '국제인공서핑협회(ISA)의 공인 자격증으로 전문 선수·강사의 길을 열어보세요.'
