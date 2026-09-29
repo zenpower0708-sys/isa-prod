@@ -292,15 +292,15 @@ input, select, textarea { font-family: inherit; }
 .logo-text-metal-img {
     height: 38px;
     width: auto;
-    max-width: 180px;
+    max-width: 195px;
     object-fit: contain;
     display: block;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+    filter: drop-shadow(0 1px 3px rgba(15, 23, 42, 0.22));
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 .nav-logo:hover .logo-text-metal-img {
     transform: scale(1.02);
-    filter: drop-shadow(0 4px 10px rgba(14, 165, 233, 0.35));
+    filter: drop-shadow(0 2px 8px rgba(14, 165, 233, 0.4));
 }
 .footer-logo-metal-img {
     height: 40px;
@@ -3274,11 +3274,11 @@ input, select, textarea { font-family: inherit; }
     }
     .logo-text-metal-img {
         height: 30px;
-        max-width: 140px;
+        max-width: 155px;
     }
     .footer-logo-metal-img {
         height: 32px;
-        max-width: 150px;
+        max-width: 160px;
     }
 }
 
