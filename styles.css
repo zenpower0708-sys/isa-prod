@@ -267,13 +267,36 @@ input, select, textarea { font-family: inherit; }
     font-size: 10px; font-weight: 900; letter-spacing: 3px;
     color: var(--cyan); margin-top: -2px;
 }
-.logo-text { display: flex; flex-direction: column; }
+.logo-text { display: flex; flex-direction: column; justify-content: center; }
 .logo-text h1 {
     font-size: 17px; font-weight: 900; letter-spacing: -0.5px;
     color: var(--navy);
     line-height: 1.2;
 }
 .logo-sub { font-size: 9px; color: var(--cyan); letter-spacing: 1px; font-weight: 700; margin-top: 2px; }
+
+/* 메탈 3D 글자 로고 이미지 (국제인공서핑협회) */
+.logo-text-metal-img {
+    height: 38px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+.nav-logo:hover .logo-text-metal-img {
+    transform: scale(1.02);
+    filter: drop-shadow(0 4px 10px rgba(14, 165, 233, 0.35));
+}
+.footer-logo-metal-img {
+    height: 40px;
+    width: auto;
+    max-width: 195px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
 
 .nav-links {
     display: none; gap: 4px; font-weight: 600;
@@ -3235,6 +3258,14 @@ input, select, textarea { font-family: inherit; }
     .nav-bgm-btn {
         padding: 5px 8px;
         font-size: 11px;
+    }
+    .logo-text-metal-img {
+        height: 30px;
+        max-width: 140px;
+    }
+    .footer-logo-metal-img {
+        height: 32px;
+        max-width: 150px;
     }
 }
 
