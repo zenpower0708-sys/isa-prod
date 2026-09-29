@@ -3011,6 +3011,146 @@ input, select, textarea { font-family: inherit; }
     background: var(--cyan-dark) !important;
 }
 
+/* ===== 상단 네비게이션 헤더 BGM 컨트롤 버튼 ===== */
+.nav-bgm-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(14, 165, 233, 0.15);
+    border: 1px solid rgba(14, 165, 233, 0.45);
+    color: #38bdf8;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+.nav-bgm-btn:hover {
+    background: rgba(14, 165, 233, 0.3);
+    border-color: #38bdf8;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+    transform: translateY(-1px);
+}
+.nav-bgm-btn.paused {
+    background: rgba(100, 116, 139, 0.15);
+    border-color: rgba(148, 163, 184, 0.3);
+    color: #94a3b8;
+}
+.nav-bgm-btn.paused:hover {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #f87171;
+}
+.nav-bgm-waves {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 12px;
+}
+.nav-bgm-waves span {
+    width: 2.5px;
+    background: #38bdf8;
+    border-radius: 1px;
+    height: 4px;
+}
+.nav-bgm-btn.playing .nav-bgm-waves span:nth-child(1) {
+    animation: navWave 0.7s ease-in-out infinite alternate;
+}
+.nav-bgm-btn.playing .nav-bgm-waves span:nth-child(2) {
+    animation: navWave 0.5s ease-in-out infinite alternate 0.2s;
+}
+.nav-bgm-btn.playing .nav-bgm-waves span:nth-child(3) {
+    animation: navWave 0.9s ease-in-out infinite alternate 0.4s;
+}
+.nav-bgm-btn.paused .nav-bgm-waves span {
+    animation: none;
+    height: 3px;
+    background: #64748b;
+}
+@keyframes navWave {
+    0% { height: 3px; }
+    100% { height: 12px; }
+}
+
+/* ===== 상단 빠른 사운드 제어 알림 배너 (Quick Sound Toast) ===== */
+.bgm-quick-bar {
+    position: fixed;
+    top: 76px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(15, 23, 42, 0.94);
+    border: 1.5px solid rgba(56, 189, 248, 0.6);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(14, 165, 233, 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 999px;
+    padding: 8px 18px;
+    color: #ffffff;
+    animation: floatDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.3s ease;
+}
+@keyframes floatDown {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+.bgm-quick-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.bgm-quick-icon {
+    font-size: 16px;
+}
+.bgm-quick-title {
+    color: #f1f5f9;
+}
+.bgm-quick-btn {
+    background: #0284c7;
+    border: none;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.45);
+    transition: all 0.2s ease;
+}
+.bgm-quick-btn:hover {
+    background: #0ea5e9;
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.6);
+}
+.bgm-quick-btn.paused-style {
+    background: #0284c7;
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.45);
+}
+.bgm-quick-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 50%;
+    transition: color 0.2s;
+}
+.bgm-quick-close:hover {
+    color: #ffffff;
+}
+
 /* ===== ISA 공식 테마송 BGM 플레이어 위젯 ===== */
 .isa-bgm-widget {
     position: fixed;
@@ -3020,20 +3160,20 @@ input, select, textarea { font-family: inherit; }
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(15, 23, 42, 0.92);
+    background: rgba(15, 23, 42, 0.94);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(14, 165, 233, 0.4);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 15px rgba(14, 165, 233, 0.2);
-    padding: 8px 14px 8px 8px;
+    border: 1.5px solid rgba(14, 165, 233, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 18px rgba(14, 165, 233, 0.25);
+    padding: 8px 16px 8px 8px;
     border-radius: 999px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
-    max-width: 320px;
+    max-width: 360px;
 }
 .isa-bgm-widget:hover {
-    border-color: rgba(14, 165, 233, 0.8);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(14, 165, 233, 0.35);
+    border-color: rgba(14, 165, 233, 0.85);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 28px rgba(14, 165, 233, 0.4);
 }
 .isa-bgm-disc {
     width: 44px;
@@ -3083,7 +3223,7 @@ input, select, textarea { font-family: inherit; }
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 140px;
+    max-width: 130px;
 }
 .isa-bgm-eq {
     display: flex;
@@ -3107,55 +3247,79 @@ input, select, textarea { font-family: inherit; }
     0% { height: 3px; }
     100% { height: 12px; }
 }
-.isa-bgm-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+
+/* 좌측 하단 위젯 명확한 소리 끄기/켜기 버튼 */
+.isa-bgm-toggle-action-btn {
+    background: #0284c7;
+    border: 1px solid rgba(56, 189, 248, 0.45);
     color: #ffffff;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 999px;
     cursor: pointer;
-    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
+    white-space: nowrap;
 }
-.isa-bgm-btn:hover {
-    background: var(--cyan);
-    color: #000;
-    border-color: var(--cyan);
-    transform: scale(1.08);
+.isa-bgm-toggle-action-btn:hover {
+    background: #0ea5e9;
+    transform: scale(1.05);
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.6);
 }
-.isa-bgm-mute-btn {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
+.isa-bgm-toggle-action-btn.paused {
+    background: rgba(100, 116, 139, 0.3);
+    border-color: rgba(148, 163, 184, 0.4);
+    color: #e2e8f0;
 }
-.isa-bgm-mute-btn:hover {
+.isa-bgm-toggle-action-btn.paused:hover {
+    background: #0284c7;
     color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    .bgm-quick-bar {
+        top: 68px;
+        padding: 6px 12px;
+        font-size: 12px;
+        max-width: 92vw;
+    }
+    .bgm-quick-title {
+        font-size: 12px;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .nav-bgm-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
 }
 
 @media (max-width: 640px) {
     .isa-bgm-widget {
         bottom: 84px;
-        left: 16px;
+        left: 14px;
         padding: 6px 12px 6px 6px;
-        max-width: 230px;
+        max-width: 250px;
     }
     .isa-bgm-disc {
         width: 38px;
         height: 38px;
     }
     .isa-bgm-title {
-        max-width: 90px;
+        max-width: 80px;
         font-size: 12px;
     }
+    .isa-bgm-toggle-action-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
 }
+
 

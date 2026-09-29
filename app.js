@@ -111,93 +111,112 @@ document.addEventListener('DOMContentLoaded', () => {
 // ISA 공식 로고송 BGM 제어 시스템 (Ride The Infinite Wave)
 // ─────────────────────────────────────────────
 let isBGMPlaying = false;
-let isBGMMuted = false;
+
+window.closeBGMQuickBar = function() {
+    const bar = document.getElementById('bgm-quick-bar');
+    if (bar) bar.style.display = 'none';
+};
+
+window.updateAllBGMUI = function(playing) {
+    isBGMPlaying = playing;
+
+    // 1. 상단 네비게이션 헤더 버튼 동기화
+    const navBtn = document.getElementById('nav-bgm-btn');
+    const navIcon = document.getElementById('nav-bgm-icon');
+    const navLabel = document.getElementById('nav-bgm-label');
+    if (navBtn) {
+        navBtn.classList.toggle('playing', playing);
+        navBtn.classList.toggle('paused', !playing);
+        navBtn.title = playing ? '클릭 시 로고송 소리 끄기' : '클릭 시 로고송 소리 켜기';
+    }
+    if (navIcon) navIcon.textContent = playing ? '🔊' : '🔇';
+    if (navLabel) navLabel.textContent = playing ? '로고송 ON' : '로고송 OFF';
+
+    // 2. 상단 퀵 알림 바 동기화
+    const quickTitle = document.getElementById('bgm-quick-title');
+    const quickBtnIcon = document.getElementById('bgm-quick-btn-icon');
+    const quickBtnText = document.getElementById('bgm-quick-btn-text');
+    const quickBtn = document.getElementById('bgm-quick-btn');
+    if (quickTitle) quickTitle.textContent = playing ? '협회 공식 로고송 재생 중' : '협회 공식 로고송 일시정지됨';
+    if (quickBtnIcon) quickBtnIcon.textContent = playing ? '🔇' : '🔊';
+    if (quickBtnText) quickBtnText.textContent = playing ? '소리 끄기' : '소리 켜기';
+    if (quickBtn) quickBtn.classList.toggle('paused-style', !playing);
+
+    // 3. 좌측 하단 플로팅 플레이어 위젯 동기화
+    const disc = document.getElementById('isa-bgm-disc');
+    const widgetBtn = document.getElementById('isa-bgm-toggle-btn');
+    const widgetBtnIcon = document.getElementById('isa-bgm-btn-icon');
+    const widgetBtnLabel = document.getElementById('isa-bgm-btn-label');
+    const statusText = document.getElementById('isa-bgm-status-text');
+
+    if (disc) disc.classList.toggle('playing', playing);
+    if (widgetBtn) widgetBtn.classList.toggle('paused', !playing);
+    if (widgetBtnIcon) widgetBtnIcon.textContent = playing ? '🔇' : '🔊';
+    if (widgetBtnLabel) widgetBtnLabel.textContent = playing ? '소리 끄기' : '소리 켜기';
+    if (statusText) statusText.title = playing ? 'Ride The Infinite Wave 재생 중' : '음악 일시정지됨';
+};
 
 window.initBGM = function() {
     const audio = document.getElementById('isa-bgm');
     if (!audio) return;
-    audio.volume = 0.35; // 편안하고 웅장한 배경음악 적정 음량
+    audio.volume = 0.40; // 시원하고 웅장한 배경 사운드
 
-    const updateUI = (playing) => {
-        isBGMPlaying = playing;
-        const disc = document.getElementById('isa-bgm-disc');
-        const playIcon = document.getElementById('isa-bgm-icon-play');
-        const pauseIcon = document.getElementById('isa-bgm-icon-pause');
-        const statusText = document.getElementById('isa-bgm-status-text');
-
-        if (disc) disc.classList.toggle('playing', playing);
-        if (playIcon) playIcon.style.display = playing ? 'none' : 'block';
-        if (pauseIcon) pauseIcon.style.display = playing ? 'block' : 'none';
-        if (statusText) statusText.title = playing ? '음악 재생 중' : '음악 일시정지됨';
-    };
-
-    // 브라우저 정책 대응: 자동 재생 시도 및 사용자 인터랙션 리스너 등록
-    const tryPlay = () => {
+    // 사이트 진입 즉시 자동 재생 시도
+    const startPlay = () => {
+        audio.muted = false;
         const promise = audio.play();
         if (promise !== undefined) {
             promise.then(() => {
-                updateUI(true);
+                window.updateAllBGMUI(true);
             }).catch(() => {
-                updateUI(false);
-                const playOnFirstTouch = () => {
-                    if (!isBGMPlaying) {
-                        audio.play().then(() => {
-                            updateUI(true);
-                        }).catch(e => console.log('BGM interaction play:', e));
-                    }
-                    window.removeEventListener('click', playOnFirstTouch);
-                    window.removeEventListener('touchstart', playOnFirstTouch);
-                    window.removeEventListener('keydown', playOnFirstTouch);
+                // 브라우저 정책으로 소리 자동재생 차단 시, 가장 빠른 첫 인터랙션(마우스, 터치, 스크롤, 키입력)에 즉각 재생
+                window.updateAllBGMUI(false);
+                const playOnFirstInteraction = () => {
+                    audio.muted = false;
+                    audio.play().then(() => {
+                        window.updateAllBGMUI(true);
+                    }).catch(() => {});
+
+                    const events = ['click', 'pointerdown', 'touchstart', 'scroll', 'wheel', 'keydown', 'mousemove'];
+                    events.forEach(ev => window.removeEventListener(ev, playOnFirstInteraction, { capture: true }));
                 };
-                window.addEventListener('click', playOnFirstTouch, { once: true });
-                window.addEventListener('touchstart', playOnFirstTouch, { once: true });
-                window.addEventListener('keydown', playOnFirstTouch, { once: true });
+
+                const events = ['click', 'pointerdown', 'touchstart', 'scroll', 'wheel', 'keydown', 'mousemove'];
+                events.forEach(ev => window.addEventListener(ev, playOnFirstInteraction, { once: true, passive: true, capture: true }));
             });
         }
     };
 
-    tryPlay();
+    startPlay();
 
-    audio.onplay = () => updateUI(true);
-    audio.onpause = () => updateUI(false);
+    audio.onplay = () => window.updateAllBGMUI(true);
+    audio.onpause = () => window.updateAllBGMUI(false);
     audio.onended = () => {
         audio.currentTime = 0;
-        audio.play().catch(()=>{});
+        audio.play().catch(() => {});
     };
 };
 
-window.toggleBGM = function() {
+window.toggleBGM = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
     const audio = document.getElementById('isa-bgm');
     if (!audio) return;
-    if (audio.paused) {
+
+    if (audio.paused || audio.muted) {
+        audio.muted = false;
         audio.play().then(() => {
-            isBGMPlaying = true;
+            window.updateAllBGMUI(true);
         }).catch(err => {
             console.error('[toggleBGM] play error', err);
         });
     } else {
         audio.pause();
-        isBGMPlaying = false;
+        window.updateAllBGMUI(false);
     }
 };
 
 window.toggleBGMMute = function(e) {
-    if (e) e.stopPropagation();
-    const audio = document.getElementById('isa-bgm');
-    const muteIcon = document.getElementById('isa-bgm-mute-icon');
-    if (!audio) return;
-    audio.muted = !audio.muted;
-    isBGMMuted = audio.muted;
-
-    if (muteIcon) {
-        if (audio.muted) {
-            muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
-            muteIcon.style.stroke = '#ef4444';
-        } else {
-            muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>';
-            muteIcon.style.stroke = 'currentColor';
-        }
-    }
+    window.toggleBGM(e);
 };
 
 // ===== ROUTING =====
