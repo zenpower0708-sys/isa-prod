@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ─────────────────────────────────────────────
 // ISA 공식 로고송 BGM 제어 시스템 (Ride The Infinite Wave)
 // ─────────────────────────────────────────────
-let isBGMPlaying = false;
+let isBGMPlaying = true; // 기본 상태: 로고송 선재생 & 소리 끄기 버튼 생성
 
 window.closeBGMQuickBar = function() {
     const bar = document.getElementById('bgm-quick-bar');
@@ -120,7 +120,7 @@ window.closeBGMQuickBar = function() {
 window.updateAllBGMUI = function(playing) {
     isBGMPlaying = playing;
 
-    // 1. 상단 네비게이션 헤더 버튼 동기화
+    // 1. 상단 네비게이션 헤더 버튼 동기화 (기본: 소리 끄기)
     const navBtn = document.getElementById('nav-bgm-btn');
     const navIcon = document.getElementById('nav-bgm-icon');
     const navLabel = document.getElementById('nav-bgm-label');
@@ -129,8 +129,8 @@ window.updateAllBGMUI = function(playing) {
         navBtn.classList.toggle('paused', !playing);
         navBtn.title = playing ? '클릭 시 로고송 소리 끄기' : '클릭 시 로고송 소리 켜기';
     }
-    if (navIcon) navIcon.textContent = playing ? '🔊' : '🔇';
-    if (navLabel) navLabel.textContent = playing ? '로고송 ON' : '로고송 OFF';
+    if (navIcon) navIcon.textContent = playing ? '🔇' : '🔊';
+    if (navLabel) navLabel.textContent = playing ? '소리 끄기' : '소리 켜기';
 
     // 2. 상단 퀵 알림 바 동기화
     const quickTitle = document.getElementById('bgm-quick-title');
@@ -159,41 +159,59 @@ window.updateAllBGMUI = function(playing) {
 window.initBGM = function() {
     const audio = document.getElementById('isa-bgm');
     if (!audio) return;
-    audio.volume = 0.40; // 시원하고 웅장한 배경 사운드
+    audio.volume = 0.45; // 웅장하고 청량한 로고송 볼륨
 
-    // 사이트 진입 즉시 자동 재생 시도
-    const startPlay = () => {
+    // UI는 사이트 진입 즉시 [소리 끄기] 버튼으로 생성 보장
+    window.updateAllBGMUI(true);
+
+    const unlockAndPlay = () => {
+        if (!isBGMPlaying) return; // 사용자가 이미 끈 경우 무시
         audio.muted = false;
-        const promise = audio.play();
-        if (promise !== undefined) {
-            promise.then(() => {
-                window.updateAllBGMUI(true);
-            }).catch(() => {
-                // 브라우저 정책으로 소리 자동재생 차단 시, 가장 빠른 첫 인터랙션(마우스, 터치, 스크롤, 키입력)에 즉각 재생
-                window.updateAllBGMUI(false);
-                const playOnFirstInteraction = () => {
-                    audio.muted = false;
-                    audio.play().then(() => {
-                        window.updateAllBGMUI(true);
-                    }).catch(() => {});
+        audio.volume = 0.45;
+        audio.play().then(() => {
+            window.updateAllBGMUI(true);
+        }).catch(() => {});
 
-                    const events = ['click', 'pointerdown', 'touchstart', 'scroll', 'wheel', 'keydown', 'mousemove'];
-                    events.forEach(ev => window.removeEventListener(ev, playOnFirstInteraction, { capture: true }));
-                };
-
-                const events = ['click', 'pointerdown', 'touchstart', 'scroll', 'wheel', 'keydown', 'mousemove'];
-                events.forEach(ev => window.addEventListener(ev, playOnFirstInteraction, { once: true, passive: true, capture: true }));
-            });
-        }
+        const events = ['click', 'pointerdown', 'touchstart', 'scroll', 'wheel', 'keydown', 'mousemove', 'mouseenter'];
+        events.forEach(ev => {
+            window.removeEventListener(ev, unlockAndPlay, { capture: true });
+            document.removeEventListener(ev, unlockAndPlay, { capture: true });
+        });
     };
 
-    startPlay();
+    // 사이트 진입 즉시 소리 재생 시도
+    audio.muted = false;
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            window.updateAllBGMUI(true);
+        }).catch(() => {
+            // 브라우저 보안 정책으로 첫 unmuted 자동재생이 보류되더라도,
+            // UI는 절대 '소리 켜기'로 바꾸지 않고 [소리 끄기] 상태를 그대로 유지!
+            window.updateAllBGMUI(true);
 
-    audio.onplay = () => window.updateAllBGMUI(true);
-    audio.onpause = () => window.updateAllBGMUI(false);
+            // 미디어 버퍼 사전 활성화
+            audio.muted = true;
+            audio.play().catch(() => {});
+
+            // 첫 미세 제스처(마우스 이동, 스크롤, 터치 등) 0.001초 즉시 소리 켜짐 전환
+            const events = ['click', 'pointerdown', 'touchstart', 'scroll', 'wheel', 'keydown', 'mousemove', 'mouseenter'];
+            events.forEach(ev => {
+                window.addEventListener(ev, unlockAndPlay, { once: true, passive: true, capture: true });
+                document.addEventListener(ev, unlockAndPlay, { once: true, passive: true, capture: true });
+            });
+        });
+    }
+
+    audio.onplay = () => {
+        if (isBGMPlaying) window.updateAllBGMUI(true);
+    };
+    audio.onpause = () => {
+        if (!isBGMPlaying) window.updateAllBGMUI(false);
+    };
     audio.onended = () => {
         audio.currentTime = 0;
-        audio.play().catch(() => {});
+        if (isBGMPlaying) audio.play().catch(() => {});
     };
 };
 
@@ -202,16 +220,21 @@ window.toggleBGM = function(e) {
     const audio = document.getElementById('isa-bgm');
     if (!audio) return;
 
-    if (audio.paused || audio.muted) {
+    if (isBGMPlaying && !audio.paused && !audio.muted) {
+        // [소리 끄기] 클릭 시 -> 음악 중지 및 [소리 켜기]로 전환
+        audio.pause();
+        audio.muted = true;
+        window.updateAllBGMUI(false);
+    } else {
+        // [소리 켜기] 클릭 시 -> 음악 재생 및 [소리 끄기]로 전환
         audio.muted = false;
+        audio.volume = 0.45;
         audio.play().then(() => {
             window.updateAllBGMUI(true);
         }).catch(err => {
             console.error('[toggleBGM] play error', err);
         });
-    } else {
-        audio.pause();
-        window.updateAllBGMUI(false);
+        window.updateAllBGMUI(true);
     }
 };
 

@@ -52,7 +52,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260929v2">
+    <link rel="stylesheet" href="styles.css?v=20260929v3">
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Kakao JavaScript SDK -->
@@ -109,9 +109,9 @@
             </div>
 
             <div class="nav-actions">
-                <button id="nav-bgm-btn" class="nav-bgm-btn playing" onclick="toggleBGM()" title="협회 로고송 소리 끄기 / 켜기">
-                    <span id="nav-bgm-icon">🔊</span>
-                    <span id="nav-bgm-label">로고송 ON</span>
+                <button id="nav-bgm-btn" class="nav-bgm-btn playing" onclick="toggleBGM()" title="협회 로고송 소리 끄기">
+                    <span id="nav-bgm-icon">🔇</span>
+                    <span id="nav-bgm-label">소리 끄기</span>
                     <span class="nav-bgm-waves">
                         <span></span><span></span><span></span>
                     </span>
@@ -850,7 +850,7 @@
 
     <script src="data.js?v=20260430v1"></script>
     <script src="ai-manager.js?v=20260430v1"></script>
-    <script src="app.js?v=20260929v2"></script>
+    <script src="app.js?v=20260929v3"></script>
     <script>
         let currentLoginMethod = 'email';
         function showEmailLogin() {
