@@ -112,11 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // ─────────────────────────────────────────────
 let isBGMPlaying = true; // 기본 상태: 로고송 선재생 & 소리 끄기 버튼 생성
 
-window.closeBGMQuickBar = function() {
-    const bar = document.getElementById('bgm-quick-bar');
-    if (bar) bar.style.display = 'none';
-};
-
 window.updateAllBGMUI = function(playing) {
     isBGMPlaying = playing;
 
@@ -132,17 +127,7 @@ window.updateAllBGMUI = function(playing) {
     if (navIcon) navIcon.textContent = playing ? '🔇' : '🔊';
     if (navLabel) navLabel.textContent = playing ? '소리 끄기' : '소리 켜기';
 
-    // 2. 상단 퀵 알림 바 동기화
-    const quickTitle = document.getElementById('bgm-quick-title');
-    const quickBtnIcon = document.getElementById('bgm-quick-btn-icon');
-    const quickBtnText = document.getElementById('bgm-quick-btn-text');
-    const quickBtn = document.getElementById('bgm-quick-btn');
-    if (quickTitle) quickTitle.textContent = playing ? '협회 공식 로고송 재생 중' : '협회 공식 로고송 일시정지됨';
-    if (quickBtnIcon) quickBtnIcon.textContent = playing ? '🔇' : '🔊';
-    if (quickBtnText) quickBtnText.textContent = playing ? '소리 끄기' : '소리 켜기';
-    if (quickBtn) quickBtn.classList.toggle('paused-style', !playing);
-
-    // 3. 좌측 하단 플로팅 플레이어 위젯 동기화
+    // 2. 좌측 하단 플로팅 플레이어 위젯 동기화
     const disc = document.getElementById('isa-bgm-disc');
     const widgetBtn = document.getElementById('isa-bgm-toggle-btn');
     const widgetBtnIcon = document.getElementById('isa-bgm-btn-icon');

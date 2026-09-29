@@ -3100,82 +3100,6 @@ input, select, textarea { font-family: inherit; }
     100% { height: 12px; }
 }
 
-/* ===== 상단 빠른 사운드 제어 알림 배너 (Quick Sound Toast) ===== */
-.bgm-quick-bar {
-    position: fixed;
-    top: 76px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(15, 23, 42, 0.94);
-    border: 1.5px solid rgba(56, 189, 248, 0.6);
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(14, 165, 233, 0.35);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: 999px;
-    padding: 8px 18px;
-    color: #ffffff;
-    animation: floatDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    transition: all 0.3s ease;
-}
-@keyframes floatDown {
-    from { opacity: 0; transform: translate(-50%, -20px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
-}
-.bgm-quick-content {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 700;
-}
-.bgm-quick-icon {
-    font-size: 16px;
-}
-.bgm-quick-title {
-    color: #f1f5f9;
-}
-.bgm-quick-btn {
-    background: #0284c7;
-    border: none;
-    color: #ffffff;
-    font-weight: 800;
-    font-size: 12px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.45);
-    transition: all 0.2s ease;
-}
-.bgm-quick-btn:hover {
-    background: #0ea5e9;
-    transform: scale(1.05);
-    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.6);
-}
-.bgm-quick-btn.paused-style {
-    background: #0284c7;
-    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.45);
-}
-.bgm-quick-close {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    font-size: 20px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 50%;
-    transition: color 0.2s;
-}
-.bgm-quick-close:hover {
-    color: #ffffff;
-}
 
 /* ===== ISA 공식 테마송 BGM 플레이어 위젯 ===== */
 .isa-bgm-widget {
@@ -3308,19 +3232,6 @@ input, select, textarea { font-family: inherit; }
 }
 
 @media (max-width: 768px) {
-    .bgm-quick-bar {
-        top: 68px;
-        padding: 6px 12px;
-        font-size: 12px;
-        max-width: 92vw;
-    }
-    .bgm-quick-title {
-        font-size: 12px;
-        max-width: 140px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
     .nav-bgm-btn {
         padding: 5px 8px;
         font-size: 11px;
