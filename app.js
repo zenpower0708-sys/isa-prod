@@ -399,7 +399,7 @@ function renderHomePage() {
 
     <!-- 핵심 서비스 카드 섹션 -->
     <div class="services-section">
-        <div style="max-width:1100px;margin:0 auto;text-align:center;margin-bottom:40px;">
+        <div style="max-width:1560px;margin:0 auto;text-align:center;margin-bottom:40px;">
             <span class="services-section .section-label" style="display:inline-block;font-size:12px;font-weight:700;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;background:var(--cyan-light);padding:4px 14px;border-radius:999px;margin-bottom:12px;">ISA SERVICES</span>
             <h2 style="font-size:clamp(24px,4vw,36px);font-weight:800;color:var(--navy);margin-bottom:8px;">
                 ${isKO ? 'ISA 핵심 서비스' : 'ISA Core Services'}
@@ -408,7 +408,7 @@ function renderHomePage() {
                 ${isKO ? '국제인공서핑협회의 모든 서비스를 한눈에 확인하세요' : 'Explore all services from ISA at a glance'}
             </p>
         </div>
-        <div class="services-grid" style="max-width:1100px;margin:0 auto;">
+        <div class="services-grid" style="max-width:1560px;margin:0 auto;">
             <div class="service-card" onclick="renderPage('cert')">
                 <div class="service-card-icon">🏆</div>
                 <h3>${isKO ? '자격증 신청' : 'Certificate'}</h3>
@@ -462,7 +462,7 @@ function renderHomePage() {
 
     <!-- 빠른 서비스 (접수확인/자격증조회/공지/이벤트) -->
     <div class="home-quick-section" style="background:#f1f5f9;padding:40px 24px;">
-        <div style="max-width:1100px;margin:0 auto;">
+        <div style="max-width:1560px;margin:0 auto;">
             <div class="home-quick-title" style="margin-bottom:24px;">
                 <h3 style="font-size:20px;font-weight:800;color:var(--navy);">${isKO ? '빠른 서비스' : 'QUICK SERVICES'}</h3>
                 <p style="font-size:14px;color:var(--text-dim);margin-top:4px;">${isKO ? '회원 및 자격증 신청자를 위한 빠른 조회 서비스' : 'Quick lookup services for members and applicants'}</p>
