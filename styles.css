@@ -3333,4 +3333,196 @@ input, select, textarea { font-family: inherit; }
     }
 }
 
+/* ========================================================
+   ===== DESKTOP TYPOGRAPHY ENHANCEMENT (PC 화면 글자 확대) =====
+   ======================================================== */
+@media (min-width: 1024px) {
+    /* 1. 상단 네비게이션 헤더 */
+    .logo-text h1 {
+        font-size: 23px !important;
+        font-weight: 900 !important;
+        letter-spacing: -0.5px !important;
+    }
+    .logo-sub {
+        font-size: 10.5px !important;
+        letter-spacing: 1.5px !important;
+        font-weight: 700 !important;
+    }
+    .nav-link {
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        padding: 10px 18px !important;
+    }
+    .nav-bgm-btn {
+        font-size: 14px !important;
+        padding: 8px 16px !important;
+        font-weight: 700 !important;
+    }
+    .lang-btn {
+        font-size: 14px !important;
+        padding: 8px 14px !important;
+        font-weight: 700 !important;
+    }
+    .login-btn {
+        font-size: 15px !important;
+        padding: 9px 22px !important;
+        font-weight: 800 !important;
+    }
+
+    /* 2. 공지 배너 스트립 */
+    .notice-strip {
+        font-size: 15px !important;
+        padding: 12px 28px !important;
+    }
+    .notice-strip .strip-badge {
+        font-size: 13px !important;
+        padding: 3px 12px !important;
+    }
+    .notice-strip a {
+        font-size: 15px !important;
+        font-weight: 800 !important;
+    }
+
+    /* 3. 메인 히어로 섹션 */
+    .hero-tag {
+        font-size: 14px !important;
+        padding: 8px 20px !important;
+        font-weight: 700 !important;
+    }
+    .hero-tag span {
+        font-size: 14px !important;
+    }
+    .hero-subtitle {
+        font-size: 19px !important;
+        font-weight: 600 !important;
+        color: #e2e8f0 !important;
+        line-height: 1.8 !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+        margin-bottom: 24px !important;
+    }
+    .hero-badge {
+        font-size: 14px !important;
+        padding: 8px 16px !important;
+        font-weight: 700 !important;
+    }
+    .hero-btn-primary {
+        font-size: 17px !important;
+        padding: 16px 30px !important;
+        font-weight: 800 !important;
+    }
+    .hero-btn-secondary {
+        font-size: 16px !important;
+        padding: 16px 28px !important;
+        font-weight: 700 !important;
+    }
+    .hero-btn-score {
+        font-size: 16px !important;
+        padding: 16px 26px !important;
+        font-weight: 700 !important;
+    }
+    .hero-stat-item .value {
+        font-size: 26px !important;
+        font-weight: 900 !important;
+    }
+    .hero-stat-item .label {
+        font-size: 13.5px !important;
+        color: #cbd5e1 !important;
+        font-weight: 600 !important;
+    }
+
+    /* 4. ISA 핵심 서비스 섹션 */
+    .services-section .section-label {
+        font-size: 13.5px !important;
+        padding: 6px 18px !important;
+    }
+    .services-section h2 {
+        font-size: 38px !important;
+        font-weight: 800 !important;
+    }
+    .services-section p {
+        font-size: 17px !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
+    }
+    .service-card {
+        padding: 32px 26px !important;
+    }
+    .service-card-icon {
+        width: 58px !important;
+        height: 58px !important;
+        font-size: 30px !important;
+        border-radius: 16px !important;
+    }
+    .service-card h3 {
+        font-size: 21px !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.3px !important;
+    }
+    .service-card p {
+        font-size: 15.5px !important;
+        line-height: 1.65 !important;
+        color: #475569 !important;
+    }
+    .service-card-arrow {
+        font-size: 15px !important;
+        font-weight: 800 !important;
+    }
+
+    /* 5. 빠른 서비스 섹션 */
+    .home-quick-title h3 {
+        font-size: 25px !important;
+        font-weight: 800 !important;
+    }
+    .home-quick-title p {
+        font-size: 16px !important;
+        color: #475569 !important;
+    }
+    .home-quick-card {
+        padding: 30px 22px !important;
+    }
+    .home-quick-card .hqc-icon,
+    .hqc-icon {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 32px !important;
+    }
+    .home-quick-card .hqc-label,
+    .hqc-label {
+        font-size: 18.5px !important;
+        font-weight: 800 !important;
+    }
+    .home-quick-card .hqc-sub,
+    .hqc-sub {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+    }
+
+    /* 6. 좌측 플로팅 퀵 사이드바 (독) */
+    .quick-btn {
+        width: 68px !important;
+        height: 68px !important;
+    }
+    .quick-btn svg {
+        width: 22px !important;
+        height: 22px !important;
+    }
+    .quick-btn span {
+        font-size: 11.5px !important;
+        font-weight: 800 !important;
+        line-height: 1.25 !important;
+    }
+
+    /* 7. 하단 푸터 */
+    .footer-col h3, .footer-col h4 {
+        font-size: 20px !important;
+    }
+    .footer-col p, .footer-col li a {
+        font-size: 15px !important;
+        line-height: 1.7 !important;
+    }
+    .footer-bottom {
+        font-size: 13.5px !important;
+    }
+}
+
 
