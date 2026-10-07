@@ -548,10 +548,14 @@ function renderCertDetail(t, cd) {
 
     const stepsHTML = steps.map((s, idx) => `
         <div class="process-step ${s.status}">
-            <div class="step-icon">${s.icon}</div>
+            <div class="process-step-header">
+                <div class="step-icon">${s.icon}</div>
+                <div class="step-header-text">
+                    <h4>${s.title}</h4>
+                    <p>${s.desc}</p>
+                </div>
+            </div>
             <div class="step-content">
-                <h4>${s.title}</h4>
-                <p>${s.desc}</p>
                 ${s.status === 'active-form' ? `
                     <div class="practical-form" style="margin-top:10px; display:flex; flex-direction:column; gap:10px">
 
@@ -633,21 +637,21 @@ function renderCertDetail(t, cd) {
                     <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px;">
                         <div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(245,158,11,0.08);">
                             <p style="color:#92400e;font-size:14px;margin:0 0 12px;font-weight:800;">⏱️ ${isKO ? '급수별 최소 실습 이수 시간 (응시 자격 조건)' : 'Minimum Training Hours Required'}</p>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                            <div class="training-hours-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
                                 ${[{lv:4,h:10},{lv:3,h:20},{lv:2,h:30},{lv:1,h:50}].map(r => `
-                                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;
+                                <div class="training-hour-card ${selectedLevel===r.lv ? 'selected' : ''}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px 8px;border-radius:8px;gap:4px;word-break:keep-all;box-sizing:border-box;
                                     background:${selectedLevel===r.lv ? '#fef3c7' : '#ffffff'};
                                     border:${selectedLevel===r.lv ? '2px solid #f59e0b' : '1px solid #e2e8f0'};
                                     box-shadow:${selectedLevel===r.lv ? '0 2px 8px rgba(245,158,11,0.2)' : 'none'};">
-                                    <span style="font-size:13px;color:${selectedLevel===r.lv ? '#92400e' : '#475569'};font-weight:${selectedLevel===r.lv ? '800' : '600'};">
+                                    <span style="font-size:13px;line-height:1.2;white-space:nowrap;color:${selectedLevel===r.lv ? '#92400e' : '#475569'};font-weight:${selectedLevel===r.lv ? '800' : '700'};">
                                         ${selectedLevel===r.lv ? '▶ ' : ''}강사 ${r.lv}급
                                     </span>
-                                    <span style="font-size:13px;color:${selectedLevel===r.lv ? '#b45309' : '#0f172a'};font-weight:800;">
+                                    <span style="font-size:13px;line-height:1.2;white-space:nowrap;color:${selectedLevel===r.lv ? '#b45309' : '#0f172a'};font-weight:800;">
                                         ${r.h}시간 이상
                                     </span>
                                 </div>`).join('')}
                             </div>
-                            <p style="color:#78350f;font-size:12px;margin:0;line-height:1.7;background:#fef3c7;border:1px solid #fde68a;padding:10px 12px;border-radius:8px;font-weight:600;">
+                            <p style="color:#78350f;font-size:12px;margin:0;line-height:1.7;background:#fef3c7;border:1px solid #fde68a;padding:10px 12px;border-radius:8px;font-weight:600;word-break:keep-all;">
                                 ${isKO
                                     ? `※ 각 급수별로 정해진 현장 실습(안전교육 및 기술동작 교습법 등) 시간을 수료해야만 해당 등급의 자격시험에 응시할 수 있습니다.`
                                     : `※ You must complete the required field training hours (safety education, technique instruction, etc.) for your level before applying for the qualification exam.`}
@@ -701,7 +705,7 @@ function renderCertDetail(t, cd) {
         <div class="content-container">
             <button class="back-btn" onclick="selectedLevel=null;renderPage('cert')">← ${isKO ? '목록으로' : 'Back to List'}</button>
             <div class="cert-detail-grid">
-                <div class="glass-panel" style="padding:28px">
+                <div class="glass-panel cert-detail-main-panel">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #f1f5f9;padding-bottom:16px;">
                         <div>
                             <h3 class="game-font" style="color:#0f172a; font-size:22px; font-weight:900; margin:0 0 4px;">${selectedDiscipline}</h3>

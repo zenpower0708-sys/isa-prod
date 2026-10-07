@@ -717,13 +717,19 @@ input, select, textarea { font-family: inherit; }
 /* Process Steps */
 .process-steps { display: flex; flex-direction: column; gap: 20px; }
 .process-step {
-    display: flex; align-items: flex-start; gap: 16px;
-    padding: 20px; border-radius: 14px; transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 20px;
+    border-radius: 14px;
+    transition: all 0.3s;
     background: #f8fafc;
     border: 1.5px solid #e2e8f0;
 }
 .process-step.completed { background: #f0fdf4; border-color: #86efac; }
 .process-step.completed .step-icon { background: #dcfce7; color: #16a34a; }
+.process-step.completed .step-header-text h4,
 .process-step.completed .step-content h4 { color: #0f172a; }
 
 .process-step.current {
@@ -732,6 +738,7 @@ input, select, textarea { font-family: inherit; }
     box-shadow: 0 4px 20px rgba(2,132,199,0.12);
 }
 .process-step.current .step-icon { background: #e0f2fe; color: #0284c7; }
+.process-step.current .step-header-text h4,
 .process-step.current .step-content h4 { color: #0f172a; }
 
 .process-step.training-upload {
@@ -740,18 +747,45 @@ input, select, textarea { font-family: inherit; }
     box-shadow: 0 4px 20px rgba(2,132,199,0.12);
 }
 .process-step.training-upload .step-icon { background: #e0f2fe; color: #0284c7; }
+.process-step.training-upload .step-header-text h4,
 .process-step.training-upload .step-content h4 { color: #0f172a; }
 
 .process-step.locked { background: #f8fafc; border: 1px solid #e2e8f0; opacity: 0.85; }
 .process-step.locked .step-icon { background: #f1f5f9; color: #94a3b8; }
+.process-step.locked .step-header-text h4,
 .process-step.locked .step-content h4 { color: #475569; }
 
-.step-icon {
-    width: 46px; height: 46px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    font-size: 22px;
+.process-step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
-.step-content { flex: 1; min-width: 0; }
+.step-header-text {
+    flex: 1;
+    min-width: 0;
+}
+.step-header-text h4 {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.4;
+    letter-spacing: -0.3px;
+}
+.step-header-text p {
+    font-size: 13px;
+    color: #475569;
+    margin: 3px 0 0;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.step-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    font-size: 20px;
+}
+.step-content { width: 100%; min-width: 0; }
 .step-content h4 { font-size: 17px; font-weight: 800; color: #0f172a; margin: 0; line-height: 1.4; letter-spacing: -0.3px; }
 .step-content p { font-size: 13px; color: #475569; margin: 4px 0 0; line-height: 1.5; font-weight: 500; }
 
@@ -1397,6 +1431,29 @@ input, select, textarea { font-family: inherit; }
 
 /* ===== CERT DETAIL & FORM ===== */
 .cert-detail-grid { display: grid; gap: 32px; margin-top: 32px; }
+.cert-detail-main-panel { padding: 28px; }
+
+/* Practice Hours Cards */
+.training-hours-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.training-hour-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 8px;
+    gap: 4px;
+    word-break: keep-all;
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
 
 .fee-panel {
     padding: 24px; border-radius: 16px;
@@ -3310,6 +3367,16 @@ input, select, textarea { font-family: inherit; }
         padding: 5px 8px;
         font-size: 11px;
     }
+    .mobile-sub-nav {
+        padding: 0 8px;
+        gap: 2px;
+        scrollbar-width: none;
+    }
+    .mobile-sub-link {
+        padding: 6px 10px;
+        font-size: 12.5px;
+        flex-shrink: 0;
+    }
 }
 
 @media (max-width: 640px) {
@@ -3330,6 +3397,89 @@ input, select, textarea { font-family: inherit; }
     .isa-bgm-toggle-action-btn {
         padding: 4px 8px;
         font-size: 11px;
+    }
+
+    /* 자격증 상세 및 실습 카드 모바일 레이아웃 최적화 */
+    .cert-detail-main-panel {
+        padding: 16px 12px !important;
+    }
+    .process-step {
+        padding: 14px 10px !important;
+        gap: 10px !important;
+    }
+    .process-step-header {
+        gap: 10px !important;
+    }
+    .step-icon {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 18px !important;
+        border-radius: 10px !important;
+    }
+    .step-header-text h4,
+    .step-content h4 {
+        font-size: 15px !important;
+    }
+    .step-header-text p,
+    .step-content p {
+        font-size: 12px !important;
+        word-break: keep-all;
+    }
+    .step-content {
+        width: 100% !important;
+    }
+    .fee-panel {
+        padding: 16px 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-container {
+        padding: 0 12px !important;
+        height: 60px !important;
+    }
+    .logo-text h1 {
+        font-size: 15px !important;
+    }
+    .logo-sub {
+        font-size: 8px !important;
+    }
+    .logo-emblem-img, .logo-emblem-video {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    .nav-actions {
+        gap: 6px !important;
+    }
+    .nav-bgm-btn {
+        padding: 4px 6px !important;
+        font-size: 10px !important;
+    }
+    .lang-btn {
+        padding: 4px 6px !important;
+        font-size: 10px !important;
+    }
+    .training-hours-grid {
+        gap: 6px !important;
+    }
+    .training-hour-card {
+        padding: 8px 4px !important;
+    }
+    .training-hour-card span {
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .cert-detail-main-panel {
+        padding: 12px 8px !important;
+    }
+    .process-step {
+        padding: 12px 8px !important;
+        gap: 8px !important;
+    }
+    .training-hour-card span {
+        font-size: 11px !important;
     }
 }
 
