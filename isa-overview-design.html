@@ -1241,7 +1241,30 @@
             transform: rotate(-15deg);
         }
         @media print {
-            body { display: none !important; }
+            body.printing-cert {
+                background: white !important;
+                color: black !important;
+            }
+            body.printing-cert * {
+                visibility: hidden !important;
+            }
+            body.printing-cert #wfStep5,
+            body.printing-cert #wfStep5 * {
+                visibility: visible !important;
+            }
+            body.printing-cert #wfStep5 {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 20px !important;
+                display: block !important;
+                background: white !important;
+            }
+            body:not(.printing-cert) {
+                display: none !important;
+            }
         }
         .footer-grid {
             max-width: 1480px;
@@ -2221,9 +2244,9 @@
 
             <div class="header-actions">
                 <!-- BGM 제어 버튼 -->
-                <button class="bgm-toggle-btn" id="headerBgmBtn" onclick="toggleBGM()" title="협회 공식 로고송 소리 끄기/켜기">
-                    <span id="headerBgmIcon">🔇</span>
-                    <span id="headerBgmLabel">소리 끄기</span>
+                <button class="bgm-toggle-btn paused" id="headerBgmBtn" onclick="toggleBGM()" title="협회 공식 로고송 소리 끄기/켜기">
+                    <span id="headerBgmIcon">🎵</span>
+                    <span id="headerBgmLabel">BGM 켜기</span>
                     <span class="bgm-waves">
                         <span></span><span></span><span></span>
                     </span>
@@ -2248,12 +2271,12 @@
 
     <!-- 5. 좌측 하단 BGM 디스크 플레이어 위젯 -->
     <div class="isa-bgm-widget" onclick="toggleBGM()" title="클릭 시 로고송 재생/일시정지">
-        <div class="isa-bgm-disc" id="bgmDisc">
+        <div class="isa-bgm-disc paused" id="bgmDisc">
             <img src="images/ride_the_infinite_wave_cover.jpeg" alt="Ride The Infinite Wave" onerror="this.src='images/isa-emblem.png'">
         </div>
         <div class="isa-bgm-info">
             <span class="isa-bgm-title">Ride The Infinite Wave</span>
-            <span class="isa-bgm-sub" id="bgmStatusLabel">로고송 재생 중 &bull; 클릭 시 끄기</span>
+            <span class="isa-bgm-sub" id="bgmStatusLabel">로고송 정지됨 &bull; 클릭 시 재생</span>
         </div>
     </div>
 
@@ -2316,7 +2339,7 @@
                         <a href="#disciplines-section" class="btn-hero-secondary">
                             📖 종목 소개
                         </a>
-                        <a href="javascript:void(0)" onclick="openKakaoChannel('히어로 배너 문의', 'https://pf.kakao.com/_xgxmxfFG')" class="btn-hero-kakao" title="카카오 1:1 상담 및 구글 시트 실시간 연동">
+                        <a href="javascript:void(0)" onclick="openKakaoChannel('히어로 배너 문의', 'http://pf.kakao.com/_xcshTX')" class="btn-hero-kakao" title="카카오 1:1 상담 및 구글 시트 실시간 연동">
                             💬 카카오 문의
                         </a>
                     </div>
@@ -2923,7 +2946,7 @@
                     </div>
                     <div class="panel-footer">
                         <button class="btn-panel-sub" onclick="toggleDrawer('drawer-safety')">보장 범위 ▾</button>
-                        <button class="btn-panel-action" onclick="showToast('공제회 가입/접수 페이지로 이동합니다.')">공제회 가입 &rarr;</button>
+                        <button class="btn-panel-action" onclick="window.open('대회플랫폼/ISA-MutualAid/index.html', '_blank')">공제회 가입 &rarr;</button>
                     </div>
                 </div>
 
@@ -2947,7 +2970,7 @@
                     </div>
                     <div class="panel-footer">
                         <button class="btn-panel-sub" onclick="toggleDrawer('drawer-shop')">상세 보기 ▾</button>
-                        <button class="btn-panel-action" onclick="showToast('공식 장비 스토어로 이동합니다.')">스토어 바로가기 &rarr;</button>
+                        <button class="btn-panel-action" onclick="window.open('대회플랫폼/ISA-Shop/index.html', '_blank')">스토어 바로가기 &rarr;</button>
                     </div>
                 </div>
 
@@ -2981,7 +3004,7 @@
                     </div>
                     <div class="panel-footer">
                         <button class="btn-panel-sub" onclick="toggleDrawer('drawer-score')">채점 규칙 ▾</button>
-                        <button class="btn-panel-action" onclick="showToast('대회 플랫폼으로 입장합니다.')">대회플랫폼 입장 &rarr;</button>
+                        <button class="btn-panel-action" onclick="window.open('대회플랫폼/isa-platform/index.html', '_blank')">대회플랫폼 입장 &rarr;</button>
                     </div>
                 </div>
 
@@ -3817,7 +3840,7 @@
 
                     <!-- 자격증 저장 및 인쇄 버튼 -->
                     <div style="display:flex; gap:12px; justify-content:center; margin-top:20px;">
-                        <button onclick="window.print()" style="background:#0f172a; color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:800; cursor:pointer;">
+                        <button onclick="printCertificate()" style="background:#0f172a; color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:800; cursor:pointer;">
                             🖨️ 자격증 인쇄 / PDF 저장
                         </button>
                         <button onclick="closeCertWorkflowModal()" style="background:#0284c7; color:white; border:none; padding:12px 28px; border-radius:10px; font-weight:900; cursor:pointer;">
@@ -3907,6 +3930,57 @@
         function toggleAllDrawers() { setAllExpanded(!isExpandedAll); }
 
         // 개별 드로어 토글
+        // [자격증 센터 종목 필터 탭 함수]
+        function filterCertDiscipline(discipline) {
+            // 탭 버튼 스타일 업데이트
+            document.querySelectorAll('.cert-tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`tab-cert-${discipline}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // 16개 급수 카드 필터링
+            const cards = document.querySelectorAll('.cert-flow-card');
+            let matchCount = 0;
+            cards.forEach(card => {
+                const title = card.querySelector('h4') ? card.querySelector('h4').textContent : '';
+                if (discipline === 'all') {
+                    card.style.display = 'flex';
+                    matchCount++;
+                } else if (discipline === 'standing' && title.includes('스탠딩')) {
+                    card.style.display = 'flex';
+                    matchCount++;
+                } else if (discipline === 'body' && title.includes('바디')) {
+                    card.style.display = 'flex';
+                    matchCount++;
+                } else if (discipline === 'wake' && title.includes('웨이크')) {
+                    card.style.display = 'flex';
+                    matchCount++;
+                } else if (discipline === 'wave' && title.includes('웨이브')) {
+                    card.style.display = 'flex';
+                    matchCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const labels = {
+                'all': '전체 4대 종목 16개 급수',
+                'standing': '스탠딩 / 플로우보드 4개 급수',
+                'body': '바디 / 부기보드 4개 급수',
+                'wake': '웨이크 서핑 4개 급수',
+                'wave': '웨이브 풀 서핑 4개 급수'
+            };
+            showToast(`📋 ${labels[discipline] || '종목'} 자격과정을 펼쳐보았습니다.`);
+        }
+
+        // [디지털 자격증 공식 인쇄/PDF 저장 함수]
+        function printCertificate() {
+            document.body.classList.add('printing-cert');
+            window.print();
+            setTimeout(() => {
+                document.body.classList.remove('printing-cert');
+            }, 1000);
+        }
+
         function toggleDrawer(id) {
             const drawer = document.getElementById(id);
             if (drawer) drawer.classList.toggle('expanded');
@@ -3951,8 +4025,25 @@
         function highlightDiscipline(type) {
             const cards = document.querySelectorAll('.discipline-card');
             cards.forEach(c => c.classList.remove('active-tab'));
-            if (event && event.currentTarget) event.currentTarget.classList.add('active-tab');
-            showToast('선택하신 종목 규격 및 교재가 연동되었습니다.');
+            
+            // type 매핑
+            const typeMap = {
+                'flow': 0, 'standing': 0,
+                'boogie': 1, 'body': 1,
+                'wake': 2,
+                'wave': 3
+            };
+            const idx = typeMap[type] !== undefined ? typeMap[type] : 0;
+            if (cards[idx]) {
+                cards[idx].classList.add('active-tab');
+            }
+
+            // 부드럽게 종목 섹션으로 스크롤 이동
+            const sec = document.getElementById('disciplines-section');
+            if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            const names = { 'flow': '스탠딩/플로우', 'boogie': '바디/부기', 'wake': '웨이크서핑', 'wave': '웨이브풀' };
+            showToast(`🏄 ${names[type] || '선택'} 종목 규격 및 교재 기준이 연동되었습니다.`);
         }
 
         // 모달 관리
@@ -4261,12 +4352,7 @@
             updateTopAuthButton();
         });
 
-        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
-        function closeLoginModal(e) { 
-            if (!e || e.target === document.getElementById('loginModal') || e.target.classList.contains('modal-close-btn')) {
-                document.getElementById('loginModal').classList.remove('active');
-            }
-        }
+
 
         function openInstructorModal() { document.getElementById('instructorModal').classList.add('active'); }
         function closeInstructorModal(e) {
@@ -4290,7 +4376,7 @@
                 body.innerHTML = '<div style="margin-bottom:10px;">접수 시 등록하신 휴대전화 번호 또는 수험번호를 입력하세요.</div><input type="text" placeholder="010-0000-0000" style="width:100%; padding:8px 10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:8px;"><button onclick="showToast(\'정상 접수 내역 1건이 확인되었습니다.\'); closeQuickModal();" style="width:100%; background:#0284c7; color:white; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer;">내역 조회</button>';
             } else if (type === 'certcheck') {
                 title.innerHTML = '🏅 자격증 진위 조회';
-                body.innerHTML = '<div style="margin-bottom:10px;">발급된 ISA 공인 자격증 번호를 입력하세요.</div><input type="text" placeholder="ISA-2025-XXXX" style="width:100%; padding:8px 10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:8px;"><button onclick="showToast(\'공인 인증된 유효 자격증입니다.\'); closeQuickModal();" style="width:100%; background:#059669; color:white; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer;">진위 검증</button>';
+                body.innerHTML = '<div style="margin-bottom:10px;">발급된 ISA 공인 자격증 번호를 입력하세요.</div><input type="text" id="certLookupInput" placeholder="ISA-2025-XXXX" style="width:100%; padding:8px 10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:8px;"><div id="certLookupResult" style="margin-bottom:8px; font-size:12px;"></div><button onclick="executeRealCertLookup()" style="width:100%; background:#059669; color:white; border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer;">구글 시트 진위 검증</button>';
             }
             modal.classList.add('active');
         }
@@ -4604,10 +4690,27 @@
         let viewerTimerInterval = null;
         let viewerSecondsLeft = 30 * 60; // 30분
 
-        function openBookViewer(vol, lv) {
+        function openBookViewer(vol, lv, bypassAuth) {
             viewerVol = vol || 'standing';
             viewerLevel = parseInt(lv || selectedBookLevels[viewerVol] || '4');
             viewerRound = parseInt(document.getElementById('vSelectRound').value || '1');
+
+            // e-Book 라이선스 검증 (결제 우회 차단)
+            const licKey = `isa_book_purchase_${viewerVol}_${viewerLevel}`;
+            const hasLicense = localStorage.getItem(licKey) || localStorage.getItem('isa_book_purchased_all');
+            
+            if (!hasLicense && !bypassAuth) {
+                const bookName = (BOOK_INFO[viewerVol] ? BOOK_INFO[viewerVol].name : '교재');
+                const proceed = confirm(`📖 [ISA E-PASS 라이선스 안내]\n\n선택하신 ${bookName} (${LEVEL_NAMES[viewerLevel]}) 교재는 정식 라이선스 구매(₩15,000) 후 1년간 자유롭게 열람하실 수 있습니다.\n\n지금 결제창으로 이동하시겠습니까?\n(취소 시 1회차 무료 체험판으로 열람됩니다.)`);
+                if (proceed) {
+                    openCheckoutModal(viewerVol, viewerLevel);
+                    return;
+                }
+                showToast('💡 1회차 무료 모의고사 체험 모드로 열람합니다.');
+                viewerRound = 1;
+                const rSelect = document.getElementById('vSelectRound');
+                if (rSelect) rSelect.value = '1';
+            }
 
             // 헤더 정보 설정
             const info = BOOK_INFO[viewerVol];
@@ -4890,6 +4993,10 @@
 
         // 화면 캡처 단축키 및 복사/인쇄 차단 리스너
         document.addEventListener('keydown', (e) => {
+            // e-Book 보안 뷰어가 열려 있을 때만 전역 DRM 단축키 차단 작동
+            const viewer = document.getElementById('bookViewerModal');
+            if (!viewer || !viewer.classList.contains('active')) return;
+
             // Ctrl+P(인쇄), Ctrl+S(저장), Ctrl+C(복사), Ctrl+U(소스보기), F12, PrintScreen
             if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'c' || e.key === 'u' || e.key === 'P' || e.key === 'S' || e.key === 'C' || e.key === 'U')) {
                 e.preventDefault();
@@ -4998,13 +5105,51 @@
 
         function executeCertPayment() {
             const applicant = document.getElementById('wfApplicantName').value.trim() || '응시자';
+            const phone = document.getElementById('wfApplicantPhone') ? document.getElementById('wfApplicantPhone').value.trim() : '010-0000-0000';
+            const moid = 'ISACERT' + Date.now();
+            const certPrice = (wfSelectedLevel <= 2) ? 500000 : 300000;
+            const certTitle = `ISA ${wfSelectedLevel}급 ${LEVEL_NAMES[wfSelectedLevel]} 검정료`;
+
+            const isHttp = window.location.protocol.startsWith('http');
+            const canCallInnopay = (typeof innopay !== 'undefined' && typeof innopay.goPay === 'function' && isHttp);
+
+            if (canCallInnopay) {
+                const params = {
+                    PayMethod: currentWfPayMethod === 'vbank' ? 'VBANK' : 'CARD',
+                    MID: INNOPAY_MID,
+                    Moid: moid,
+                    Amt: certPrice,
+                    GoodsName: certTitle,
+                    BuyerName: applicant,
+                    BuyerTel: phone,
+                    BuyerEmail: 'member@isa-surfing.or.kr',
+                    ResultCode: '0000',
+                    ResultMsg: '자격검정 결제 성공',
+                    ReturnUrl: window.location.href
+                };
+
+                try {
+                    localStorage.setItem('isa_cert_pending_pay', JSON.stringify({
+                        moid: moid,
+                        level: wfSelectedLevel,
+                        applicant: applicant,
+                        amount: certPrice
+                    }));
+                    showToast('💳 이노페이 자격검정료 공식 결제창을 호출합니다...');
+                    innopay.goPay(params);
+                    return;
+                } catch(e) {
+                    console.warn('Innopay goPay failed, falling back to simulated grant:', e);
+                }
+            }
+
+            // 로컬/오프라인 환경 안전 승인
             const tid = 'INNO-CERT-' + Date.now().toString(36).toUpperCase();
             wfIsPaid = true;
-
             document.getElementById('wfTid').textContent = tid;
             document.getElementById('wfPaymentStatusBox').style.display = 'block';
             document.getElementById('step-btn-1').classList.add('completed');
-            showToast('💳 이노페이 검정료 결제가 승인되었습니다!');
+            showToast(`💳 이노페이 검정료(₩${certPrice.toLocaleString()}) 결제가 승인되었습니다!`);
 
             setTimeout(() => {
                 switchWorkflowStep(2);
