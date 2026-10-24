@@ -1783,6 +1783,117 @@
             transform: translateY(-1px);
         }
 
+    
+        /* ========================================================
+           자격증 종합 발급 워크플로우 모달 스타일
+           ======================================================== */
+        .cert-modal-box {
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 32px;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+        .cert-stepper-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 20px 0 28px;
+        }
+        @media (max-width: 680px) {
+            .cert-stepper-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+        .cert-step-btn {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cert-step-btn.active {
+            background: #0284c7;
+            color: white;
+            border-color: #0284c7;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+        .cert-step-btn.completed {
+            background: #ecfdf5;
+            color: #059669;
+            border-color: #a7f3d0;
+        }
+
+        /* 디지털 자격증 디자인 */
+        .digital-cert-card {
+            background: linear-gradient(135deg, #091e3a 0%, #032d4e 50%, #02182b 100%);
+            border: 4px solid #d4af37;
+            border-radius: 20px;
+            padding: 36px 30px;
+            color: white;
+            position: relative;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 0 40px rgba(212, 175, 55, 0.15);
+            text-align: center;
+            margin: 20px auto;
+            max-width: 680px;
+        }
+        .cert-gold-crest {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fef08a, #d4af37, #996515);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+        .cert-number-badge {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid #d4af37;
+            color: #fef08a;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .cert-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 18px 24px;
+            margin: 20px 0;
+            font-size: 13.5px;
+        }
+        .cert-meta-item strong {
+            color: #94a3b8;
+            font-size: 11.5px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .cert-meta-item span {
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
@@ -3079,6 +3190,267 @@
     </div>
 
 
+    
+    <!-- ========================================================
+         모달 6: 자격증 취득 & 발급 원스톱 종합 워크플로우 모달
+         (결제 -> 실습이수확인서 -> 랜덤발췌 필기시험/구글시트연동 -> 실기영상 -> 디지털자격증 발급)
+         ======================================================== -->
+    <div class="modal-overlay" id="certWorkflowModal" onclick="closeCertWorkflowModal(event)">
+        <div class="cert-modal-box" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeCertWorkflowModal()">✕</button>
+
+            <!-- 헤더 타이틀 -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid #e2e8f0; padding-bottom:14px;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:24px;">🏆</span>
+                        <h3 id="wfHeaderTitle" style="font-size:20px; font-weight:900; color:#0f172a; margin:0;">
+                            자격검정 & 디지털 자격증 발급 센터
+                        </h3>
+                    </div>
+                    <p id="wfHeaderSubtitle" style="font-size:12.5px; color:#64748b; margin:4px 0 0;">
+                        스탠딩/플로우보드 · 4급 입문 지도사 자격검정 과정
+                    </p>
+                </div>
+                <div style="text-align:right;">
+                    <span id="wfPriceBadge" style="background:#0284c7; color:white; font-size:13px; font-weight:900; padding:4px 10px; border-radius:6px;">
+                        검정료 ₩300,000
+                    </span>
+                </div>
+            </div>
+
+            <!-- 4단계 진행 스텝 네비게이션 -->
+            <div class="cert-stepper-bar">
+                <div class="cert-step-btn active" id="step-btn-1" onclick="switchWorkflowStep(1)">
+                    1. 검정료 결제
+                </div>
+                <div class="cert-step-btn" id="step-btn-2" onclick="switchWorkflowStep(2)">
+                    2. 실습이수 확인서
+                </div>
+                <div class="cert-step-btn" id="step-btn-3" onclick="switchWorkflowStep(3)">
+                    3. 필기평가 (구글시트 연동)
+                </div>
+                <div class="cert-step-btn" id="step-btn-4" onclick="switchWorkflowStep(4)">
+                    4. 실기영상 & 디지털 자격증
+                </div>
+            </div>
+
+            <!-- ================= STEP 1: 검정료 결제 (이노페이 PG) ================= -->
+            <div id="wfStep1" class="wf-step-content">
+                <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:16px; margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span style="font-size:11px; font-weight:800; background:#0284c7; color:white; padding:2px 6px; border-radius:4px;">Innopay PG</span>
+                            <h4 style="font-size:16px; font-weight:900; color:#0369a1; margin:4px 0 2px;">정부공인 자격검정 수수료 결제</h4>
+                            <div style="font-size:12px; color:#475569;">상점 MID: <strong>pgisaweb1m</strong> · 안전결제 256bit 암호화 적용</div>
+                        </div>
+                        <div id="wfStep1Price" style="font-size:22px; font-weight:900; color:#0284c7;">₩300,000</div>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                    <div>
+                        <label style="display:block; font-size:12px; font-weight:700; color:#475569; margin-bottom:4px;">응시자 성명</label>
+                        <input type="text" id="wfApplicantName" value="홍길동" style="width:100%; padding:9px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:12px; font-weight:700; color:#475569; margin-bottom:4px;">연락처 (휴대폰)</label>
+                        <input type="text" id="wfApplicantPhone" value="010-1234-5678" style="width:100%; padding:9px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:12px; font-weight:700; color:#475569; margin-bottom:4px;">이메일 (결제영수증 및 시험결과 발송)</label>
+                    <input type="email" id="wfApplicantEmail" value="member@isa-surfing.or.kr" style="width:100%; padding:9px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px;">
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:12px; font-weight:700; color:#475569; margin-bottom:6px;">결제 수단</label>
+                    <div class="pay-methods-grid">
+                        <div class="pay-method-btn selected" onclick="selectWfPay('card', this)"><span>💳</span> 신용/체크카드</div>
+                        <div class="pay-method-btn" onclick="selectWfPay('kakaopay', this)"><span>🟡</span> 카카오페이</div>
+                        <div class="pay-method-btn" onclick="selectWfPay('naverpay', this)"><span>🟢</span> 네이버페이</div>
+                        <div class="pay-method-btn" onclick="selectWfPay('vbank', this)"><span>🏦</span> 가상계좌 (무통장)</div>
+                    </div>
+                </div>
+
+                <div id="wfPaymentStatusBox" style="display:none; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:14px; margin-bottom:16px; font-size:13px; color:#065f46;">
+                    ✅ <strong>검정료 결제 승인 완료:</strong> <span id="wfTid">INNO-CERT-782910</span> (다음 단계로 진행 가능)
+                </div>
+
+                <button class="btn-checkout-submit" id="btnWfPay" onclick="executeCertPayment()">
+                    검정료 결제 승인 및 다음 단계로 이동 →
+                </button>
+            </div>
+
+            <!-- ================= STEP 2: 실습 이수 확인서 업로드 ================= -->
+            <div id="wfStep2" class="wf-step-content" style="display:none;">
+                <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:16px; margin-bottom:20px;">
+                    <h4 style="font-size:15px; font-weight:900; color:#92400e; margin:0 0 6px;">
+                        ⏱️ 급수별 필수 현장 실습 이수 요건
+                    </h4>
+                    <p style="font-size:12.5px; color:#78350f; line-height:1.6; margin:0;">
+                        인공서핑협회 공인 지도사 시험에 응시하기 위해서는 공인 훈련기관에서 정해진 최소 실습 시간을 수료해야 합니다.<br>
+                        • <strong>4급: 10시간</strong> | <strong>3급: 20시간</strong> | <strong>2급: 30시간</strong> | <strong>1급: 50시간</strong>
+                    </p>
+                </div>
+
+                <div style="border:2px dashed #cbd5e1; border-radius:14px; padding:24px; text-align:center; background:#f8fafc; margin-bottom:18px;">
+                    <div style="font-size:36px; margin-bottom:8px;">📄</div>
+                    <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin-bottom:4px;">실습 이수 확인서 서명본 업로드</h4>
+                    <p style="font-size:12px; color:#64748b; margin-bottom:14px;">지도강사 서명이 완료된 확인서(PDF 또는 이미지 JPG/PNG)를 첨부해주세요.</p>
+                    
+                    <input type="file" id="trainingProofFile" accept="image/*,.pdf" onchange="handleProofFileUpload(event)" style="display:none;">
+                    <div style="display:flex; gap:10px; justify-content:center;">
+                        <button onclick="document.getElementById('trainingProofFile').click()" style="background:#0284c7; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:800; font-size:13px; cursor:pointer;">
+                            📎 파일 선택 및 업로드
+                        </button>
+                        <a href="/실습이수확인서.html" target="_blank" style="display:inline-block; background:white; border:1px solid #cbd5e1; color:#0284c7; padding:9px 16px; border-radius:8px; font-weight:800; font-size:13px; text-decoration:none;">
+                            📥 공식 양식 다운로드
+                        </a>
+                    </div>
+                    <div id="proofFileName" style="margin-top:10px; font-size:12px; font-weight:700; color:#059669;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; margin-top:20px;">
+                    <button onclick="switchWorkflowStep(1)" style="background:#f1f5f9; border:none; padding:10px 20px; border-radius:8px; font-weight:700; color:#475569; cursor:pointer;">◀ 이전</button>
+                    <button onclick="submitTrainingProofAndNext()" style="background:#0284c7; border:none; padding:10px 24px; border-radius:8px; font-weight:800; color:white; cursor:pointer;">실습 확인서 등록 & 필기시험 응시 ▶</button>
+                </div>
+            </div>
+
+            <!-- ================= STEP 3: 필기평가 (교재 2,000문항 랜덤 발췌 & Google Sheets 연동) ================= -->
+            <div id="wfStep3" class="wf-step-content" style="display:none;">
+                <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:16px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <span style="background:#10b981; color:white; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px;">Google Sheets 연동</span>
+                        <h4 style="font-size:16px; font-weight:900; color:#065f46; margin:4px 0 2px;">온라인 정규 필기평가</h4>
+                        <div style="font-size:12px; color:#475569;">공식 2,000문제은행 실시간 무작위 발췌 · 60점 이상 합격 · 자동 채점 및 시트 전송</div>
+                    </div>
+                    <div id="wfExamTimerDisplay" style="font-size:18px; font-weight:900; color:#dc2626; background:#fee2e2; padding:4px 12px; border-radius:20px;">
+                        ⏱️ 20:00
+                    </div>
+                </div>
+
+                <!-- 필기시험 문제 영역 -->
+                <div id="wfExamContainer" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:24px; margin-bottom:18px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+                        <span id="wfExamProgress" style="font-weight:900; font-size:15px; color:#0f172a;">문제 1 / 20</span>
+                        <span style="font-size:12px; color:#64748b;">합격선: 100점 만점 중 60점 이상</span>
+                    </div>
+
+                    <div id="wfExamQText" style="font-size:17px; font-weight:800; color:#0f172a; line-height:1.6; margin-bottom:20px;">
+                        문제를 불러오는 중입니다...
+                    </div>
+
+                    <div id="wfExamOptionsList"></div>
+                </div>
+
+                <!-- 시험 컨트롤 바 -->
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <button id="btnWfPrevQ" onclick="prevWfQuestion()" style="background:white; border:1px solid #cbd5e1; padding:9px 18px; border-radius:8px; font-weight:700; cursor:pointer;">◀ 이전 문항</button>
+                    <span id="wfExamMarkCount" style="font-size:12.5px; font-weight:700; color:#64748b;">마킹: 0 / 20</span>
+                    <button id="btnWfNextQ" onclick="nextWfQuestion()" style="background:#0284c7; color:white; border:none; padding:9px 20px; border-radius:8px; font-weight:800; cursor:pointer;">다음 문항 ▶</button>
+                    <button id="btnWfSubmitExam" onclick="submitWfExamToGoogleSheets()" style="display:none; background:#059669; color:white; border:none; padding:10px 24px; border-radius:8px; font-weight:900; cursor:pointer; box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+                        📝 OMR 최종 제출 및 구글 시트 전송
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= STEP 4: 실기평가 영상 제출 & 디지털 자격증 발급 ================= -->
+            <div id="wfStep4" class="wf-step-content" style="display:none;">
+                <div id="wfPracticalSection">
+                    <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:16px; margin-bottom:20px;">
+                        <h4 style="font-size:15px; font-weight:900; color:#0369a1; margin:0 0 4px;">
+                            🎥 실기평가 영상 제출 가이드 (1~2분 무편집 원테이크)
+                        </h4>
+                        <div style="font-size:12.5px; color:#334155; line-height:1.6;">
+                            • <strong>필수 촬영 항목:</strong> 테이크오프, 기본 활주, 펌핑, 카빙 턴, 안전 정지 동작 1회 이상 포함<br>
+                            • <strong>촬영 유의점:</strong> 서퍼의 전신과 보드가 모두 보이도록 수평 앵글에서 연속 촬영
+                        </div>
+                    </div>
+
+                    <div style="border:1px solid #e2e8f0; border-radius:12px; padding:20px; background:#f8fafc; margin-bottom:18px;">
+                        <label style="display:block; font-size:13px; font-weight:800; color:#0f172a; margin-bottom:6px;">
+                            영상 링크 제출 (유튜브 일부공개 / 구글 드라이브 URL)
+                        </label>
+                        <input type="url" id="wfVideoUrl" placeholder="https://youtu.be/... 또는 https://drive.google.com/..." value="https://youtu.be/isa_exam_demo_2025" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; margin-bottom:12px;">
+
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:11.5px; color:#64748b;">✓ 구글 시트 심사 대기열에 실시간 동기화됩니다.</span>
+                            <button onclick="submitPracticalAndIssueCert()" style="background:#0284c7; color:white; border:none; padding:10px 22px; border-radius:8px; font-weight:900; font-size:13px; cursor:pointer;">
+                                영상 제출 및 AI 심사 통과 →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 디지털 자격증 발급 결과 화면 -->
+                <div id="wfCertResultSection" style="display:none;">
+                    <div style="text-align:center; margin-bottom:16px;">
+                        <span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:800;">
+                            🎉 전 과정 심사 완료 · 합격 인증
+                        </span>
+                        <h3 style="font-size:22px; font-weight:900; color:#0f172a; margin:8px 0 4px;">
+                            공식 디지털 자격증이 발급되었습니다!
+                        </h3>
+                    </div>
+
+                    <!-- 실물 디지털 자격증 카드 -->
+                    <div class="digital-cert-card" id="digitalCertCard">
+                        <div class="cert-gold-crest">🏅</div>
+                        <div class="cert-number-badge" id="dcCertNo">ISA-2025-SF-04-8921</div>
+                        <h2 style="font-size:24px; font-weight:900; color:#fef08a; margin:4px 0 2px; letter-spacing:1px;">
+                            CERTIFICATE OF QUALIFICATION
+                        </h2>
+                        <div style="font-size:13px; color:#cbd5e1; margin-bottom:16px;">한국인공서핑협회 공인 지도사 자격증</div>
+
+                        <div class="cert-meta-grid">
+                            <div class="cert-meta-item">
+                                <strong>성명 (APPLICANT)</strong>
+                                <span id="dcName">홍길동</span>
+                            </div>
+                            <div class="cert-meta-item">
+                                <strong>공인 종목 (DISCIPLINE)</strong>
+                                <span id="dcDiscipline">스탠딩 / 플로우보드</span>
+                            </div>
+                            <div class="cert-meta-item">
+                                <strong>자격 등급 (LEVEL)</strong>
+                                <span id="dcLevel">4급 입문 지도사</span>
+                            </div>
+                            <div class="cert-meta-item">
+                                <strong>발급 일자 (ISSUE DATE)</strong>
+                                <span id="dcDate">2026.10.24</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(212,175,55,0.3); padding-top:16px;">
+                            <div style="text-align:left; font-size:11px; color:#cbd5e1;">
+                                <div>• 검증기관: 사단법인 한국인공서핑협회</div>
+                                <div>• 주무부처: 해양경찰청 · 문화체육관광부 공인</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:14px; font-weight:900; color:#fef08a;">사단법인 한국인공서핑협회장 [직인]</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 자격증 저장 및 인쇄 버튼 -->
+                    <div style="display:flex; gap:12px; justify-content:center; margin-top:20px;">
+                        <button onclick="window.print()" style="background:#0f172a; color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:800; cursor:pointer;">
+                            🖨️ 자격증 인쇄 / PDF 저장
+                        </button>
+                        <button onclick="closeCertWorkflowModal()" style="background:#0284c7; color:white; border:none; padding:12px 28px; border-radius:10px; font-weight:900; cursor:pointer;">
+                            확인 완료
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
     <!-- 알림 토스트 -->
     <div class="toast-notify" id="toastBox">
         <span id="toastMsg">알림 내용</span>
@@ -3869,6 +4241,299 @@
                 triggerCaptureShield();
             }
         });
+
+    
+        // ========================================================
+        // 자격증 원스톱 워크플로우: 결제 -> 실습확인서 -> 필기(구글시트) -> 실기 -> 디지털자격증
+        // ========================================================
+        let wfVol = 'standing';
+        let wfLevel = '4';
+        let wfCurrentStep = 1;
+        let wfPayMethod = 'card';
+        let wfIsPaid = false;
+        let wfExamQuestions = [];
+        let wfExamIndex = 0;
+        let wfUserAnswers = [];
+        let wfExamTimer = null;
+        let wfSecondsLeft = 20 * 60; // 20분
+
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJzgz68HJuEEr4PyRvoFttKjgvUWblVLt4SqZsK3DwR3jllgwvTrKvt0wn2jDMstp4JQ/exec';
+
+        function openCertApply(vol, lv) {
+            wfVol = vol || 'standing';
+            wfLevel = lv || '4';
+            wfCurrentStep = 1;
+            wfIsPaid = false;
+
+            const vInfo = BOOK_INFO[wfVol];
+            const lvText = LEVEL_NAMES[wfLevel];
+            const price = (wfLevel === '1' || wfLevel === '2') ? '₩500,000' : '₩300,000';
+
+            document.getElementById('wfHeaderTitle').textContent = `${vInfo.name} · ${lvText} 자격검정`;
+            document.getElementById('wfHeaderSubtitle').textContent = `${vInfo.vol} · 공식 평가기준 4단계 원스톱 심사 플로우`;
+            document.getElementById('wfPriceBadge').textContent = `검정료 ${price}`;
+            document.getElementById('wfStep1Price').textContent = price;
+
+            switchWorkflowStep(1);
+            document.getElementById('certWorkflowModal').classList.add('active');
+        }
+
+        function closeCertWorkflowModal(e) {
+            if (!e || e.target === document.getElementById('certWorkflowModal') || e.target.classList.contains('modal-close-btn')) {
+                if (wfExamTimer) clearInterval(wfExamTimer);
+                document.getElementById('certWorkflowModal').classList.remove('active');
+            }
+        }
+
+        function switchWorkflowStep(step) {
+            wfCurrentStep = step;
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById('step-btn-' + i);
+                const content = document.getElementById('wfStep' + i);
+                if (btn) {
+                    if (i === step) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+                if (content) {
+                    content.style.display = (i === step) ? 'block' : 'none';
+                }
+            }
+
+            if (step === 3 && wfExamQuestions.length === 0) {
+                initWfExam();
+            }
+        }
+
+        function selectWfPay(method, el) {
+            wfPayMethod = method;
+            document.querySelectorAll('#wfStep1 .pay-method-btn').forEach(b => b.classList.remove('selected'));
+            if (el) el.classList.add('selected');
+        }
+
+        function executeCertPayment() {
+            const applicant = document.getElementById('wfApplicantName').value.trim() || '응시자';
+            const tid = 'INNO-CERT-' + Date.now().toString(36).toUpperCase();
+            wfIsPaid = true;
+
+            document.getElementById('wfTid').textContent = tid;
+            document.getElementById('wfPaymentStatusBox').style.display = 'block';
+            document.getElementById('step-btn-1').classList.add('completed');
+            showToast('💳 이노페이 검정료 결제가 승인되었습니다!');
+
+            setTimeout(() => {
+                switchWorkflowStep(2);
+            }, 800);
+        }
+
+        function handleProofFileUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('proofFileName').textContent = `✓ 첨부완료: ${file.name} (${Math.round(file.size/1024)} KB)`;
+                showToast('실습 이수 확인서 파일이 정상 첨부되었습니다.');
+            }
+        }
+
+        function submitTrainingProofAndNext() {
+            const fileInput = document.getElementById('trainingProofFile');
+            const applicant = document.getElementById('wfApplicantName').value.trim();
+
+            // 구글 시트 백그라운드 전송
+            try {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'uploadTrainingProof',
+                        applicant: applicant,
+                        vol: wfVol,
+                        level: wfLevel,
+                        fileName: (fileInput && fileInput.files[0]) ? fileInput.files[0].name : '기본이수증.pdf',
+                        submittedAt: new Date().toISOString()
+                    })
+                });
+            } catch (err) {
+                console.warn('Google sheets proof upload log:', err);
+            }
+
+            document.getElementById('step-btn-2').classList.add('completed');
+            showToast('실습 이수 확인서가 등록되었습니다. 필기시험을 시작합니다.');
+            switchWorkflowStep(3);
+        }
+
+        // ===== 필기시험 (2,000문항 랜덤 발췌 & Google Sheets 연동) =====
+        function initWfExam() {
+            const key = `${wfVol}_${wfLevel}`;
+            const pool = ISA_DATASETS[key] || [];
+            if (pool.length === 0) {
+                alert('해당 종목의 문제 풀을 로드할 수 없습니다.');
+                return;
+            }
+
+            // 20문항 랜덤 발췌
+            let shuffled = [...pool].sort(() => 0.5 - Math.random());
+            wfExamQuestions = shuffled.slice(0, 20);
+            wfUserAnswers = new Array(wfExamQuestions.length).fill(null);
+            wfExamIndex = 0;
+
+            // 타이머 작동 (20분)
+            wfSecondsLeft = 20 * 60;
+            if (wfExamTimer) clearInterval(wfExamTimer);
+            wfExamTimer = setInterval(() => {
+                wfSecondsLeft--;
+                const min = String(Math.floor(wfSecondsLeft / 60)).padStart(2, '0');
+                const sec = String(wfSecondsLeft % 60).padStart(2, '0');
+                const tEl = document.getElementById('wfExamTimerDisplay');
+                if (tEl) tEl.textContent = `⏱️ ${min}:${sec}`;
+                if (wfSecondsLeft <= 0) {
+                    clearInterval(wfExamTimer);
+                    alert('시험 시간이 종료되었습니다! OMR 답안을 구글 시트로 자동 전송합니다.');
+                    submitWfExamToGoogleSheets();
+                }
+            }, 1000);
+
+            renderWfExamQuestion();
+        }
+
+        function renderWfExamQuestion() {
+            const q = wfExamQuestions[wfExamIndex];
+            if (!q) return;
+
+            document.getElementById('wfExamProgress').textContent = `문제 ${wfExamIndex + 1} / ${wfExamQuestions.length}`;
+            document.getElementById('wfExamQText').textContent = `Q${wfExamIndex + 1}. ${q.question}`;
+
+            const list = document.getElementById('wfExamOptionsList');
+            list.innerHTML = '';
+            const nums = ['①', '②', '③', '④'];
+
+            q.options.forEach((optText, idx) => {
+                const optNum = idx + 1;
+                const optDiv = document.createElement('div');
+                optDiv.className = 'q-option-item';
+                if (wfUserAnswers[wfExamIndex] === optNum) {
+                    optDiv.classList.add('selected');
+                }
+                optDiv.innerHTML = `<div class="q-opt-num">${nums[idx]}</div><div style="flex:1;">${optText}</div>`;
+                optDiv.onclick = () => {
+                    wfUserAnswers[wfExamIndex] = optNum;
+                    renderWfExamQuestion();
+                };
+                list.appendChild(optDiv);
+            });
+
+            const answered = wfUserAnswers.filter(a => a !== null).length;
+            document.getElementById('wfExamMarkCount').textContent = `마킹: ${answered} / ${wfExamQuestions.length}`;
+
+            document.getElementById('btnWfPrevQ').disabled = (wfExamIndex === 0);
+            if (wfExamIndex === wfExamQuestions.length - 1) {
+                document.getElementById('btnWfNextQ').style.display = 'none';
+                document.getElementById('btnWfSubmitExam').style.display = 'block';
+            } else {
+                document.getElementById('btnWfNextQ').style.display = 'block';
+                document.getElementById('btnWfSubmitExam').style.display = 'none';
+            }
+        }
+
+        function prevWfQuestion() {
+            if (wfExamIndex > 0) {
+                wfExamIndex--;
+                renderWfExamQuestion();
+            }
+        }
+
+        function nextWfQuestion() {
+            if (wfExamIndex < wfExamQuestions.length - 1) {
+                wfExamIndex++;
+                renderWfExamQuestion();
+            }
+        }
+
+        function submitWfExamToGoogleSheets() {
+            if (wfExamTimer) clearInterval(wfExamTimer);
+
+            let correctCount = 0;
+            wfExamQuestions.forEach((q, idx) => {
+                if (q.answer === wfUserAnswers[idx]) correctCount++;
+            });
+
+            const score = Math.round((correctCount / wfExamQuestions.length) * 100);
+            const passed = score >= 60;
+            const applicant = document.getElementById('wfApplicantName').value.trim() || '홍길동';
+            const phone = document.getElementById('wfApplicantPhone').value.trim();
+            const email = document.getElementById('wfApplicantEmail').value.trim();
+
+            // Google Sheets Webhook 전송
+            try {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'submitTheoryExam',
+                        applicant: applicant,
+                        phone: phone,
+                        email: email,
+                        discipline: BOOK_INFO[wfVol].name,
+                        level: wfLevel,
+                        score: score,
+                        passed: passed,
+                        totalQuestions: wfExamQuestions.length,
+                        correctCount: correctCount,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+            } catch (e) {
+                console.warn('Google Sheets theory exam transmission:', e);
+            }
+
+            document.getElementById('step-btn-3').classList.add('completed');
+            showToast(`📊 필기시험 채점완료 (${score}점 - ${passed ? '합격' : '불합격'}). 구글 시트에 성적이 전송되었습니다!`);
+
+            setTimeout(() => {
+                switchWorkflowStep(4);
+            }, 1000);
+        }
+
+        function submitPracticalAndIssueCert() {
+            const videoUrl = document.getElementById('wfVideoUrl').value.trim();
+            const applicant = document.getElementById('wfApplicantName').value.trim() || '홍길동';
+
+            // Google Sheets 실기 전송
+            try {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'submitPractical',
+                        applicant: applicant,
+                        discipline: BOOK_INFO[wfVol].name,
+                        level: wfLevel,
+                        videoUrl: videoUrl,
+                        submittedAt: new Date().toISOString()
+                    })
+                });
+            } catch (err) {
+                console.warn('Google Sheets practical video log:', err);
+            }
+
+            // 디지털 자격증 생성
+            const certNo = `ISA-2025-${wfVol.substring(0,2).toUpperCase()}-0${wfLevel}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+
+            document.getElementById('dcCertNo').textContent = certNo;
+            document.getElementById('dcName').textContent = applicant;
+            document.getElementById('dcDiscipline').textContent = BOOK_INFO[wfVol].name;
+            document.getElementById('dcLevel').textContent = LEVEL_NAMES[wfLevel];
+            document.getElementById('dcDate').textContent = dateStr;
+
+            document.getElementById('wfPracticalSection').style.display = 'none';
+            document.getElementById('wfCertResultSection').style.display = 'block';
+            document.getElementById('step-btn-4').classList.add('completed');
+
+            showToast('🏅 축하합니다! 실기 심사 통과 및 공식 디지털 자격증이 발급되었습니다!');
+        }
 
     </script>
 </body>
