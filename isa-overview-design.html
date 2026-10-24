@@ -1894,6 +1894,269 @@
             font-size: 14px;
         }
 
+    
+        /* ========================================================
+           모바일 최적화 및 글자 배치 안정화 (360px~768px 완벽 대응)
+           ======================================================== */
+        @media (max-width: 768px) {
+            /* 1. 최상단 정부 바 (문체부, 해경 텍스트 줄바꿈 방지) */
+            .top-gov-bar {
+                padding: 6px 10px !important;
+                font-size: 11px !important;
+            }
+            .gov-badges-left {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+            }
+            .gov-badges-left::-webkit-scrollbar { display: none; }
+            .gov-badge-unit {
+                display: flex !important;
+                align-items: center !important;
+                gap: 4px !important;
+                white-space: nowrap !important;
+                font-size: 11px !important;
+                flex-shrink: 0 !important;
+            }
+            .gov-badge-unit span {
+                white-space: nowrap !important;
+                word-break: keep-all !important;
+            }
+            .gov-logo-img {
+                height: 16px !important;
+                width: auto !important;
+            }
+            .gov-center-pill {
+                display: none !important; /* 모바일에서 텍스트 넘침 방지 */
+            }
+            .gov-right-utils {
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                flex-shrink: 0 !important;
+            }
+            .kakao-channel-link, .top-gov-bar .lang-btn {
+                padding: 4px 8px !important;
+                font-size: 10.5px !important;
+                white-space: nowrap !important;
+                border-radius: 6px !important;
+            }
+
+            /* 2. 메인 사이트 헤더 (로고 잘림 및 버튼 세로 쪼개짐 완벽 방지) */
+            .site-header {
+                padding: 0 !important;
+            }
+            .header-inner {
+                padding: 8px 12px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 6px !important;
+                flex-wrap: nowrap !important;
+            }
+            .brand-link {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                min-width: 0 !important;
+                flex-shrink: 1 !important;
+            }
+            .logo-video-frame {
+                width: 36px !important;
+                height: 36px !important;
+                min-width: 36px !important;
+                border-radius: 50% !important;
+                flex-shrink: 0 !important;
+            }
+            .brand-text {
+                min-width: 0 !important;
+                overflow: hidden !important;
+            }
+            .brand-text h1 {
+                font-size: 14px !important;
+                white-space: nowrap !important;
+                word-break: keep-all !important;
+                line-height: 1.2 !important;
+                letter-spacing: -0.3px !important;
+            }
+            .brand-text p {
+                font-size: 9px !important;
+                white-space: nowrap !important;
+                word-break: keep-all !important;
+                opacity: 0.8 !important;
+            }
+            .nav-menu-links {
+                display: none !important;
+            }
+
+            /* 헤더 우측 액션 버튼들 (글자 세로 쪼개짐 원천 방지) */
+            .header-actions {
+                display: flex !important;
+                align-items: center !important;
+                gap: 5px !important;
+                flex-shrink: 0 !important;
+            }
+            .bgm-toggle-btn {
+                padding: 5px 8px !important;
+                font-size: 10.5px !important;
+                white-space: nowrap !important;
+                height: 30px !important;
+                border-radius: 20px !important;
+            }
+            .bgm-toggle-btn #headerBgmLabel {
+                display: none !important; /* 모바일에서는 텍스트 숨기고 아이콘+파형만 콤팩트 표시 */
+            }
+            .header-actions .lang-btn {
+                padding: 5px 8px !important;
+                font-size: 10.5px !important;
+                white-space: nowrap !important;
+                height: 30px !important;
+            }
+            /* 전체 기능 펼쳐보기 버튼 (세로로 글자 쪼개지는 현상 완전 해결!) */
+            .mode-btn-all {
+                white-space: nowrap !important;
+                word-break: keep-all !important;
+                font-size: 11px !important;
+                padding: 6px 10px !important;
+                height: 30px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 20px !important;
+                flex-shrink: 0 !important;
+                letter-spacing: -0.2px !important;
+            }
+            /* 로그인 버튼 */
+            .login-btn-top {
+                white-space: nowrap !important;
+                word-break: keep-all !important;
+                font-size: 11px !important;
+                padding: 6px 12px !important;
+                height: 30px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 8px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* 3. 공지 롤링 바 */
+            .notice-strip {
+                padding: 8px 12px !important;
+                font-size: 12px !important;
+                gap: 8px !important;
+            }
+            .notice-strip span:nth-child(2) {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                flex: 1 !important;
+                font-size: 11.5px !important;
+            }
+            .notice-strip a {
+                white-space: nowrap !important;
+                font-size: 11.5px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* 4. 카테고리 퀵 탭 바 (모바일 가로 부드러운 스크롤 & 글자 잘림 방지) */
+            .category-nav-strip {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+                gap: 8px !important;
+                padding: 8px 12px !important;
+                margin-bottom: 20px !important;
+            }
+            .category-nav-strip::-webkit-scrollbar { display: none !important; }
+            .nav-chip {
+                white-space: nowrap !important;
+                word-break: keep-all !important;
+                flex-shrink: 0 !important;
+                font-size: 11.5px !important;
+                padding: 6px 12px !important;
+                border-radius: 99px !important;
+            }
+
+            /* 5. 히어로 섹션 모바일 반응형 정돈 */
+            .hero-section-original {
+                padding: 20px 14px !important;
+            }
+            .hero-badge-row {
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+            }
+            .hero-badge-gold {
+                font-size: 11px !important;
+                padding: 4px 8px !important;
+            }
+            .hero-main-title-box h2 {
+                font-size: 20px !important;
+                line-height: 1.35 !important;
+                word-break: keep-all !important;
+            }
+            .hero-main-title-box p {
+                font-size: 12px !important;
+                word-break: keep-all !important;
+            }
+            .hero-cta-group {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .hero-cta-group button {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+
+            /* 6. 자격증 4대 종목 센터 모바일 가독성 */
+            .cert-fullwidth {
+                padding: 16px 12px !important;
+            }
+            .cert-header-actions {
+                width: 100% !important;
+                overflow-x: auto !important;
+                flex-wrap: nowrap !important;
+                scrollbar-width: none !important;
+                padding-bottom: 4px !important;
+            }
+            .cert-header-actions::-webkit-scrollbar { display: none !important; }
+            .cert-tab-btn {
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+                font-size: 11px !important;
+                padding: 5px 10px !important;
+            }
+            .cert-grade-row {
+                font-size: 12px !important;
+                padding: 7px 8px !important;
+            }
+
+            /* 7. 교재 카드 모바일 여백 및 글자 배치 */
+            .book-real-cover-frame {
+                height: 175px !important;
+            }
+            .level-chip {
+                white-space: nowrap !important;
+            }
+            .book-spec-list li {
+                font-size: 11.5px !important;
+                word-break: keep-all !important;
+            }
+        }
+
+        /* 초소형 스마트폰 (360px 이하) 추가 초밀착 대응 */
+        @media (max-width: 380px) {
+            .brand-text h1 { font-size: 13px !important; }
+            .mode-btn-all { font-size: 10px !important; padding: 5px 8px !important; }
+            .login-btn-top { font-size: 10px !important; padding: 5px 8px !important; }
+            .header-inner { padding: 6px 8px !important; }
+        }
+
     </style>
 </head>
 <body>
