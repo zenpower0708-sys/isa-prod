@@ -1654,6 +1654,135 @@
         .result-pass .result-score-circle { border-color: #10b981; color: #10b981; }
         .result-fail .result-score-circle { border-color: #ef4444; color: #ef4444; }
 
+    
+        /* ========================================================
+           자격증 센터 종목별 급수별 전체 펼쳐보기 스타일
+           ======================================================== */
+        .feature-panel.cert-fullwidth {
+            grid-column: 1 / -1;
+            background: var(--bg-card);
+            border: 2px solid rgba(2, 132, 199, 0.35);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .cert-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .cert-tab-btn {
+            background: var(--badge-bg);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cert-tab-btn:hover {
+            border-color: #0284c7;
+            color: #0284c7;
+        }
+        .cert-tab-btn.active {
+            background: #0284c7;
+            color: white;
+            border-color: #0284c7;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+        .cert-disciplines-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 18px;
+        }
+        @media (max-width: 1024px) {
+            .cert-disciplines-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .cert-disciplines-grid { grid-template-columns: 1fr; }
+        }
+        .cert-discipline-col {
+            background: rgba(15, 23, 42, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s;
+        }
+        .cert-discipline-col:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        .cert-col-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .cert-col-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cert-col-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+        }
+        .cert-grade-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            font-size: 12.5px;
+            transition: all 0.2s;
+        }
+        .cert-grade-row:hover {
+            border-color: #0284c7;
+            background: rgba(2, 132, 199, 0.05);
+        }
+        .cert-grade-tag {
+            font-weight: 800;
+            margin-right: 6px;
+        }
+        .cert-grade-price {
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .btn-cert-col-apply {
+            width: 100%;
+            margin-top: 10px;
+            padding: 9px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .btn-cert-col-apply:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
     </style>
 </head>
 <body>
@@ -2142,36 +2271,167 @@
             <div class="omni-dashboard-grid">
 
                 <!-- 1. 자격증 신청 센터 -->
-                <div class="feature-panel" id="cert-panel">
-                    <div class="panel-header">
+                                <!-- 1. 자격증 신청 & 발급 센터 (종목별 급수별 전체 펼쳐보기 완료) -->
+                <div class="feature-panel cert-fullwidth" id="cert-panel">
+                    <div class="panel-header" style="flex-wrap:wrap; gap:12px; justify-content:space-between;">
                         <div class="panel-badge-group">
-                            <div class="panel-icon-box" style="background:#e0f2fe; color:#0284c7;">🏆</div>
+                            <div class="panel-icon-box" style="background:#e0f2fe; color:#0284c7; font-size:24px;">🏆</div>
                             <div class="panel-title-text">
-                                <h3>자격증 신청 & 발급 센터</h3>
-                                <p>정부 공인 1~4급 심사 플로우</p>
+                                <h3 style="font-size:18px; font-weight:900;">자격증 신청 & 발급 센터</h3>
+                                <p style="font-size:12px; color:var(--text-sub);">정부 공인 1~4급 심사 플로우 · 종목별 급수별 전체 펼쳐보기</p>
                             </div>
                         </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="grade-step-list">
-                            <div class="grade-item"><span><strong style="color:#64748b;">4급</strong> 입문 서퍼</span><strong>₩300,000</strong></div>
-                            <div class="grade-item"><span><strong style="color:#0284c7;">3급</strong> 중급 서퍼</span><strong>₩300,000</strong></div>
-                            <div class="grade-item"><span><strong style="color:#7c3aed;">2급</strong> 전문 강사</span><strong>₩500,000</strong></div>
-                            <div class="grade-item"><span><strong style="color:#d97706;">1급</strong> 마스터 심판</span><strong>₩500,000</strong></div>
+
+                        <!-- 종목 필터 탭 -->
+                        <div class="cert-header-actions">
+                            <button class="cert-tab-btn active" id="tab-cert-all" onclick="filterCertDiscipline('all')">전체 4대 종목 펼쳐보기</button>
+                            <button class="cert-tab-btn" id="tab-cert-standing" onclick="filterCertDiscipline('standing')">🏄‍♂️ 스탠딩/플로우</button>
+                            <button class="cert-tab-btn" id="tab-cert-body" onclick="filterCertDiscipline('body')">🌊 바디/부기</button>
+                            <button class="cert-tab-btn" id="tab-cert-wake" onclick="filterCertDiscipline('wake')">🚤 웨이크서핑</button>
+                            <button class="cert-tab-btn" id="tab-cert-wave" onclick="filterCertDiscipline('wave')">🏊 웨이브풀</button>
+                            <button class="btn-panel-sub" style="padding:6px 12px; font-size:12px;" onclick="toggleDrawer('drawer-cert')">심사절차 ▾</button>
                         </div>
-                        <div class="panel-drawer" id="drawer-cert">
+                    </div>
+
+                    <div class="panel-body" style="padding:0;">
+                        <!-- 4개 종목 파노라마 그리드 -->
+                        <div class="cert-disciplines-grid">
+                            
+                            <!-- VOL. 1 스탠딩 / 플로우보드 -->
+                            <div class="cert-discipline-col" id="cert-col-standing" style="border-top:3px solid #0284c7;">
+                                <div class="cert-col-header">
+                                    <div class="cert-col-title">
+                                        <span>🏄‍♂️</span>
+                                        <span>스탠딩/플로우보드</span>
+                                    </div>
+                                    <span class="cert-col-badge" style="background:#0284c7;">VOL. 1</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('standing', '4')">
+                                    <span><span class="cert-grade-tag" style="color:#64748b;">4급</span> 입문 서퍼</span>
+                                    <span class="cert-grade-price">₩300,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('standing', '3')">
+                                    <span><span class="cert-grade-tag" style="color:#0284c7;">3급</span> 중급 서퍼</span>
+                                    <span class="cert-grade-price">₩300,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('standing', '2')">
+                                    <span><span class="cert-grade-tag" style="color:#7c3aed;">2급</span> 전문 강사</span>
+                                    <span class="cert-grade-price">₩500,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('standing', '1')">
+                                    <span><span class="cert-grade-tag" style="color:#d97706;">1급</span> 마스터 심판</span>
+                                    <span class="cert-grade-price">₩500,000</span>
+                                </div>
+                                <button class="btn-cert-col-apply" style="background:#0284c7;" onclick="openCertApply('standing', '4')">
+                                    스탠딩 자격증 신청하기 →
+                                </button>
+                            </div>
+
+                            <!-- VOL. 2 바디 / 부기보드 -->
+                            <div class="cert-discipline-col" id="cert-col-body" style="border-top:3px solid #059669;">
+                                <div class="cert-col-header">
+                                    <div class="cert-col-title">
+                                        <span>🌊</span>
+                                        <span>바디/부기보드</span>
+                                    </div>
+                                    <span class="cert-col-badge" style="background:#059669;">VOL. 2</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('body', '4')">
+                                    <span><span class="cert-grade-tag" style="color:#64748b;">4급</span> 입문 서퍼</span>
+                                    <span class="cert-grade-price">₩300,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('body', '3')">
+                                    <span><span class="cert-grade-tag" style="color:#059669;">3급</span> 중급 서퍼</span>
+                                    <span class="cert-grade-price">₩300,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('body', '2')">
+                                    <span><span class="cert-grade-tag" style="color:#7c3aed;">2급</span> 전문 강사</span>
+                                    <span class="cert-grade-price">₩500,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('body', '1')">
+                                    <span><span class="cert-grade-tag" style="color:#d97706;">1급</span> 마스터 심판</span>
+                                    <span class="cert-grade-price">₩500,000</span>
+                                </div>
+                                <button class="btn-cert-col-apply" style="background:#059669;" onclick="openCertApply('body', '4')">
+                                    바디보드 자격증 신청하기 →
+                                </button>
+                            </div>
+
+                            <!-- VOL. 3 웨이크서핑 -->
+                            <div class="cert-discipline-col" id="cert-col-wake" style="border-top:3px solid #7c3aed;">
+                                <div class="cert-col-header">
+                                    <div class="cert-col-title">
+                                        <span>🚤</span>
+                                        <span>웨이크 서핑</span>
+                                    </div>
+                                    <span class="cert-col-badge" style="background:#7c3aed;">VOL. 3</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('wake', '4')">
+                                    <span><span class="cert-grade-tag" style="color:#64748b;">4급</span> 입문 서퍼</span>
+                                    <span class="cert-grade-price">₩300,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('wake', '3')">
+                                    <span><span class="cert-grade-tag" style="color:#7c3aed;">3급</span> 중급 서퍼</span>
+                                    <span class="cert-grade-price">₩300,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('wake', '2')">
+                                    <span><span class="cert-grade-tag" style="color:#9333ea;">2급</span> 전문 강사</span>
+                                    <span class="cert-grade-price">₩500,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('wake', '1')">
+                                    <span><span class="cert-grade-tag" style="color:#d97706;">1급</span> 마스터 심판</span>
+                                    <span class="cert-grade-price">₩500,000</span>
+                                </div>
+                                <button class="btn-cert-col-apply" style="background:#7c3aed;" onclick="openCertApply('wake', '4')">
+                                    웨이크 자격증 신청하기 →
+                                </button>
+                            </div>
+
+                            <!-- VOL. 4 웨이브풀 서핑 -->
+                            <div class="cert-discipline-col" id="cert-col-wave" style="border-top:3px solid #d97706;">
+                                <div class="cert-col-header">
+                                    <div class="cert-col-title">
+                                        <span>🏊</span>
+                                        <span>웨이브풀 서핑</span>
+                                    </div>
+                                    <span class="cert-col-badge" style="background:#d97706;">VOL. 4</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('wave', '4')">
+                                    <span><span class="cert-grade-tag" style="color:#64748b;">4급</span> 입문 서퍼</span>
+                                    <span class="cert-grade-price">₩300,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('wave', '3')">
+                                    <span><span class="cert-grade-tag" style="color:#d97706;">3급</span> 중급 서퍼</span>
+                                    <span class="cert-grade-price">₩300,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('wave', '2')">
+                                    <span><span class="cert-grade-tag" style="color:#7c3aed;">2급</span> 전문 강사</span>
+                                    <span class="cert-grade-price">₩500,000</span>
+                                </div>
+                                <div class="cert-grade-row" onclick="openCertApply('wave', '1')">
+                                    <span><span class="cert-grade-tag" style="color:#b45309;">1급</span> 마스터 심판</span>
+                                    <span class="cert-grade-price">₩500,000</span>
+                                </div>
+                                <button class="btn-cert-col-apply" style="background:#d97706;" onclick="openCertApply('wave', '4')">
+                                    웨이브풀 자격증 신청하기 →
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <!-- 심사 플로우 상세 드로어 -->
+                        <div class="panel-drawer expanded" id="drawer-cert" style="margin-top:16px;">
                             <div class="flow-stepper">
-                                <div class="step-box active">온라인접수</div>
-                                <div class="step-box active">필기평가</div>
-                                <div class="step-box active">실기영상</div>
-                                <div class="step-box active">자격증발급</div>
+                                <div class="step-box active">1. 온라인접수 & 검정료 납부</div>
+                                <div class="step-box active">2. 필기평가 (2,000문제은행/10회 모의고사)</div>
+                                <div class="step-box active">3. 실기영상 AI/심사위원 검증</div>
+                                <div class="step-box active">4. 정부공인 자격증 및 카드 발급</div>
                             </div>
-                            <p style="font-size:11px; color:#94a3b8; margin-top:4px;">불합격 시 10,000원으로 30일 이내 재응시 가능</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:12px; color:var(--text-sub); flex-wrap:wrap; gap:8px;">
+                                <span>✓ 불합격 시 10,000원으로 30일 이내 재응시 가능</span>
+                                <span>✓ 2급/1급 취득 시 전국 45개 인공서핑장 공식 지도사 및 심판 배정 권한 부여</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="panel-footer">
-                        <button class="btn-panel-sub" onclick="toggleDrawer('drawer-cert')">상세 펼치기 ▾</button>
-                        <button class="btn-panel-action" onclick="showToast('자격증 접수 신청서 폼을 호출합니다.')">자격증 신청하기 &rarr;</button>
                     </div>
                 </div>
 
