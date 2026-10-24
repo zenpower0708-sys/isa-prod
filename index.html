@@ -4951,6 +4951,7 @@
             if (!hasLicense && targetRound > 1) {
                 alert('🔒 [정식 라이선스 전용]\n2회차 이상의 모의고사는 E-PASS 정식 교재 구매(₩15,000) 후 이용 가능합니다.\n결제창으로 이동합니다.');
                 document.getElementById('vSelectRound').value = '1';
+                closeBookViewer();
                 openCheckoutModal(viewerVol, viewerLevel);
                 return;
             }
@@ -4979,6 +4980,7 @@
                 const hasLicense = localStorage.getItem(licKey) || localStorage.getItem('isa_book_purchased_all');
                 if (!hasLicense) {
                     alert('🔒 [정식 라이선스 전용]\n전체 문제은행(학습 모드) 열람은 E-PASS 정식 교재 구매(₩15,000) 후 이용 가능합니다.\n결제창으로 이동합니다.');
+                    closeBookViewer();
                     openCheckoutModal(viewerVol, viewerLevel);
                     return;
                 }
