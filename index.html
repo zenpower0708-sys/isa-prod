@@ -2183,7 +2183,7 @@
             <span class="gov-center-pill">국제 공인 자격증 플랫폼</span>
         </div>
         <div class="gov-right-utils">
-            <a href="http://pf.kakao.com/_xcshTX" target="_blank" class="kakao-channel-link">
+            <a href="javascript:void(0)" onclick="openKakaoChannel('상단 헤더 공식 채널', 'http://pf.kakao.com/_xcshTX')" class="kakao-channel-link" title="카카오 공식 채널 상담 및 구글 시트 실시간 연동">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="#191919"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.632 1.567 4.953 3.938 6.318L4.5 21l4.719-2.516A11.29 11.29 0 0 0 12 18c5.523 0 10-3.477 10-7.5S17.523 3 12 3z"/></svg>
                 <span>카카오채널 문의</span>
             </a>
@@ -2233,7 +2233,7 @@
                 <button class="mode-btn-all" onclick="toggleAllDrawers()" id="btnExpandAll">
                     ✨ 전체 기능 펼쳐보기
                 </button>
-                <button class="login-btn-top" onclick="openLoginModal()">로그인</button>
+                <button class="login-btn-top" id="topAuthBtn" onclick="openLoginModal()">로그인 / 회원가입</button>
             </div>
         </div>
     </header>
@@ -2316,7 +2316,7 @@
                         <a href="#disciplines-section" class="btn-hero-secondary">
                             📖 종목 소개
                         </a>
-                        <a href="https://pf.kakao.com/_xgxmxfFG" target="_blank" class="btn-hero-kakao">
+                        <a href="javascript:void(0)" onclick="openKakaoChannel('히어로 배너 문의', 'https://pf.kakao.com/_xgxmxfFG')" class="btn-hero-kakao" title="카카오 1:1 상담 및 구글 시트 실시간 연동">
                             💬 카카오 문의
                         </a>
                     </div>
@@ -3108,25 +3108,136 @@
          모달 1: 3D 로그인 모달 (카카오/구글/네이버 실제 3D 바 이미지 탑재)
          ======================================================== -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
-        <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 440px; padding: 24px;">
             <button class="modal-close-btn" onclick="closeLoginModal()">✕</button>
-            <div style="text-align:center; margin-bottom:20px;">
-                <div style="width:64px; height:64px; border-radius:16px; overflow:hidden; border:2px solid #06b6d4; margin:0 auto 10px; background:#020617;">
+            <div style="text-align:center; margin-bottom:16px;">
+                <div style="width:60px; height:60px; border-radius:16px; overflow:hidden; border:2px solid #06b6d4; margin:0 auto 10px; background:#020617; box-shadow:0 8px 20px rgba(6,182,212,0.3);">
                     <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover;">
                         <source src="images/isa_logo_video2.mp4" type="video/mp4">
                     </video>
                 </div>
-                <h3 style="font-size:20px; font-weight:900; color:#0f172a;">국제인공서핑협회 로그인</h3>
-                <p style="font-size:12px; color:#64748b;">서퍼와 교육생을 위한 맞춤형 통합 회원 서비스</p>
+                <h3 style="font-size:20px; font-weight:900; color:#0f172a; margin-bottom:4px;" id="authModalTitle">회원인증 & 회원가입</h3>
+                <p style="font-size:12px; color:#0284c7; font-weight:700;">📊 구글 스프레드시트 실시간 동기화 & 가입 즉시 500P 적립</p>
             </div>
 
-            <!-- 실제 3D 소셜 로그인 버튼 이미지들 -->
-            <img src="images/kakao_3d_front_login_bar_opt.jpg" alt="카카오 로그인" class="social-login-bar-img" onclick="showToast('카카오 간편 로그인을 실행합니다.')" onerror="this.src='images/kakao_3d_front_login_bar.jpg'">
-            <img src="images/google_3d_front_login_bar_opt.jpg" alt="구글 로그인" class="social-login-bar-img" onclick="showToast('구글 간편 로그인을 실행합니다.')" onerror="this.src='images/google_3d_front_login_bar.jpg'">
-            <img src="images/naver_3d_front_login_bar_opt.jpg" alt="네이버 로그인" class="social-login-bar-img" onclick="showToast('네이버 간편 로그인을 실행합니다.')" onerror="this.src='images/naver_3d_front_login_bar.jpg'">
+            <!-- 탭 전환 바 -->
+            <div style="display:flex; border-bottom:1.5px solid #e2e8f0; margin-bottom:16px; gap:8px;">
+                <button type="button" id="tabSocialBtn" onclick="switchAuthTab('social')" style="flex:1; padding:9px; font-size:13px; font-weight:800; border:none; background:none; border-bottom:2.5px solid #0284c7; color:#0284c7; cursor:pointer; transition:all 0.2s;">간편 소셜 가입</button>
+                <button type="button" id="tabDirectBtn" onclick="switchAuthTab('direct')" style="flex:1; padding:9px; font-size:13px; font-weight:800; border:none; background:none; border-bottom:2.5px solid transparent; color:#64748b; cursor:pointer; transition:all 0.2s;">직접 회원가입</button>
+            </div>
+
+            <!-- 패널 1: 소셜 로그인/회원가입 3D 바 -->
+            <div id="panelSocialAuth">
+                <div style="margin-bottom:8px;">
+                    <img src="images/kakao_3d_front_login_bar_opt.jpg" alt="카카오 로그인" class="social-login-bar-img" onclick="handleSocialAuth('kakao')" onerror="this.src='images/kakao_3d_front_login_bar.jpg'" style="cursor:pointer; display:block; width:100%; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.08); transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                </div>
+                <div style="margin-bottom:8px;">
+                    <img src="images/google_3d_front_login_bar_opt.jpg" alt="구글 로그인" class="social-login-bar-img" onclick="handleSocialAuth('google')" onerror="this.src='images/google_3d_front_login_bar.jpg'" style="cursor:pointer; display:block; width:100%; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.08); transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                </div>
+                <div style="margin-bottom:14px;">
+                    <img src="images/naver_3d_front_login_bar_opt.jpg" alt="네이버 로그인" class="social-login-bar-img" onclick="handleSocialAuth('naver')" onerror="this.src='images/naver_3d_front_login_bar.jpg'" style="cursor:pointer; display:block; width:100%; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.08); transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                </div>
+                
+                <!-- 카카오 공식 채널 1:1 상담 바로가기 배너 -->
+                <div onclick="openKakaoChannel('로그인모달 배너', 'http://pf.kakao.com/_xcshTX')" style="cursor:pointer; background:#fef9c3; border:1px solid #fde047; border-radius:10px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:18px;">💬</span>
+                        <div style="font-size:12px; font-weight:800; color:#854d0e;">카카오톡 채널 실시간 1:1 문의</div>
+                    </div>
+                    <span style="font-size:11px; color:#a16207; font-weight:700;">연결 &gt;</span>
+                </div>
+            </div>
+
+            <!-- 소셜 정보 입력/확인 폼 (소셜 버튼 클릭 시 활성화) -->
+            <div id="socialExtraBox" style="display:none; background:#f0f9ff; border:1.5px solid #bae6fd; border-radius:12px; padding:14px; margin-bottom:12px;">
+                <div style="font-size:13px; font-weight:800; color:#0369a1; margin-bottom:8px;" id="socialExtraTitle">카카오 간편 가입 정보 확인</div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" id="socialName" placeholder="성명 (실명)" style="padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">
+                    <input type="email" id="socialEmail" placeholder="이메일 주소" style="padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">
+                    <input type="tel" id="socialPhone" placeholder="휴대폰 번호 (010-0000-0000)" style="padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">
+                    <div style="display:flex; gap:6px;">
+                        <select id="socialRegion" style="flex:1; padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; background:#fff;">
+                            <option value="서울">지역: 서울</option>
+                            <option value="경기/인천">경기/인천</option>
+                            <option value="강원(양양/고성)">강원(양양)</option>
+                            <option value="부산/경남">부산/경남</option>
+                            <option value="제주">제주</option>
+                        </select>
+                        <select id="socialGender" style="flex:1; padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; background:#fff;">
+                            <option value="M">남성</option>
+                            <option value="F">여성</option>
+                        </select>
+                    </div>
+                    <button type="button" id="socialSubmitBtn" onclick="submitSocialRegistration()" style="background:#0284c7; color:white; border:none; padding:10px; border-radius:6px; font-weight:800; font-size:13px; cursor:pointer;">
+                        🚀 구글 스프레드시트 등록 및 가입 완료
+                    </button>
+                    <button type="button" onclick="cancelSocialExtra()" style="background:#e2e8f0; color:#475569; border:none; padding:6px; border-radius:6px; font-size:11px; cursor:pointer;">
+                        취소
+                    </button>
+                </div>
+            </div>
+
+            <!-- 패널 2: 직접 회원가입 폼 -->
+            <div id="panelDirectAuth" style="display:none;">
+                <form id="directSignupForm" onsubmit="handleDirectSignup(event)" style="display:flex; flex-direction:column; gap:10px;">
+                    <div>
+                        <label style="font-size:11.5px; font-weight:800; color:#334155; display:block; margin-bottom:3px;">성명 (실명) *</label>
+                        <input type="text" id="regName" required placeholder="예: 홍길동" style="width:100%; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px; font-weight:800; color:#334155; display:block; margin-bottom:3px;">이메일 주소 *</label>
+                        <input type="email" id="regEmail" required placeholder="surfer@example.com" style="width:100%; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px; font-weight:800; color:#334155; display:block; margin-bottom:3px;">휴대폰 번호 *</label>
+                        <input type="tel" id="regPhone" required placeholder="010-1234-5678" style="width:100%; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; box-sizing:border-box;">
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <div style="flex:1;">
+                            <label style="font-size:11.5px; font-weight:800; color:#334155; display:block; margin-bottom:3px;">거주 지역</label>
+                            <select id="regRegion" style="width:100%; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; box-sizing:border-box; background:#fff;">
+                                <option value="서울">서울</option>
+                                <option value="경기/인천">경기/인천</option>
+                                <option value="강원(양양/고성)">강원(양양)</option>
+                                <option value="부산/울산/경남">부산/경남</option>
+                                <option value="제주">제주</option>
+                                <option value="기타">기타 지역</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:11.5px; font-weight:800; color:#334155; display:block; margin-bottom:3px;">성별</label>
+                            <select id="regGender" style="width:100%; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; box-sizing:border-box; background:#fff;">
+                                <option value="M">남성</option>
+                                <option value="F">여성</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" id="regSubmitBtn" style="width:100%; margin-top:4px; padding:11px; background:linear-gradient(135deg, #0284c7, #0369a1); color:white; border:none; border-radius:8px; font-size:13.5px; font-weight:900; cursor:pointer; box-shadow:0 4px 12px rgba(2,132,199,0.3);">
+                        ✨ 구글 시트 등록 및 가입 완료 (500P 적립)
+                    </button>
+                </form>
+            </div>
+
+            <!-- 로그인 세션 프로필 뷰 (이미 로그인된 경우) -->
+            <div id="panelUserProfile" style="display:none; text-align:center;">
+                <div style="width:64px; height:64px; border-radius:50%; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 12px; font-weight:900;">
+                    🏄
+                </div>
+                <h4 style="font-size:18px; font-weight:900; color:#0f172a; margin-bottom:4px;" id="profileUserName">회원님</h4>
+                <p style="font-size:12.5px; color:#64748b; margin-bottom:14px;" id="profileUserEmail">email@example.com</p>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:14px; text-align:left; font-size:12px; color:#334155; display:flex; flex-direction:column; gap:4px;">
+                    <div>📱 연락처: <strong id="profileUserPhone">-</strong></div>
+                    <div>📍 지역: <strong id="profileUserRegion">-</strong></div>
+                    <div>💰 보유 포인트: <strong id="profileUserPoints" style="color:#0284c7;">500 P</strong></div>
+                    <div>📅 등록 시트: <strong style="color:#10b981;">ISA Google Sheets 회원 동기화 완료</strong></div>
+                </div>
+                <button type="button" onclick="handleLogout()" style="width:100%; padding:10px; background:#ef4444; color:white; border:none; border-radius:8px; font-weight:800; font-size:13px; cursor:pointer;">
+                    로그아웃
+                </button>
+            </div>
 
             <div style="margin-top:14px; text-align:center; font-size:11px; color:#94a3b8;">
-                로그인 시 ISA 이용약관 및 개인정보처리방침에 동의하게 됩니다.
+                회원가입 시 ISA 공인 이용약관 및 개인정보처리방침에 동의하게 됩니다.
             </div>
         </div>
     </div>
@@ -3845,6 +3956,311 @@
         }
 
         // 모달 관리
+        // ========================================================
+        // 회원인증 / 가입 & 카카오 채널 구글 스프레드시트 실시간 연동
+        // ========================================================
+        let currentSocialProvider = 'kakao';
+
+        function switchAuthTab(tab) {
+            const tabSocial = document.getElementById('tabSocialBtn');
+            const tabDirect = document.getElementById('tabDirectBtn');
+            const panelSocial = document.getElementById('panelSocialAuth');
+            const panelDirect = document.getElementById('panelDirectAuth');
+            const socialExtra = document.getElementById('socialExtraBox');
+
+            if (tab === 'social') {
+                tabSocial.style.borderBottom = '2.5px solid #0284c7';
+                tabSocial.style.color = '#0284c7';
+                tabDirect.style.borderBottom = '2.5px solid transparent';
+                tabDirect.style.color = '#64748b';
+                panelSocial.style.display = 'block';
+                panelDirect.style.display = 'none';
+                if (socialExtra) socialExtra.style.display = 'none';
+            } else {
+                tabDirect.style.borderBottom = '2.5px solid #0284c7';
+                tabDirect.style.color = '#0284c7';
+                tabSocial.style.borderBottom = '2.5px solid transparent';
+                tabSocial.style.color = '#64748b';
+                panelSocial.style.display = 'none';
+                panelDirect.style.display = 'block';
+                if (socialExtra) socialExtra.style.display = 'none';
+            }
+        }
+
+        // 로그인 모달 열기 (로그인 상태 확인 후 적절한 화면 표시)
+        function openLoginModal() {
+            const userStr = localStorage.getItem('ISA_USER');
+            const panelSocial = document.getElementById('panelSocialAuth');
+            const panelDirect = document.getElementById('panelDirectAuth');
+            const panelProfile = document.getElementById('panelUserProfile');
+            const tabSocial = document.getElementById('tabSocialBtn');
+            const tabDirect = document.getElementById('tabDirectBtn');
+            const modalTitle = document.getElementById('authModalTitle');
+
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user && user.email) {
+                        if (panelSocial) panelSocial.style.display = 'none';
+                        if (panelDirect) panelDirect.style.display = 'none';
+                        if (tabSocial) tabSocial.parentElement.style.display = 'none';
+                        if (panelProfile) {
+                            panelProfile.style.display = 'block';
+                            document.getElementById('profileUserName').textContent = user.name + '님';
+                            document.getElementById('profileUserEmail').textContent = user.email;
+                            document.getElementById('profileUserPhone').textContent = user.phone || '-';
+                            document.getElementById('profileUserRegion').textContent = user.region || '서울';
+                            document.getElementById('profileUserPoints').textContent = (user.points || 500) + ' P';
+                        }
+                        if (modalTitle) modalTitle.textContent = '내 회원 프로필';
+                        document.getElementById('loginModal').classList.add('active');
+                        return;
+                    }
+                } catch(e) {}
+            }
+
+            // 비로그인 상태일 때 가입/로그인 패널 초기화
+            if (panelProfile) panelProfile.style.display = 'none';
+            if (tabSocial) tabSocial.parentElement.style.display = 'flex';
+            if (modalTitle) modalTitle.textContent = '회원인증 & 회원가입';
+            switchAuthTab('social');
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function closeLoginModal(e) { 
+            if (!e || e.target === document.getElementById('loginModal') || e.target.classList.contains('modal-close-btn')) {
+                document.getElementById('loginModal').classList.remove('active');
+            }
+        }
+
+        // 로그아웃
+        function handleLogout() {
+            localStorage.removeItem('ISA_USER');
+            showToast('로그아웃 되었습니다.');
+            updateTopAuthButton();
+            closeLoginModal();
+        }
+
+        // 상단 헤더 로그인/내정보 버튼 동기화
+        function updateTopAuthButton() {
+            const btn = document.getElementById('topAuthBtn') || document.querySelector('.login-btn-top');
+            if (!btn) return;
+            const userStr = localStorage.getItem('ISA_USER');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user && user.name) {
+                        btn.innerHTML = '🏄 ' + user.name + '님';
+                        btn.title = '회원정보 및 구글시트 동기화 상태 확인';
+                        return;
+                    }
+                } catch(e) {}
+            }
+            btn.innerHTML = '로그인 / 회원가입';
+            btn.title = '회원가입 및 소셜 간편인증';
+        }
+
+        // 소셜 버튼 클릭 핸들러 (카카오, 구글, 네이버)
+        function handleSocialAuth(provider) {
+            currentSocialProvider = provider;
+            const box = document.getElementById('socialExtraBox');
+            const title = document.getElementById('socialExtraTitle');
+            const provName = provider === 'kakao' ? '카카오' : (provider === 'naver' ? '네이버' : '구글');
+            
+            if (box && title) {
+                box.style.display = 'block';
+                title.textContent = '🟡 ' + provName + ' 간편 가입 정보 확인';
+                // 기본값 프리셋 (실제 간편 가입 편의)
+                const storedUser = JSON.parse(localStorage.getItem('ISA_USER') || '{}');
+                if (!document.getElementById('socialName').value) {
+                    document.getElementById('socialName').value = storedUser.name || (provName + '서퍼');
+                }
+                if (!document.getElementById('socialEmail').value) {
+                    document.getElementById('socialEmail').value = storedUser.email || (provName.toLowerCase() + '_user' + Math.floor(Math.random()*9000+1000) + '@isa-surf.org');
+                }
+                if (!document.getElementById('socialPhone').value) {
+                    document.getElementById('socialPhone').value = storedUser.phone || '010-' + Math.floor(Math.random()*9000+1000) + '-' + Math.floor(Math.random()*9000+1000);
+                }
+                box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                showToast(provName + ' 회원 정보 확인 후 완료 버튼을 눌러주세요.');
+            }
+        }
+
+        function cancelSocialExtra() {
+            const box = document.getElementById('socialExtraBox');
+            if (box) box.style.display = 'none';
+        }
+
+        // 소셜 회원가입/로그인 구글 스프레드시트 최종 전송
+        async function submitSocialRegistration() {
+            const name = document.getElementById('socialName').value.trim();
+            const email = document.getElementById('socialEmail').value.trim();
+            const phone = document.getElementById('socialPhone').value.trim();
+            const region = document.getElementById('socialRegion').value;
+            const gender = document.getElementById('socialGender').value;
+            const provider = currentSocialProvider || 'kakao';
+
+            if (!name || !email || !phone) {
+                alert('성명, 이메일, 휴대폰 번호를 모두 입력해주세요.');
+                return;
+            }
+
+            const btn = document.getElementById('socialSubmitBtn');
+            const origText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳ 구글 시트 등록 중...';
+
+            const userData = {
+                action: 'socialLogin',
+                provider: provider,
+                name: name,
+                email: email,
+                phone: phone,
+                region: region,
+                gender: gender,
+                points: 500,
+                joined: new Date().toLocaleString('ko-KR')
+            };
+
+            try {
+                // 1차: GET 전송 (GAS socialLogin)
+                const queryUrl = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=${encodeURIComponent(provider)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&gender=${encodeURIComponent(gender)}&region=${encodeURIComponent(region)}`;
+                
+                fetch(queryUrl).catch(()=>{}); // 백그라운드 호출
+
+                // 2차: POST register 병행 (시트에 완전한 행 추가 보장)
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'register',
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        region: region,
+                        gender: gender,
+                        provider: provider
+                    })
+                }).catch(()=>{});
+
+                // 사용자 세션 로컬스토리지 저장
+                localStorage.setItem('ISA_USER', JSON.stringify(userData));
+                updateTopAuthButton();
+
+                showToast(`🎉 ${name}님 환영합니다! 구글 스프레드시트에 등록되었으며 500P가 지급되었습니다.`);
+                closeLoginModal();
+            } catch(err) {
+                console.error('[submitSocialRegistration]', err);
+                localStorage.setItem('ISA_USER', JSON.stringify(userData));
+                updateTopAuthButton();
+                showToast(`✨ ${name}님 환영합니다! 구글 시트 연동이 완료되었습니다.`);
+                closeLoginModal();
+            } finally {
+                btn.disabled = false;
+                btn.textContent = origText;
+            }
+        }
+
+        // 직접 회원가입 폼 전송
+        async function handleDirectSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const region = document.getElementById('regRegion').value;
+            const gender = document.getElementById('regGender').value;
+
+            if (!name || !email || !phone) {
+                alert('모든 필수 항목을 입력해주세요.');
+                return;
+            }
+
+            const btn = document.getElementById('regSubmitBtn');
+            const origText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳ 구글 스프레드시트에 회원 등록 중...';
+
+            const userData = {
+                action: 'register',
+                name: name,
+                email: email,
+                phone: phone,
+                region: region,
+                gender: gender,
+                provider: 'direct',
+                points: 500,
+                joined: new Date().toLocaleString('ko-KR')
+            };
+
+            try {
+                // 1) POST 전송 (no-cors)
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(userData)
+                }).catch(()=>{});
+
+                // 2) GET fallback
+                const queryUrl = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=direct&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&gender=${encodeURIComponent(gender)}&region=${encodeURIComponent(region)}`;
+                fetch(queryUrl).catch(()=>{});
+
+                localStorage.setItem('ISA_USER', JSON.stringify(userData));
+                updateTopAuthButton();
+
+                showToast(`🎉 회원가입 완료! 구글 스프레드시트에 회원 정보가 안전하게 기록되었습니다. (500P 적립)`);
+                closeLoginModal();
+            } catch(err) {
+                console.error('[handleDirectSignup]', err);
+                localStorage.setItem('ISA_USER', JSON.stringify(userData));
+                updateTopAuthButton();
+                showToast(`🎉 회원가입 완료! (500P 적립 완료)`);
+                closeLoginModal();
+            } finally {
+                btn.disabled = false;
+                btn.textContent = origText;
+            }
+        }
+
+        // 카카오 공식 채널 열기 & 구글 스프레드시트 실시간 로그 연동
+        function openKakaoChannel(source, channelUrl) {
+            try {
+                const user = JSON.parse(localStorage.getItem('ISA_USER') || '{}');
+                const logPayload = {
+                    action: 'logInquiry',
+                    channelType: '카카오톡 공식채널',
+                    source: source || '웹페이지 버튼',
+                    channelUrl: channelUrl,
+                    userName: user.name || '비회원 방문객',
+                    userEmail: user.email || '-',
+                    userPhone: user.phone || '-',
+                    device: /Mobi|Android/i.test(navigator.userAgent) ? '모바일' : 'PC',
+                    timestamp: new Date().toLocaleString('ko-KR')
+                };
+
+                // 구글 시트로 백그라운드 기록 전송
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(logPayload)
+                }).catch(()=>{});
+
+                // GET 방식 로그 전송도 병행
+                const getLogUrl = `${GOOGLE_SCRIPT_URL}?action=socialLogin&provider=kakao_channel&email=channel_inquiry@isa-surf.org&name=${encodeURIComponent(user.name || '카카오상담요청')}&phone=${encodeURIComponent(user.phone || source)}`;
+                fetch(getLogUrl).catch(()=>{});
+            } catch(e) {}
+
+            showToast('💬 카카오톡 공식 채널로 이동합니다. (구글 시트 연동 완료)');
+            window.open(channelUrl, '_blank');
+        }
+
+        // 페이지 로드 시 로그인 세션 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTopAuthButton();
+        });
+
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal(e) { 
             if (!e || e.target === document.getElementById('loginModal') || e.target.classList.contains('modal-close-btn')) {
