@@ -381,7 +381,12 @@ function renderHomePage() {
             <!-- 오른쪽: 비주얼 패널 (공식 플로우보드 비주얼) -->
             <div class="hero-visual">
                 <div class="hero-visual-frame" style="position:relative; overflow:hidden; border-radius:20px; border:1.5px solid rgba(14,165,233,0.35); box-shadow:0 20px 60px rgba(0,0,0,0.45); background:#020617; aspect-ratio:16/10;">
-                    <img src="images/flowboard_indoor_edm_official.jpg?v=20260928v9" alt="ISA 인공서핑 공식 비주얼" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                    <video autoplay loop muted playsinline poster="images/flowboard_indoor_edm_official.jpg" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                        <source src="images/artificial_surfing_typo.mp4" type="video/mp4">
+                        <source src="images/%EC%98%81%EC%83%81/%EC%9D%B8%EA%B3%B5%EC%84%9C%ED%95%91%20%ED%83%80%EC%9D%B4%ED%8F%AC.mp4" type="video/mp4">
+                        <source src="images/영상/인공서핑 타이포.mp4" type="video/mp4">
+                        <img src="images/flowboard_indoor_edm_official.jpg" alt="ISA 인공서핑 공식 비주얼">
+                    </video>
                     
                     <!-- 하단 반투명 오버레이 배지 (4대 종목 안내) -->
                     <div style="position:absolute; bottom:0; left:0; right:0; padding:28px 20px 16px; background:linear-gradient(to top, rgba(2,6,23,0.92) 0%, rgba(2,6,23,0.6) 65%, transparent 100%); display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none;">

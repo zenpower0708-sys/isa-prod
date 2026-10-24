@@ -619,14 +619,16 @@
             aspect-ratio: 16 / 10;
             background: #020617;
         }
-        .hero-visual-card img {
+        .hero-visual-card img,
+        .hero-visual-card video {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
             transition: transform 0.5s ease;
         }
-        .hero-visual-card:hover img {
+        .hero-visual-card:hover img,
+        .hero-visual-card:hover video {
             transform: scale(1.03);
         }
         .hero-visual-overlay {
@@ -2332,9 +2334,14 @@
                     </div>
                 </div>
 
-                <!-- 오른쪽: 실제 flowboard_indoor_edm_official.jpg 인공서핑 4대 종목 카드 -->
+                <!-- 오른쪽: 인공서핑 4대 종목 공식 타이포 영상 (1번 사진을 3번 동영상으로 대체) -->
                 <div class="hero-visual-card">
-                    <img src="images/flowboard_indoor_edm_official.jpg" alt="인공서핑 4대 종목 공식 현장">
+                    <video autoplay loop muted playsinline poster="images/flowboard_indoor_edm_official.jpg" class="hero-visual-video" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        <source src="images/artificial_surfing_typo.mp4" type="video/mp4">
+                        <source src="images/%EC%98%81%EC%83%81/%EC%9D%B8%EA%B3%B5%EC%84%9C%ED%95%91%20%ED%83%80%EC%9D%B4%ED%8F%AC.mp4" type="video/mp4">
+                        <source src="images/영상/인공서핑 타이포.mp4" type="video/mp4">
+                        <img src="images/flowboard_indoor_edm_official.jpg" alt="인공서핑 4대 종목 공식 현장">
+                    </video>
                     <div class="hero-visual-overlay">
                         <div class="overlay-headline">인공서핑 4대 종목</div>
                         <div class="overlay-disciplines-pills">
