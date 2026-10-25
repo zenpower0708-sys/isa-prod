@@ -383,6 +383,8 @@ function renderHomePage() {
                 <div class="hero-visual-frame" style="position:relative; overflow:hidden; border-radius:20px; border:1.5px solid rgba(14,165,233,0.35); box-shadow:0 20px 60px rgba(0,0,0,0.45); background:#020617; aspect-ratio:16/10;">
                     <video autoplay loop muted playsinline poster="images/flowboard_indoor_edm_official.jpg" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
                         <source src="images/artificial_surfing_typo.mp4" type="video/mp4">
+                        <source src="images/%EC%98%81%EC%83%81/%EC%9D%B8%EA%B3%B5%EC%84%9C%ED%95%91%20%ED%83%80%EC%9D%B4%ED%8F%AC_%EC%98%A4%ED%83%80%EC%88%98%EC%A0%95%EB%B3%B8.mp4" type="video/mp4">
+                        <source src="images/영상/인공서핑 타이포_오타수정본.mp4" type="video/mp4">
                         <source src="images/%EC%98%81%EC%83%81/%EC%9D%B8%EA%B3%B5%EC%84%9C%ED%95%91%20%ED%83%80%EC%9D%B4%ED%8F%AC.mp4" type="video/mp4">
                         <source src="images/영상/인공서핑 타이포.mp4" type="video/mp4">
                         <img src="images/flowboard_indoor_edm_official.jpg" alt="ISA 인공서핑 공식 비주얼">
