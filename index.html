@@ -2265,7 +2265,7 @@
     </audio>
 
     <!-- 1. 최상단 정부기관 바 (1번 사진과 100% 동일) -->
-    <div class="top-gov-bar">
+    <div class="top-gov-bar" style="display: none !important;">
         <div class="gov-badges-left">
             <div class="gov-badge-unit">
                 <img src="images/mcst-logo.png" alt="문화체육관광부" class="gov-logo-img" onerror="this.src='https://via.placeholder.com/120x24?text=MCST'">
@@ -2334,7 +2334,7 @@
     </header>
 
     <!-- 3. 공지 롤링 띠 (1번 사진과 100% 동일) -->
-    <div class="notice-strip">
+    <div class="notice-strip" style="display: none !important;">
         <span class="notice-strip-tag">공지</span>
         <span>2025 ISA 인공서핑 자격증 시험이 진행 중입니다. 지금 신청하세요!</span>
         <a href="#cert-panel" onclick="expandSpecificPanel('cert')">신청하기 &rarr;</a>
@@ -2342,7 +2342,7 @@
 
 
     <!-- 5. 좌측 하단 BGM 디스크 플레이어 위젯 -->
-    <div class="isa-bgm-widget" onclick="toggleBGM()" title="클릭 시 로고송 재생/일시정지">
+    <div class="isa-bgm-widget" style="display: none !important;" onclick="toggleBGM()" title="클릭 시 로고송 재생/일시정지">
         <div class="isa-bgm-disc paused" id="bgmDisc">
             <img src="images/ride_the_infinite_wave_cover.jpeg" alt="Ride The Infinite Wave" onerror="this.src='images/isa-emblem.png'">
         </div>
@@ -2431,14 +2431,7 @@
 
                 <!-- 오른쪽: 인공서핑 4대 종목 공식 타이포 영상 (1번 사진을 3번 동영상으로 대체) -->
                 <div class="hero-visual-card">
-                    <video autoplay loop muted playsinline poster="images/flowboard_indoor_edm_official.jpg" class="hero-visual-video" style="width:100%; height:100%; object-fit:cover; display:block;">
-                        <source src="images/artificial_surfing_typo.mp4" type="video/mp4">
-                        <source src="images/%EC%98%81%EC%83%81/%EC%9D%B8%EA%B3%B5%EC%84%9C%ED%95%91%20%ED%83%80%EC%9D%B4%ED%8F%AC_%EC%98%A4%ED%83%80%EC%88%98%EC%A0%95%EB%B3%B8.mp4" type="video/mp4">
-                        <source src="images/영상/인공서핑 타이포_오타수정본.mp4" type="video/mp4">
-                        <source src="images/%EC%98%81%EC%83%81/%EC%9D%B8%EA%B3%B5%EC%84%9C%ED%95%91%20%ED%83%80%EC%9D%B4%ED%8F%AC.mp4" type="video/mp4">
-                        <source src="images/영상/인공서핑 타이포.mp4" type="video/mp4">
-                        <img src="images/flowboard_indoor_edm_official.jpg" alt="인공서핑 4대 종목 공식 현장">
-                    </video>
+                    <img src="images/flowboard_indoor_edm_official.jpg" alt="인공서핑 4대 종목 공식 현장" class="hero-visual-video" style="width:100%; height:100%; object-fit:cover; display:block;">
                     <div class="hero-visual-overlay">
                         <div class="overlay-headline">인공서핑 4대 종목</div>
                         <div class="overlay-disciplines-pills">
